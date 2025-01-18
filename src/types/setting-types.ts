@@ -1,4 +1,8 @@
-import type { SettingIconPosition, TimerPosition } from "@/common/settings"
+import type {
+  SettingIconPosition,
+  TimerPosition,
+  TimerSize
+} from "@/common/settings"
 
 export type SettingsButtonConfig = {
   position: SettingIconPosition
@@ -17,5 +21,7 @@ export type SettingsConfig = {
     position: TimerPosition
     showGreetings: boolean
     greetingsText: string
+    margin: number
+    size: TimerSize
   }
 }

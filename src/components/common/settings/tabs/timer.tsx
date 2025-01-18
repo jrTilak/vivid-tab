@@ -11,7 +11,7 @@ import { useSettings } from '@/providers/settings-provider'
 import type { SettingsConfig } from '@/types/setting-types'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { TIMER_POSITIONS } from '@/common/settings'
+import { TIMER_POSITIONS, TIMER_SIZE } from '@/common/settings'
 import { capitalCase } from 'change-case'
 
 type TimeFormat = SettingsConfig["timer"]["timeFormat"]
@@ -129,6 +129,45 @@ const TimerSettings = () => {
         value={timer.greetingsText}
         onChange={(e) => handleSettingsChange("greetingsText", e.target.value)}
       />
+      <div className="flex items-center justify-between">
+        <div className="space-y-0.5">
+          <Label className="text-sm font-medium">
+            Margin (px)
+          </Label>
+        </div>
+        <Input type="number" id="margin"
+          className='w-24'
+          placeholder="2"
+          value={timer.margin}
+          disabled={!timer.showTimer || timer.position === "center"}
+          onChange={(e) => handleSettingsChange("margin", parseInt(e.target.value))}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="space-y-0.5">
+          <label className="text-sm font-medium">
+            Timer Font Size
+          </label>
+        </div>
+        <Select
+          disabled={!timer.position}
+          value={timer.size}
+          onValueChange={(value) => handleSettingsChange("size", value)}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select timer size" />
+          </SelectTrigger>
+          <SelectContent>
+            {
+              (Object.values(TIMER_SIZE)).map((val) => (
+                <SelectItem key={val} value={val}>
+                  {capitalCase(val)}
+                </SelectItem>
+              ))
+            }
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   )
 }

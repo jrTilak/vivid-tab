@@ -45,7 +45,7 @@ module.exports = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        urbanist: ["Urbanist", "sans-serif"],
+        "bricolage-grotesque": ["Bricolage Grotesque", "sans-serif"],
       }
     },
   },

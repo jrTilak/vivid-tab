@@ -1,5 +1,5 @@
+import Homepage from "@/components/common/homepage"
 import { Settings } from "@/components/common/settings"
-import Minimal from "@/components/styles/minimal"
 import { SettingsProvider } from "@/providers/settings-provider"
 import { ThemeProvider } from "@/providers/theme-provider"
 import "@/styles/index.css"
@@ -8,8 +8,8 @@ function Index() {
   return (
     <ThemeProvider>
       <SettingsProvider>
-        <Minimal />
-        <Settings />
+        <Homepage />
+        {/* <Settings /> */}
       </SettingsProvider>
     </ThemeProvider>
   )

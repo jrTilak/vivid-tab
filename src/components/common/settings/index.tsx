@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog"
 import TimerSettings from './tabs/timer';
 import stylesFns from '@/helpers/styles-fns';
+import { cn } from '@/helpers/cn';
 export function Settings() {
   const { settings } = useSettings();
   const config = settings.others.triggerButton
@@ -92,7 +93,7 @@ export function Settings() {
                   <Button
                     key={index}
                     variant="ghost"
-                    className="justify-start gap-2 rounded-sm"
+                    className={cn("justify-start gap-2 rounded-sm", activeTabIndex === index && 'bg-muted')}
                     onClick={() => setActiveTabIndex(index)}
                   >
                     <tab.icon size={20} />
@@ -107,9 +108,11 @@ export function Settings() {
           <DialogHeader className="border-b px-4 py-4">
             <DialogTitle>Settings</DialogTitle>
           </DialogHeader>
-          {
-            React.createElement(TABS[activeTabIndex].component)
-          }
+          <div className='mb-20'>
+            {
+              React.createElement(TABS[activeTabIndex].component)
+            }
+          </div>
           <DialogFooter className="border-t p-4 absolute bottom-0 right-0 w-full">
             <Button size='sm' variant="outline" onClick={() => setOpen(false)}>
               Cancel

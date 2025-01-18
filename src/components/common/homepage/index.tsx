@@ -1,0 +1,67 @@
+import * as React from "react"
+import { Card } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Search } from 'lucide-react'
+import background from "data-base64:@/assets/scene.jpg"
+import Clock from "./clock"
+import Weather from "./weather"
+import Todos from "./todos"
+import Quote from "./quote"
+import Notes from "./notes"
+import Bookmarks from "./bookmarks"
+
+export default function Homepage() {
+
+
+  return (
+    <div
+      className="min-h-screen w-full bg-cover bg-center p-6 relative"
+    >
+
+      <img
+        src={background}
+        alt="scene"
+        className="h-full w-full object-cover object-center absolute inset-0"
+      />
+      <div
+        className="h-full w-full absolute inset-0  bg-black/50 backdrop-blur-[1px]"
+      />
+
+      <div className="mx-auto max-w-[1400px] relative">
+        {/* Search Bar */}
+        <div className="mb-6 flex items-center justify-center">
+          <Card className="flex w-[40%] items-center space-x-2 bg-white/80 p-2 backdrop-blur">
+            <Search className="h-4 w-4 text-gray-500" />
+            <Input
+              type="text"
+              placeholder="Search Google or Bookmarks"
+              className="border-none bg-transparent focus-visible:ring-0"
+            />
+          </Card>
+        </div>
+
+        {/* Tabs */}
+
+
+        <div className="grid grid-cols-12 gap-x-14">
+          {/* Left Sidebar */}
+          <div className="col-span-3 space-y-6 opacity-80">
+            <Clock />
+            <Weather />
+            <Quote />
+            <Todos />
+          </div>
+
+          <Bookmarks />
+
+          {/* Right Sidebar */}
+          <div className="col-span-3 space-y-6 opacity-80">
+            <Todos />
+            <Notes />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
