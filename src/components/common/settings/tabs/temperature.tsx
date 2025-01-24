@@ -10,48 +10,49 @@ import { Switch } from "@/components/ui/switch"
 import { useSettings } from '@/providers/settings-provider'
 import type { SettingsConfig } from '@/types/setting-types'
 import { Label } from '@/components/ui/label'
-import { capitalCase } from 'change-case'
 
-type TimeFormat = SettingsConfig["timer"]["timeFormat"]
+type TemperatureUnit = SettingsConfig["temperature"]["unit"]
 
-const TimerSettings = () => {
-  const { settings: { timer }, setSettings } = useSettings()
+const TemperatureSetting = () => {
+  const { settings: { temperature }, setSettings } = useSettings()
 
 
   const handleSettingsChange = useCallback((key: string, value: any) => {
     setSettings((prevSettings) => ({
       ...prevSettings,
-      timer: {
-        ...prevSettings.timer,
+      temperature: {
+        ...prevSettings.temperature,
         [key]: value
       }
     }))
-  }, [timer])
+  }, [temperature])
 
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
         <div className="space-y-0.5">
-          <label className="text-sm font-medium">Time format</label>
+          <label className="text-sm font-medium">
+            Temperature unit
+          </label>
         </div>
         <Select
-          value={timer.timeFormat}
-          onValueChange={(value) => handleSettingsChange("timeFormat", value as TimeFormat)}
+          value={temperature.unit}
+          onValueChange={(value) => handleSettingsChange("unit", value as TemperatureUnit)}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select format" />
+            <SelectValue placeholder="Select temperature unit" />
           </SelectTrigger>
           <SelectContent>
             {
               ([
                 {
-                  label: "12-Hour",
-                  value: "12h"
+                  label: "Celsius",
+                  value: "celsius"
 
                 },
                 {
-                  label: "24-Hour",
-                  value: "24h"
+                  label: "Fahrenheit",
+                  value: "fahrenheit"
 
                 }
               ] as const).map(({ label, value }) => (
@@ -63,19 +64,8 @@ const TimerSettings = () => {
           </SelectContent>
         </Select>
       </div>
-      <div className="flex items-center justify-between">
-        <div className="space-y-0.5">
-          <Label className="text-sm font-medium">
-            Show seconds
-          </Label>
-        </div>
-        <Switch
-          checked={timer.showSeconds}
-          onCheckedChange={(checked) => handleSettingsChange("showSeconds", checked)}
-        />
-      </div>
     </div>
   )
 }
 
-export default TimerSettings
+export default TemperatureSetting

@@ -1,5 +1,5 @@
 import { useSettings } from '@/providers/settings-provider';
-import { LaptopMinimalIcon, SettingsIcon, TimerIcon } from 'lucide-react';
+import { CloudIcon, LaptopMinimalIcon, QuoteIcon, SettingsIcon, TextQuoteIcon, TimerIcon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import * as React from "react"
 import { Bookmark, Image, Layout, LogOut, MonitorSmartphone, Search, NotebookTabsIcon as Tabs, User, X } from 'lucide-react'
@@ -16,8 +16,10 @@ import {
 import TimerSettings from './tabs/timer';
 import stylesFns from '@/helpers/styles-fns';
 import { cn } from '@/helpers/cn';
+import TemperatureSetting from './tabs/temperature';
+import QuotesSettings from './tabs/quotes';
 export function Settings() {
-  const { settings } = useSettings();
+  const { settings, resetSettings } = useSettings();
   const config = settings.others.triggerButton
 
   const [triggerPosition, setTriggerPosition] = useState(() => stylesFns.settingsTriggerPosition(config.position))
@@ -34,13 +36,13 @@ export function Settings() {
       component: TimerSettings
     },
     {
-      label: 'General',
-      icon: MonitorSmartphone,
-      component: TimerSettings
+      label: 'Weather',
+      icon: CloudIcon,
+      component: TemperatureSetting
     }, {
-      label: 'General',
-      icon: MonitorSmartphone,
-      component: TimerSettings
+      label: 'Quotes',
+      icon: QuoteIcon,
+      component: QuotesSettings
     }, {
       label: 'General',
       icon: MonitorSmartphone,
@@ -83,7 +85,7 @@ export function Settings() {
       >
         <SettingsIcon size={config.size} opacity={config.opacity} />
       </DialogTrigger>
-      <DialogContent className="flex max-w-3xl gap-0 p-0 z-50">
+      <DialogContent className="flex max-w-3xl gap-0 p-0 z-50 bg-black/90 min-h-[600px]">
         <div className="w-60 border-r">
           <nav className="flex flex-col gap-1 p-1">
             {
@@ -108,16 +110,23 @@ export function Settings() {
           <DialogHeader className="border-b px-4 py-4">
             <DialogTitle>Settings</DialogTitle>
           </DialogHeader>
-          <div className='mb-20'>
+          <div className='mb-20 max-h-[500px] overflow-y-scroll h-full'>
             {
               React.createElement(TABS[activeTabIndex].component)
             }
           </div>
           <DialogFooter className="border-t p-4 absolute bottom-0 right-0 w-full">
-            <Button size='sm' variant="outline" onClick={() => setOpen(false)}>
+            <Button size='sm' variant="ghost" onClick={() => {
+              resetSettings()
+              setOpen(false)
+            }}>
               Cancel
             </Button>
-            <Button size='sm' className='min-w-28'>Save</Button>
+            <Button
+              onClick={() => setOpen(false)}
+              size='sm'
+              variant='outline'
+              className='min-w-28'>Save</Button>
           </DialogFooter>
         </div>
       </DialogContent>

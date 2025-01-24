@@ -1,8 +1,4 @@
-import type {
-  SettingIconPosition,
-  TimerPosition,
-  TimerSize
-} from "@/common/settings"
+import type { SettingIconPosition } from "@/common/settings"
 
 export type SettingsButtonConfig = {
   position: SettingIconPosition
@@ -17,11 +13,11 @@ export type SettingsConfig = {
   timer: {
     timeFormat: "12h" | "24h"
     showSeconds: boolean
-    showTimer: boolean
-    position: TimerPosition
-    showGreetings: boolean
-    greetingsText: string
-    margin: number
-    size: TimerSize
+  }
+  temperature: {
+    unit: "celsius" | "fahrenheit"
+  }
+  quotes: {
+    categories: string[]
   }
 }

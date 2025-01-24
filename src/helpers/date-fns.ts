@@ -23,17 +23,8 @@ class DateFns {
       day: "numeric"
     })
   }
-
-  getGreetings(date: Date) {
-    const hours = date.getHours()
-    if (hours >= 0 && hours < 12) {
-      return "Good morning"
-    } else if (hours >= 12 && hours < 17) {
-      return "Good afternoon"
-    } else {
-      return "Good evening"
-    }
-  }
 }
 
-export default new DateFns()
+const dateFns = new DateFns()
+
+export default dateFns

@@ -1,7 +1,10 @@
 import { Card } from '@/components/ui/card'
+import dateFns from '@/helpers/date-fns'
+import { useSettings } from '@/providers/settings-provider'
 import React, { useEffect, useState } from 'react'
 
 const Clock = () => {
+  const { settings: { timer } } = useSettings()
   const [time, setTime] = useState(new Date())
 
   useEffect(() => {
@@ -12,17 +15,13 @@ const Clock = () => {
   return (
     <Card className="p-6">
       <div className="text-5xl font-light">
-        {time.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
+        {dateFns.formatTime(time, {
+          hour12: timer.timeFormat === "12h",
+          showSeconds: timer.showSeconds,
         })}
       </div>
       <div className="mt-1 text-sm">
-        {time.toLocaleDateString([], {
-          weekday: "long",
-          month: "long",
-          day: "numeric",
-        })}
+        {dateFns.formatDate(time)}
       </div>
     </Card>
   )

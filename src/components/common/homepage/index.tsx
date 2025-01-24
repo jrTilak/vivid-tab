@@ -9,9 +9,9 @@ import Todos from "./todos"
 import Quote from "./quote"
 import Notes from "./notes"
 import Bookmarks from "./bookmarks"
+import Searchbar1 from "@/components/searchbars/1"
 
 export default function Homepage() {
-
 
   return (
     <div
@@ -30,14 +30,7 @@ export default function Homepage() {
       <div className="mx-auto max-w-[1400px] relative">
         {/* Search Bar */}
         <div className="mb-6 flex items-center justify-center">
-          <Card className="flex w-[40%] items-center space-x-2 bg-white/80 p-2 backdrop-blur">
-            <Search className="h-4 w-4 text-gray-500" />
-            <Input
-              type="text"
-              placeholder="Search Google or Bookmarks"
-              className="border-none bg-transparent focus-visible:ring-0"
-            />
-          </Card>
+          <Searchbar1 />
         </div>
 
         {/* Tabs */}

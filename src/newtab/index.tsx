@@ -9,7 +9,7 @@ function Index() {
     <ThemeProvider>
       <SettingsProvider>
         <Homepage />
-        {/* <Settings /> */}
+        <Settings />
       </SettingsProvider>
     </ThemeProvider>
   )
