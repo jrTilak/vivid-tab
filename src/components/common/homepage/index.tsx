@@ -1,8 +1,4 @@
 import * as React from "react"
-import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Search } from 'lucide-react'
-import background from "data-base64:@/assets/scene.jpg"
 import Clock from "./clock"
 import Weather from "./weather"
 import Todos from "./todos"
@@ -10,8 +6,29 @@ import Quote from "./quote"
 import Notes from "./notes"
 import Bookmarks from "./bookmarks"
 import Searchbar1 from "@/components/searchbars/1"
+import { useSettings } from "@/providers/settings-provider"
+import type { ImageData } from "../settings/tabs/wallpapers"
+import background from "data-base64:@/assets/scene.jpg"
+
 
 export default function Homepage() {
+  const [image, setImage] = React.useState<ImageData>(null)
+
+  // get images from local storage
+  React.useEffect(() => {
+    chrome.storage.local.get("selectedImage", (data) => {
+      if (data.selectedImage) {
+        try {
+          setImage(JSON.parse(data.selectedImage))
+        } catch (error) {
+          console.error("Error parsing images from local storage", error)
+          setImage({
+            src: background
+          })
+        }
+      }
+    })
+  }, [])
 
   return (
     <div
@@ -19,7 +36,7 @@ export default function Homepage() {
     >
 
       <img
-        src={background}
+        src={image?.src}
         alt="scene"
         className="h-full w-full object-cover object-center absolute inset-0"
       />

@@ -33,5 +33,8 @@ export const DEFAULT_SETTINGS_CONFIG: SettingsConfig = {
       enabled: true,
       durationInMinutes: 60 // 1 hour
     }
+  },
+  wallpapers: {
+    selectedImgIndex: 0
   }
 }

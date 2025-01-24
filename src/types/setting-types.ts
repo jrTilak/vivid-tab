@@ -26,4 +26,7 @@ export type SettingsConfig = {
       durationInMinutes: number
     }
   }
+  wallpapers: {
+    selectedImgIndex: number
+  }
 }

@@ -1,7 +1,9 @@
 import { useSettings } from '@/providers/settings-provider';
 import {
   CloudIcon,
-  LaptopMinimalIcon, ListTodoIcon,
+  HistoryIcon,
+  ImageIcon,
+  LaptopMinimalIcon, LayoutGridIcon, ListTodoIcon,
   QuoteIcon,
   ScrollTextIcon,
   SettingsIcon,
@@ -27,6 +29,7 @@ import { cn } from '@/helpers/cn';
 import TemperatureSetting from './tabs/temperature';
 import QuotesSettings from './tabs/quotes';
 import TodosSettings from "@/components/common/settings/tabs/todos";
+import WallpaperSettings from './tabs/wallpapers';
 export function Settings() {
   const { settings, resetSettings } = useSettings();
   const config = settings.others.triggerButton
@@ -40,6 +43,21 @@ export function Settings() {
 
   const TABS = [
     {
+      label: 'General',
+      icon: MonitorSmartphone,
+      component: TimerSettings
+    },
+    {
+      label: "Layout",
+      icon: LayoutGridIcon,
+      component: TimerSettings
+    },
+    {
+      label: "Wallpaper",
+      icon: ImageIcon,
+      component: WallpaperSettings
+    },
+    {
       label: 'Timer',
       icon: TimerIcon,
       component: TimerSettings
@@ -48,39 +66,22 @@ export function Settings() {
       label: 'Weather',
       icon: CloudIcon,
       component: TemperatureSetting
-    }, {
+    },
+    {
       label: 'Quotes',
       icon: QuoteIcon,
       component: QuotesSettings
-    }, {
+    },
+    {
       label: 'Todos',
       icon: ListTodoIcon,
       component: TodosSettings
-    }, {
-      label: 'General',
-      icon: MonitorSmartphone,
-      component: TimerSettings
-    }, {
-      label: 'General',
-      icon: MonitorSmartphone,
-      component: TimerSettings
-    }, {
-      label: 'General',
-      icon: MonitorSmartphone,
-      component: TimerSettings
-    }, {
-      label: 'General',
-      icon: MonitorSmartphone,
-      component: TimerSettings
-    }, {
-      label: 'General',
-      icon: MonitorSmartphone,
-      component: TimerSettings
-    }, {
-      label: 'General',
-      icon: MonitorSmartphone,
-      component: TimerSettings
     },
+    {
+      label: 'Backup & Sync',
+      icon: HistoryIcon,
+      component: TimerSettings
+    }
   ]
 
   return (
@@ -94,7 +95,7 @@ export function Settings() {
       >
         <SettingsIcon size={config.size} opacity={config.opacity} />
       </DialogTrigger>
-      <DialogContent className="flex max-w-3xl gap-0 p-0 z-50 bg-black/90 min-h-[600px]">
+      <DialogContent className="flex max-w-3xl gap-0 p-0 z-50 bg-black/90 max-h-[632px] h-full">
         <div className="w-60 border-r">
           <nav className="flex flex-col gap-1 p-1">
             {
