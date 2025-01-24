@@ -1,5 +1,13 @@
 import { useSettings } from '@/providers/settings-provider';
-import { CloudIcon, LaptopMinimalIcon, QuoteIcon, SettingsIcon, TextQuoteIcon, TimerIcon } from 'lucide-react';
+import {
+  CloudIcon,
+  LaptopMinimalIcon, ListTodoIcon,
+  QuoteIcon,
+  ScrollTextIcon,
+  SettingsIcon,
+  TextQuoteIcon,
+  TimerIcon
+} from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import * as React from "react"
 import { Bookmark, Image, Layout, LogOut, MonitorSmartphone, Search, NotebookTabsIcon as Tabs, User, X } from 'lucide-react'
@@ -18,6 +26,7 @@ import stylesFns from '@/helpers/styles-fns';
 import { cn } from '@/helpers/cn';
 import TemperatureSetting from './tabs/temperature';
 import QuotesSettings from './tabs/quotes';
+import TodosSettings from "@/components/common/settings/tabs/todos";
 export function Settings() {
   const { settings, resetSettings } = useSettings();
   const config = settings.others.triggerButton
@@ -44,9 +53,9 @@ export function Settings() {
       icon: QuoteIcon,
       component: QuotesSettings
     }, {
-      label: 'General',
-      icon: MonitorSmartphone,
-      component: TimerSettings
+      label: 'Todos',
+      icon: ListTodoIcon,
+      component: TodosSettings
     }, {
       label: 'General',
       icon: MonitorSmartphone,

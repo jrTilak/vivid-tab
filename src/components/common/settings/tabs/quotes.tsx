@@ -88,8 +88,9 @@ const QuotesSettings = () => {
                 </div>
 
               )) :
-
-              <Skeleton className='col-span-2 h-24 bg-muted-foreground/20' />
+              Array.from({ length: 8 }).map((_, index) => (
+                <Skeleton key={index} className='h-4 bg-muted-foreground/20 rounded-sm' />
+              ))
           }
         </div>
       </div>

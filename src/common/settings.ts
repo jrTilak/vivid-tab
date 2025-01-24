@@ -27,5 +27,11 @@ export const DEFAULT_SETTINGS_CONFIG: SettingsConfig = {
   },
   quotes: {
     categories: []
+  },
+  todos: {
+    expireAfterCompleted: {
+      enabled: true,
+      durationInMinutes: 60 // 1 hour
+    }
   }
 }

@@ -20,4 +20,10 @@ export type SettingsConfig = {
   quotes: {
     categories: string[]
   }
+  todos: {
+    expireAfterCompleted: {
+      enabled: boolean
+      durationInMinutes: number
+    }
+  }
 }

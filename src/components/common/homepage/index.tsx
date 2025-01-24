@@ -41,7 +41,6 @@ export default function Homepage() {
           <div className="col-span-3 space-y-6 opacity-80">
             <Clock />
             <Weather />
-            <Quote />
             <Todos />
           </div>
 
@@ -49,7 +48,7 @@ export default function Homepage() {
 
           {/* Right Sidebar */}
           <div className="col-span-3 space-y-6 opacity-80">
-            <Todos />
+            <Quote />
             <Notes />
           </div>
         </div>
