@@ -30,4 +30,7 @@ export type SettingsConfig = {
     selectedImgIndex: number
   }
   layout: Record<number, string>
+  general: {
+    rootFolder: string
+  }
 }

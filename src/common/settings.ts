@@ -45,5 +45,8 @@ export const DEFAULT_SETTINGS_CONFIG: SettingsConfig = {
     4: "bookmarks",
     5: "quotes",
     6: "notes"
+  },
+  general: {
+    rootFolder: "0"
   }
 }

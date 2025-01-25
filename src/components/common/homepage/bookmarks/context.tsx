@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import type { BookmarkFolderNode, Bookmarks as BookmarksType, BookmarkUrlNode } from '@/types/bookmark-types'
 import { BACKGROUND_ACTIONS } from "@/common/constants";
 import { type HistoryItem } from "@/types/history-types";
@@ -33,9 +33,32 @@ export const BookmarkProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [parentFolderIds, setParentFolderIds] = useState<string[]>([]);
 
+
+  const getBookmarkFolder = useCallback((id: string, bookmarks: BookmarksType): BookmarkFolderNode | null => {
+    const findNode = (nodes: BookmarkFolderNode[], id: string): BookmarkFolderNode | null => {
+      for (const node of nodes) {
+        if (node.id === id) {
+          return node
+        }
+        if (node.children) {
+          const foundNode = findNode(node.children as BookmarkFolderNode[], id)
+          if (foundNode) {
+            return foundNode
+          }
+        }
+      }
+      return null
+    }
+    return findNode(bookmarks, id)
+  }, [])
+
   useEffect(() => {
     chrome.runtime.sendMessage({ action: BACKGROUND_ACTIONS.GET_BOOKMARKS }, (response: BookmarksType = []) => {
-      const data = response[0]?.id == "0" ? (response[0] as BookmarkFolderNode).children : response;
+      console.log(response);
+      const folder = getBookmarkFolder("16", response)
+      const data = folder?.children || [];
+
+      console.log(folder);
 
       setBookmarks(data);
 
