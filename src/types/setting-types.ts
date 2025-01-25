@@ -29,4 +29,5 @@ export type SettingsConfig = {
   wallpapers: {
     selectedImgIndex: number
   }
+  layout: Record<number, string>
 }

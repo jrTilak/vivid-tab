@@ -30,6 +30,8 @@ import TemperatureSetting from './tabs/temperature';
 import QuotesSettings from './tabs/quotes';
 import TodosSettings from "@/components/common/settings/tabs/todos";
 import WallpaperSettings from './tabs/wallpapers';
+import GeneralSettings from './tabs/general';
+import LayoutsSettings from './tabs/layouts';
 export function Settings() {
   const { settings, resetSettings } = useSettings();
   const config = settings.others.triggerButton
@@ -45,12 +47,12 @@ export function Settings() {
     {
       label: 'General',
       icon: MonitorSmartphone,
-      component: TimerSettings
+      component: GeneralSettings
     },
     {
       label: "Layout",
       icon: LayoutGridIcon,
-      component: TimerSettings
+      component: LayoutsSettings
     },
     {
       label: "Wallpaper",
@@ -95,7 +97,7 @@ export function Settings() {
       >
         <SettingsIcon size={config.size} opacity={config.opacity} />
       </DialogTrigger>
-      <DialogContent className="flex max-w-3xl gap-0 p-0 z-50 bg-black/90 max-h-[632px] h-full">
+      <DialogContent className="flex max-w-4xl gap-0 p-0 z-50 bg-black/90 max-h-[632px] h-full">
         <div className="w-60 border-r">
           <nav className="flex flex-col gap-1 p-1">
             {

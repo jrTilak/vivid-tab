@@ -36,5 +36,14 @@ export const DEFAULT_SETTINGS_CONFIG: SettingsConfig = {
   },
   wallpapers: {
     selectedImgIndex: 0
+  },
+  layout: {
+    0: "searchbar",
+    1: "clock",
+    2: "weather",
+    3: "todos",
+    4: "bookmarks",
+    5: "quotes",
+    6: "notes"
   }
 }
