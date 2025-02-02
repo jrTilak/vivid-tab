@@ -14,6 +14,7 @@ class DateFns {
         second: config.showSeconds ? "2-digit" : undefined
       })
       .replace(/\s/g, "")
+      .replace(/(AM|PM)/, " $1") // Ensure space before AM/PM
   }
 
   formatDate(date: Date) {

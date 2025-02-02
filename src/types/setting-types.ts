@@ -27,10 +27,13 @@ export type SettingsConfig = {
     }
   }
   wallpapers: {
-    selectedImgIndex: number
+    selectedImageId: string | null
+    images: string[]
   }
   layout: Record<number, string>
   general: {
     rootFolder: string
+    showHistory: boolean
+    layout: "grid" | "list"
   }
 }

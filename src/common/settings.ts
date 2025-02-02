@@ -35,7 +35,8 @@ export const DEFAULT_SETTINGS_CONFIG: SettingsConfig = {
     }
   },
   wallpapers: {
-    selectedImgIndex: 0
+    selectedImageId: null,
+    images: []
   },
   layout: {
     0: "searchbar",
@@ -47,6 +48,8 @@ export const DEFAULT_SETTINGS_CONFIG: SettingsConfig = {
     6: "notes"
   },
   general: {
-    rootFolder: "0"
+    rootFolder: "0",
+    showHistory: true,
+    layout: "list"
   }
 }

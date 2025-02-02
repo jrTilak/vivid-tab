@@ -1,22 +1,15 @@
-import type { BookmarkFolderNode, Bookmarks, BookmarkUrlNode } from '@/types/bookmark-types'
+import type { BookmarkFolderNode } from '@/types/bookmark-types'
 import React from 'react'
-import { useBookmarkContext } from './context'
 import { FolderIcon, FolderOpenIcon } from 'lucide-react'
 
-type Props = BookmarkFolderNode
+type Props = BookmarkFolderNode & {
+  onOpenFolder: () => void
+}
 
 const BookmarkFolder = (props: Props) => {
-  const { setContents, pushToParentFolderIds } = useBookmarkContext()
-
-  const onOpenFolder = () => {
-    if (!props?.children || props?.children?.length === 0) return
-    setContents(props.children)
-    pushToParentFolderIds(props.id)
-  }
-
   return (
     <button
-      onClick={onOpenFolder}
+      onClick={props.onOpenFolder}
       className='flex items-center justify-center flex-col space-y-2 p-2 rounded-lg hover:scale-105 transition-transform text-center truncate'>
       {props?.children?.length > 0 ? <FolderOpenIcon
         style={{

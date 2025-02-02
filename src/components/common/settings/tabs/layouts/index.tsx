@@ -42,7 +42,7 @@ const LayoutsSettings = () => {
         <div className="relative">
           {/* Search Bar */}
           <div className="mb-6 flex items-center justify-center">
-            {layout[0] && COMPONENTS[layout[0]]}
+            {COMPONENTS[layout[0]] || <PreviewCard index={0} />}
           </div>
 
           {/* Tabs */}
@@ -50,24 +50,24 @@ const LayoutsSettings = () => {
           <div className="grid grid-cols-12 gap-x-9">
             {/* Left Sidebar */}
             <div className="col-span-3 space-y-6 opacity-80">
-              {layout[1] && COMPONENTS[layout[1]]}
-              {layout[2] && COMPONENTS[layout[2]]}
-              {layout[3] && COMPONENTS[layout[3]]}
+              {COMPONENTS[layout[1]] || <PreviewCard index={1} />}
+              {COMPONENTS[layout[2]] || <PreviewCard index={2} />}
+              {COMPONENTS[layout[3]] || <PreviewCard index={3} />}
             </div>
 
             {/* Main Content */}
-            {layout[4] && COMPONENTS[layout[4]]}
+            {COMPONENTS[layout[4]]}
 
             {/* Right Sidebar */}
             <div className="col-span-3 space-y-6 opacity-80">
-              {layout[5] && COMPONENTS[layout[5]]}
-              {layout[6] && COMPONENTS[layout[6]]}
-              {layout[7] && COMPONENTS[layout[7]]}
+              {COMPONENTS[layout[5]] || <PreviewCard index={5} />}
+              {COMPONENTS[layout[6]] || <PreviewCard index={6} />}
+              {COMPONENTS[layout[7]] || <PreviewCard index={7} />}
             </div>
           </div>
 
           <div className="mt-6 flex items-center justify-center">
-            {layout[8] && COMPONENTS[layout[8]]}
+            {COMPONENTS[layout[8]] || <PreviewCard index={8} className="h-9 mx-auto w-[80%]" />}
           </div>
         </div>
       </div>

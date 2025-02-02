@@ -1,4 +1,3 @@
-import type { TimerSize } from "@/common/settings"
 import type { CSSProperties } from "react"
 
 class StylesFns {
@@ -73,49 +72,6 @@ class StylesFns {
           left: "50%",
           transform: "translate(-50%, -50%)",
           textAlign: "center"
-        }
-    }
-  }
-
-  timerSize(size: TimerSize) {
-    // timerFontSize: larger
-    // greetingsFontSize: slightly smaller
-    // dateFontSize: smaller
-
-    switch (size) {
-      case "extra-large":
-        return {
-          timerFontSize: 48,
-          greetingsFontSize: 24,
-          dateFontSize: 16
-        }
-
-      case "large":
-        return {
-          timerFontSize: 36,
-          greetingsFontSize: 18,
-          dateFontSize: 14
-        }
-
-      case "medium":
-        return {
-          timerFontSize: 24,
-          greetingsFontSize: 16,
-          dateFontSize: 12
-        }
-
-      case "small":
-        return {
-          timerFontSize: 18,
-          greetingsFontSize: 14,
-          dateFontSize: 10
-        }
-
-      case "extra-small":
-        return {
-          timerFontSize: 14,
-          greetingsFontSize: 12,
-          dateFontSize: 8
         }
     }
   }

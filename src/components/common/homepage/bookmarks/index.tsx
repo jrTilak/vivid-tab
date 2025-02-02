@@ -1,11 +1,10 @@
-import React from 'react'
-import { BookmarkProvider } from './context'
-import B from './bookmarks'
+import React from "react"
+
+import B from "./bookmarks"
+
 const Bookmarks = () => {
   return (
-    <BookmarkProvider>
-      <B />
-    </BookmarkProvider>
+    <B />
   )
 }
 

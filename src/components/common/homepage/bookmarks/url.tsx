@@ -29,7 +29,7 @@ const BookmarkUrl = (props: Props) => {
     >
       <Avatar>
         <AvatarImage
-          src={data.image} alt={props.title} />
+          src={data.image} alt={props.title} className='rounded-none object-contain object-center' />
         <AvatarFallback>
           {data.title.replace(/[^a-zA-Z ]/g, "").trim().toLowerCase()
             .split(" ").map((word) => word[0]?.toUpperCase()).join("").substring(0, 2)

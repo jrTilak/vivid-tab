@@ -1,7 +1,8 @@
 import Searchbar1 from "@/components/searchbars/1"
+import useImage from "@/hooks/use-image"
 import { useSettings } from "@/providers/settings-provider"
 import background from "data-base64:@/assets/scene.jpg"
-import * as React from "react"
+import { useMemo } from "react"
 
 import type { ImageData } from "../settings/tabs/wallpapers"
 import Bookmarks from "./bookmarks"
@@ -12,28 +13,13 @@ import Todos from "./todos"
 import Weather from "./weather"
 
 export default function Homepage() {
-  const [image, setImage] = React.useState<ImageData>(null)
   const {
-    settings: { layout }
+    settings: { layout, wallpapers }
   } = useSettings()
 
-  // get images from local storage
-  React.useEffect(() => {
-    chrome.storage.local.get("selectedImage", (data) => {
-      if (data.selectedImage) {
-        try {
-          setImage(JSON.parse(data.selectedImage))
-        } catch (error) {
-          console.error("Error parsing images from local storage", error)
-          setImage({
-            src: background
-          })
-        }
-      }
-    })
-  }, [])
+  const image = useImage(wallpapers.selectedImageId)
 
-  const COMPONENTS = React.useMemo(() => {
+  const COMPONENTS = useMemo(() => {
     return {
       searchbar: <Searchbar1 />,
       clock: <Clock />,
@@ -48,17 +34,17 @@ export default function Homepage() {
   return (
     <div className="min-h-screen w-full bg-cover bg-center p-6 relative">
       <img
-        src={image?.src}
+        src={wallpapers.selectedImageId === null ? background : image}
         alt="scene"
         className="h-full w-full object-cover object-center absolute inset-0"
       />
-      <div className="h-full w-full absolute inset-0  bg-black/50 backdrop-blur-[1px]" />
+      <div className="h-full w-full absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
 
-      <div className="mx-auto max-w-[1400px] relative">
+      <div className="mx-auto max-w-[1400px] relative mt-20">
         {/* Search Bar */}
-        <div className="mb-6 flex items-center justify-center">
+        {/* <div className="mb-6 flex items-center justify-center">
           <Searchbar1 />
-        </div>
+        </div> */}
 
         {/* Tabs */}
 

@@ -2,18 +2,18 @@ import { Card, CardHeader } from "@/components/ui/card"
 import { cn } from "@/helpers/cn"
 import { useSettings } from "@/providers/settings-provider"
 import { GridIcon, GripIcon } from "lucide-react"
-import React from "react"
+import React, { useEffect } from "react"
 import { useDrag, useDrop } from "react-dnd"
 
 type Props = {
-  label: string
-  id: string
+  label?: string
+  id?: string
   className?: string
   index: number
 }
 
-const PreviewCard = ({ id, label, className, index }: Props) => {
-  const { setSettings } = useSettings()
+const PreviewCard = ({ id = "empty", label = "Empty", className, index }: Props) => {
+  const { setSettings, settings: { layout } } = useSettings()
   // Drag hook for the button
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "CARD",
@@ -27,9 +27,21 @@ const PreviewCard = ({ id, label, className, index }: Props) => {
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "CARD",
     drop: (item: { id: string; index: number }) => {
-      if (id === item.id) return
-      if (id === "bookmarks" || item.id === "bookmarks") return
-      if (item.id === "searchbar" && !(index === 0 || index === 8)) return
+
+      console.log(`Drop: ${item.id} -> ${id}`)
+
+      if (id === item.id) {
+        console.log("Same item, returning")
+        return
+      }
+      if (id === "bookmarks" || item.id === "bookmarks") {
+        console.log("Bookmarks can't be moved, returning")
+        return
+      }
+      if (item.id === "searchbar" && !(index === 0 || index === 8)) {
+        console.log("Searchbar can only be moved to the top or bottom, returning")
+        return
+      }
 
       // Update the settings layout
       setSettings((prevSettings) => {
@@ -47,6 +59,10 @@ const PreviewCard = ({ id, label, className, index }: Props) => {
       isOver: monitor.isOver()
     })
   }))
+
+  useEffect(() => {
+    console.log(`Setting change for ${id}`, layout)
+  }, [layout])
 
   return (
     <Card
