@@ -20,7 +20,7 @@ import getBookmarkFolder from "@/helpers/get-bookmark-folder"
 const GeneralSettings = () => {
   const {
     settings: {
-      general: { rootFolder, showHistory }
+      general: { rootFolder, showHistory, layout }
     },
     setSettings
   } = useSettings()
@@ -84,7 +84,7 @@ const GeneralSettings = () => {
           <ChooseBookmarkFolder />
         </div>
       </div>
-      <div className="flex items-center justify-between">
+      {/* <div className="flex items-center justify-between">
         <div className="space-y-0.5">
           <Label className="text-sm font-medium">Show History</Label>
         </div>
@@ -94,6 +94,36 @@ const GeneralSettings = () => {
             handleSettingsChange("showHistory", checked)
           }
         />
+      </div> */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-0.5">
+          <label className="text-sm font-medium">Layout</label>
+        </div>
+        <Select
+          value={layout}
+          onValueChange={(value) => handleSettingsChange("layout", value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select layout" />
+          </SelectTrigger>
+          <SelectContent>
+            {(
+              [
+                {
+                  label: "Grid",
+                  value: "grid"
+                },
+                {
+                  label: "List",
+                  value: "list"
+                },
+              ] as const
+            ).map(({ label, value }) => (
+              <SelectItem key={value} value={value}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </div>
   )

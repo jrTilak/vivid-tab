@@ -1,33 +1,77 @@
-This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
+# Vivid Tab - A Custom New Tab Extension
 
-## Getting Started
+Vivid Tab is an open-source Chrome extension that replaces the default new tab with a fully customizable and feature-rich new tab page. Inspired by the **Homey** extension, Vivid Tab enhances your browsing experience by providing quick access to essential features and frequently visited sites.
 
-First, run the development server:
+---
 
-```bash
-pnpm dev
-# or
-npm run dev
-```
+## 🚀 Features
 
-Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, using manifest v3, use: `build/chrome-mv3-dev`.
+- 📝 **Quotes & Notes** - Get daily inspiration with quotes and jot down quick notes.
+- ☁️ **Weather Updates** - Stay informed with real-time weather information.
+- ⏰ **Time & Date** - Always stay on track with a built-in clock.
+- ✅ **To-Do List** - Manage your daily tasks efficiently.
+- 🔖 **Bookmark Integration** - Select a bookmark folder and display frequently visited pages for easy navigation.
+- 🎨 **Customizable UI** - Personalize the layout and design to fit your style.
 
-You can start editing the popup by modifying `popup.tsx`. It should auto-update as you make changes. To add an options page, simply add a `options.tsx` file to the root of the project, with a react component default exported. Likewise to add a content page, add a `content.ts` file to the root of the project, importing some module and do some logic, then reload the extension on your browser.
+---
 
-For further guidance, [visit our Documentation](https://docs.plasmo.com/)
+## 📌 Preview
 
-## Making production build
+![Screenshot 1](./public/image.png)
 
-Run the following:
+---
 
-```bash
-pnpm build
-# or
-npm run build
-```
+## 🛠 Built With
 
-This should create a production bundle for your extension, ready to be zipped and published to the stores.
+Vivid Tab is developed using **Plasmo**, an amazing framework for building Chrome extensions effortlessly.
 
-## Submit to the webstores
+🔗 [Plasmo Documentation](https://docs.plasmo.com/)
 
-The easiest way to deploy your Plasmo extension is to use the built-in [bpp](https://bpp.browser.market) GitHub action. Prior to using this action however, make sure to build your extension and upload the first version to the store to establish the basic credentials. Then, simply follow [this setup instruction](https://docs.plasmo.com/framework/workflows/submit) and you should be on your way for automated submission!
+---
+
+## 🔗 Installation
+
+### Install from Chrome Web Store
+
+🔗 [Vivid Tab on Chrome Web Store](https://chrome.google.com/webstore/detail/vivid-tab/your-extension-id)
+
+### Manual Installation
+
+1. Download the source code or clone the repository:
+   ```sh
+   git clone https://github.com/jrtilak/vivid-tab.git
+   ```
+2. Navigate to `chrome://extensions/` in your browser.
+3. Enable **Developer Mode** (toggle in the top right corner).
+4. Click **Load Unpacked** and select the `vivid-tab` folder.
+
+---
+
+## 🤝 Contributing
+
+Vivid Tab is an exploratory project, and there may be many missing features. If you have ideas or improvements, feel free to contribute!
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature-branch`).
+3. Commit your changes (`git commit -m "Added new feature"`).
+4. Push to the branch (`git push origin feature-branch`).
+5. Open a Pull Request.
+
+---
+
+## 📜 License
+
+This project is open-source and available under the [MIT License](LICENSE).
+
+---
+
+## 📬 Contact
+
+For questions or suggestions, reach out to me at: 
+- 🌐 [GitHub](https://github.com/jrtilak)
+- 📧 contact@jrtilak.dev
+
+---
+
+Thank you for checking out **Vivid Tab**! 🚀
+

@@ -37,6 +37,12 @@ const LayoutsSettings = () => {
   }, [])
 
   return (
+    <div>
+      Coming soon...
+    </div>
+  )
+
+  return (
     <DndProvider backend={HTML5Backend}>
       <div className="space-y-5 w-full p-4">
         <div className="relative">

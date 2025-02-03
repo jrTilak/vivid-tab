@@ -50,6 +50,6 @@ export const DEFAULT_SETTINGS_CONFIG: SettingsConfig = {
   general: {
     rootFolder: "0",
     showHistory: true,
-    layout: "list"
+    layout: "grid"
   }
 }

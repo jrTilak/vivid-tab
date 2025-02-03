@@ -48,9 +48,9 @@ export default function Homepage() {
 
         {/* Tabs */}
 
-        <div className="grid grid-cols-12 gap-x-14">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-x-14">
           {/* Left Sidebar */}
-          <div className="col-span-3 space-y-6 opacity-80">
+          <div className="col-span-3 space-y-6 opacity-80 max-xl:hidden">
             {layout[1] && COMPONENTS[layout[1]]}
             {layout[2] && COMPONENTS[layout[2]]}
             {layout[3] && COMPONENTS[layout[3]]}
@@ -59,7 +59,7 @@ export default function Homepage() {
           {/* Main Content */ layout[4] && COMPONENTS[layout[4]]}
 
           {/* Right Sidebar */}
-          <div className="col-span-3 space-y-6 opacity-80">
+          <div className="col-span-3 space-y-6 opacity-80 max-xl:hidden">
             {layout[5] && COMPONENTS[layout[5]]}
             {layout[6] && COMPONENTS[layout[6]]}
             {layout[7] && COMPONENTS[layout[7]]}
