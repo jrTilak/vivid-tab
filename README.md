@@ -33,7 +33,7 @@ Vivid Tab is developed using **Plasmo**, an amazing framework for building Chrom
 
 ### Install from Chrome Web Store
 
-🔗 [Vivid Tab on Chrome Web Store](https://chrome.google.com/webstore/detail/vivid-tab/your-extension-id)
+🔗 [Vivid Tab on Chrome Web Store](https://chrome.google.com/webstore/detail/vivid-tab/hchlkclbagoklpnijoadpghhcjpeoeim)
 
 ### Manual Installation
 
