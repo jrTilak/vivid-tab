@@ -3,7 +3,7 @@
   "displayName": "Vivid tab",
   "version": "0.0.1",
   "description": "\"VividTab: Your dynamic new tab for a brighter, more productive browsing experience.\"",
-  "author": "Plasmo Corp. <foss@plasmo.com>",
+  "author": "jrTilak <contact@jrtilak.dev>",
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",

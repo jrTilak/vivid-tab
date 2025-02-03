@@ -17,7 +17,7 @@ Vivid Tab is an open-source Chrome extension that replaces the default new tab w
 
 ## 📌 Preview
 
-![Screenshot 1](./public/image.png)
+![Screenshot 1](./src/assets/preview.png)
 
 ---
 
