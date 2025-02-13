@@ -9,13 +9,14 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
+import getBookmarkFolder from "@/helpers/get-bookmark-folder"
+import useBookmarks from "@/hooks/use-bookmarks"
 import { useSettings } from "@/providers/settings-provider"
 import { useTheme, type Theme } from "@/providers/theme-provider"
 import type { BookmarkFolderNode, Bookmarks } from "@/types/bookmark-types"
 import React, { useCallback, useEffect, useState } from "react"
+
 import { ChooseBookmarkFolder } from "./choose-bookmar-folder"
-import useBookmarks from "@/hooks/use-bookmarks"
-import getBookmarkFolder from "@/helpers/get-bookmark-folder"
 
 const GeneralSettings = () => {
   const {
@@ -26,8 +27,6 @@ const GeneralSettings = () => {
   } = useSettings()
   const { setTheme, theme } = useTheme()
   const bookmarks = useBookmarks()
-
-
 
   const handleSettingsChange = useCallback((key: string, value: any) => {
     setSettings((prevSettings) => ({
@@ -80,7 +79,10 @@ const GeneralSettings = () => {
           <label className="text-sm font-medium">Root Folder</label>
         </div>
         <div>
-          <span className="mr-2"> ({getBookmarkFolder(bookmarks, rootFolder)?.title})</span>
+          <span className="mr-2">
+            {" "}
+            ({getBookmarkFolder(bookmarks, rootFolder)?.title})
+          </span>
           <ChooseBookmarkFolder />
         </div>
       </div>
@@ -115,7 +117,7 @@ const GeneralSettings = () => {
                 {
                   label: "List",
                   value: "list"
-                },
+                }
               ] as const
             ).map(({ label, value }) => (
               <SelectItem key={value} value={value}>

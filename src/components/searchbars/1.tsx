@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
-import { Input } from '../ui/input'
-import { Button } from '../ui/button'
-import { SearchIcon } from 'lucide-react'
+import { SearchIcon } from "lucide-react"
+import React, { useState } from "react"
+
+import { Button } from "../ui/button"
+import { Input } from "../ui/input"
 
 const Searchbar1 = () => {
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery, setSearchQuery] = useState("")
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     window.location.href = `https://www.google.com/search?q=${searchQuery}`
@@ -20,7 +21,9 @@ const Searchbar1 = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
-      <Button type="submit" className="rounded-full bg-blue-500 hover:bg-blue-600 text-white px-6 py-2">
+      <Button
+        type="submit"
+        className="rounded-full bg-blue-500 hover:bg-blue-600 text-white px-6 py-2">
         <SearchIcon className="h-5 w-5" />
         <span className="sr-only">Search</span>
       </Button>

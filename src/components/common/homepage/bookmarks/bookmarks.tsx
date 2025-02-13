@@ -1,21 +1,19 @@
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/helpers/cn"
+import { useBookmarkFolderNavigation } from "@/hooks/use-bookmarks-folder-navigation"
 import { useSettings } from "@/providers/settings-provider"
 import type {
   BookmarkFolderNode,
   BookmarkUrlNode
 } from "@/types/bookmark-types"
-import {
-  ArrowLeftIcon,
-} from "lucide-react"
+import { ArrowLeftIcon } from "lucide-react"
 import React, { useEffect } from "react"
 
 import BookmarkFolder from "./folder"
 import BookmarkUrl from "./url"
-import { useBookmarkFolderNavigation } from "@/hooks/use-bookmarks-folder-navigation"
-import { ScrollArea } from "@/components/ui/scroll-area"
 
 const Bookmarks = () => {
   const [activeRootFolder, setActiveRootFolder] = React.useState("home")
@@ -23,8 +21,8 @@ const Bookmarks = () => {
     settings: { general }
   } = useSettings()
 
-  const { currentFolders, folderPath, goBack, openFolder } = useBookmarkFolderNavigation(general.rootFolder)
-
+  const { currentFolders, folderPath, goBack, openFolder } =
+    useBookmarkFolderNavigation(general.rootFolder)
 
   return (
     <div className="mb-6 col-span-6 h-[70vh] overflow-scroll">
@@ -66,24 +64,38 @@ const Bookmarks = () => {
             Back
           </Button>
         )}
-        <div className={cn(general.layout === "grid" ? "grid grid-cols-6 sm:grid-cols-7 gap-4" : "grid grid-cols-2 xl:grid-cols-3 gap-4")}>
+        <div
+          className={cn(
+            general.layout === "grid"
+              ? "grid grid-cols-6 sm:grid-cols-7 gap-4"
+              : "grid grid-cols-2 xl:grid-cols-3 gap-4"
+          )}>
           {currentFolders?.map((content, index) => {
             if ((content as BookmarkFolderNode).children) {
-              return <BookmarkFolder {...content} key={index} onOpenFolder={() => {
-                openFolder(content as BookmarkFolderNode)
-              }}
-                layout={general.layout}
-              />
+              return (
+                <BookmarkFolder
+                  {...content}
+                  key={index}
+                  onOpenFolder={() => {
+                    openFolder(content as BookmarkFolderNode)
+                  }}
+                  layout={general.layout}
+                />
+              )
             } else {
               return (
-                <BookmarkUrl {...(content as BookmarkUrlNode)} key={index} layout={general.layout} />
+                <BookmarkUrl
+                  {...(content as BookmarkUrlNode)}
+                  key={index}
+                  layout={general.layout}
+                />
               )
             }
           })}
         </div>
       </div>
       {/* </Tabs> */}
-    </div >
+    </div>
   )
 }
 

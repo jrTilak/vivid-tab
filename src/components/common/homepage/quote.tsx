@@ -1,9 +1,9 @@
-import { Card } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import tryCatchAsync from '@/helpers/try-catch-async'
-import useAsyncEffect from '@/hooks/use-async-effect'
-import { useSettings } from '@/providers/settings-provider'
-import React, { useState } from 'react'
+import { Card } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
+import tryCatchAsync from "@/helpers/try-catch-async"
+import useAsyncEffect from "@/hooks/use-async-effect"
+import { useSettings } from "@/providers/settings-provider"
+import React, { useState } from "react"
 
 type QuoteResponse = {
   _id: string
@@ -18,14 +18,21 @@ const Quote = () => {
     err: false,
     message: ""
   })
-  const { settings: { quotes: { categories } } } = useSettings()
+  const {
+    settings: {
+      quotes: { categories }
+    }
+  } = useSettings()
 
   useAsyncEffect(async () => {
     const [err, data] = await tryCatchAsync(async () => {
       const baseUrl = "http://api.quotable.io/quotes/random"
-      const urlWithTags = categories.length > 0 ? `${baseUrl}?tags=${categories.join("|")}` : baseUrl
+      const urlWithTags =
+        categories.length > 0
+          ? `${baseUrl}?tags=${categories.join("|")}`
+          : baseUrl
       const response = await fetch(urlWithTags)
-      const json = await response.json() as QuoteResponse[]
+      const json = (await response.json()) as QuoteResponse[]
       return json[0]
     })
 
@@ -39,20 +46,25 @@ const Quote = () => {
     }
 
     setQuote(data)
-
   }, [])
 
   if (!isLoaded) {
-    <Skeleton className="h-24" />
+    ;<Skeleton className="h-24" />
   }
 
   return (
     <Card className=" p-6">
       <blockquote className="space-y-2">
         <p className="text-sm italic">
-          "{err.err ? "An error occurred while fetching the quote" : quote?.content}"
+          "
+          {err.err
+            ? "An error occurred while fetching the quote"
+            : quote?.content}
+          "
         </p>
-        <footer className="text-xs">— {err.err ? "Unknown" : quote?.author}        </footer>
+        <footer className="text-xs">
+          — {err.err ? "Unknown" : quote?.author}{" "}
+        </footer>
       </blockquote>
     </Card>
   )

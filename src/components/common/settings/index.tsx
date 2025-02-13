@@ -96,9 +96,7 @@ export function Settings() {
     {
       label: "Backup & Sync",
       icon: HistoryIcon,
-      component: () => <div>
-        Coming soon...
-      </div>
+      component: () => <div>Coming soon...</div>
     }
   ]
 

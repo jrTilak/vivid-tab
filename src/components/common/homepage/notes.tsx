@@ -1,9 +1,9 @@
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Textarea } from '@/components/ui/textarea'
-import useShortcutKey from '@/hooks/use-shortcut-key'
-import { Trash2Icon, TrashIcon } from 'lucide-react'
-import React from 'react'
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { Textarea } from "@/components/ui/textarea"
+import useShortcutKey from "@/hooks/use-shortcut-key"
+import { Trash2Icon, TrashIcon } from "lucide-react"
+import React from "react"
 
 type Note = {
   id: number
@@ -23,8 +23,7 @@ const Notes = () => {
       if (data.notes) {
         try {
           setNotes(JSON.parse(data.notes))
-        }
-        catch (e) {
+        } catch (e) {
           console.error(e)
         }
       }
@@ -37,11 +36,14 @@ const Notes = () => {
   }
 
   const addNote = () => {
-    const newNotes = [...notes, {
-      id: Date.now(),
-      text: note,
-      createdAt: new Date().getTime()
-    }]
+    const newNotes = [
+      ...notes,
+      {
+        id: Date.now(),
+        text: note,
+        createdAt: new Date().getTime()
+      }
+    ]
     setNotes(newNotes)
     updateNotesInStorage(newNotes)
     setNote("")
@@ -54,7 +56,7 @@ const Notes = () => {
   }
 
   useShortcutKey(btnRef, {
-    keys: ["Control", "Enter"],
+    keys: ["Control", "Enter"]
   })
 
   return (
@@ -71,25 +73,27 @@ const Notes = () => {
         variant="secondary"
         onClick={addNote}
         disabled={!note.trim()}
-        ref={btnRef}
-      >
+        ref={btnRef}>
         Add Note
       </Button>
       <div className="mt-4 space-y-2">
         {
           // sort notes by createdAt
-          notes.sort((a, b) => b.createdAt - a.createdAt)
+          notes
+            .sort((a, b) => b.createdAt - a.createdAt)
             .map((note, index) => (
-              <div key={index} className="text-sm bg-white/10 p-2 rounded relative group">
+              <div
+                key={index}
+                className="text-sm bg-white/10 p-2 rounded relative group">
                 {note.text}
                 <button
                   onClick={() => deleteNote(note.id)}
-                  className="absolute top-2 right-2 text-red-500 scale-0 group-hover:scale-100 transition-transform"
-                >
+                  className="absolute top-2 right-2 text-red-500 scale-0 group-hover:scale-100 transition-transform">
                   <TrashIcon size={16} />
                 </button>
               </div>
-            ))}
+            ))
+        }
       </div>
     </Card>
   )

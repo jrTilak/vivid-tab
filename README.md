@@ -67,11 +67,11 @@ This project is open-source and available under the [MIT License](LICENSE).
 
 ## 📬 Contact
 
-For questions or suggestions, reach out to me at: 
+For questions or suggestions, reach out to me at:
+
 - 🌐 [GitHub](https://github.com/jrtilak)
 - 📧 contact@jrtilak.dev
 
 ---
 
 Thank you for checking out **Vivid Tab**! 🚀
-

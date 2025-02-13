@@ -60,8 +60,7 @@ const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   return (
     <SettingsContext.Provider value={value}>
-      {isLoaded &&
-        children}
+      {isLoaded && children}
     </SettingsContext.Provider>
   )
 }

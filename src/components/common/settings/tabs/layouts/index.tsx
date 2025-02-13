@@ -36,11 +36,7 @@ const LayoutsSettings = () => {
     }
   }, [])
 
-  return (
-    <div>
-      Coming soon...
-    </div>
-  )
+  return <div>Coming soon...</div>
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -73,7 +69,9 @@ const LayoutsSettings = () => {
           </div>
 
           <div className="mt-6 flex items-center justify-center">
-            {COMPONENTS[layout[8]] || <PreviewCard index={8} className="h-9 mx-auto w-[80%]" />}
+            {COMPONENTS[layout[8]] || (
+              <PreviewCard index={8} className="h-9 mx-auto w-[80%]" />
+            )}
           </div>
         </div>
       </div>

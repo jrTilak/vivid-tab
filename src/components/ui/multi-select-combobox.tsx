@@ -1,13 +1,23 @@
 "use client"
 
-import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList
+} from "@/components/ui/command"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from "@/components/ui/popover"
 import { cn } from "@/helpers/cn"
+import { Check, ChevronsUpDown } from "lucide-react"
+import * as React from "react"
 
 export interface Option {
   value: string
@@ -37,7 +47,9 @@ export function MultiSelectCombobox({
 
   const handleSelect = (value: string) => {
     onSelectedValuesChange(
-      selectedValues.includes(value) ? selectedValues.filter((v) => v !== value) : [...selectedValues, value],
+      selectedValues.includes(value)
+        ? selectedValues.filter((v) => v !== value)
+        : [...selectedValues, value]
     )
   }
 
@@ -49,23 +61,35 @@ export function MultiSelectCombobox({
     <div className={className}>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger disabled={disabled} asChild>
-          <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
-            {selectedValues.length > 0 ? `${selectedValues.length} selected` : placeholder}
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-between">
+            {selectedValues.length > 0
+              ? `${selectedValues.length} selected`
+              : placeholder}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full p-0">
           <Command>
-            <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} />
+            <CommandInput
+              placeholder={`Search ${placeholder.toLowerCase()}...`}
+            />
             <CommandList>
               <CommandEmpty>{emptyMessage}</CommandEmpty>
               <CommandGroup>
                 {options.map((option) => (
-                  <CommandItem key={option.value} onSelect={() => handleSelect(option.value)}>
+                  <CommandItem
+                    key={option.value}
+                    onSelect={() => handleSelect(option.value)}>
                     <Check
                       className={cn(
                         "mr-2 h-4 w-4",
-                        selectedValues.includes(option.value) ? "opacity-100" : "opacity-0",
+                        selectedValues.includes(option.value)
+                          ? "opacity-100"
+                          : "opacity-0"
                       )}
                     />
                     {option.label}
@@ -93,8 +117,7 @@ export function MultiSelectCombobox({
                   e.preventDefault()
                   e.stopPropagation()
                 }}
-                onClick={() => handleRemove(value)}
-              >
+                onClick={() => handleRemove(value)}>
                 ✕
               </button>
             </Badge>
@@ -104,4 +127,3 @@ export function MultiSelectCombobox({
     </div>
   )
 }
-

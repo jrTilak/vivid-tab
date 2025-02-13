@@ -20,3 +20,5 @@ export interface BookmarkUrlNode extends BookmarkBaseNode {
 export type BookmarkTreeNode = BookmarkFolderNode | BookmarkUrlNode
 
 export type Bookmarks = BookmarkTreeNode[]
+
+export type Bookmark = BookmarkTreeNode

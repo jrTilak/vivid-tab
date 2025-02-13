@@ -12,8 +12,16 @@ type Props = {
   index: number
 }
 
-const PreviewCard = ({ id = "empty", label = "Empty", className, index }: Props) => {
-  const { setSettings, settings: { layout } } = useSettings()
+const PreviewCard = ({
+  id = "empty",
+  label = "Empty",
+  className,
+  index
+}: Props) => {
+  const {
+    setSettings,
+    settings: { layout }
+  } = useSettings()
   // Drag hook for the button
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "CARD",
@@ -27,7 +35,6 @@ const PreviewCard = ({ id = "empty", label = "Empty", className, index }: Props)
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "CARD",
     drop: (item: { id: string; index: number }) => {
-
       console.log(`Drop: ${item.id} -> ${id}`)
 
       if (id === item.id) {
@@ -39,7 +46,9 @@ const PreviewCard = ({ id = "empty", label = "Empty", className, index }: Props)
         return
       }
       if (item.id === "searchbar" && !(index === 0 || index === 8)) {
-        console.log("Searchbar can only be moved to the top or bottom, returning")
+        console.log(
+          "Searchbar can only be moved to the top or bottom, returning"
+        )
         return
       }
 

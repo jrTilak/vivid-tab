@@ -6,8 +6,7 @@ const UploadButton = ({ onUpload }: { onUpload: (file: File) => void }) => (
     <Button
       variant="outline"
       className="w-full h-full flex flex-col items-center justify-center text-muted-foreground hover:text-foreground"
-      onClick={() => document.getElementById("fileInput")?.click()}
-    >
+      onClick={() => document.getElementById("fileInput")?.click()}>
       <UploadIcon className="w-8 h-8 mb-2" />
       <span>Upload Image</span>
     </Button>

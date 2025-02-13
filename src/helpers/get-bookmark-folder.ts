@@ -4,8 +4,6 @@ const getBookmarkFolder = (
   bookmarks: Bookmarks,
   id: string
 ): BookmarkFolderNode | null => {
-  console.log("getBookmarkFolder -> id", id)
-
   const findNode = (
     nodes: BookmarkFolderNode[],
     id: string
