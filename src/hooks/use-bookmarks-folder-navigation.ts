@@ -11,12 +11,17 @@ export function useBookmarkFolderNavigation(id?: string) {
     Bookmarks[number] | null
   >(null)
 
-  const openFolder = useCallback((folder: BookmarkFolderNode) => {
-    if (folder.children) {
-      setCurrentFolders(folder.children)
-      setFolderPath((prev) => [...prev, folder])
-    }
-  }, [])
+  const openFolder = useCallback(
+    (folder: BookmarkFolderNode, savePath = true) => {
+      if (folder.children) {
+        setCurrentFolders(folder.children)
+        if (savePath) {
+          setFolderPath((prev) => [...prev, folder])
+        }
+      }
+    },
+    []
+  )
 
   const goBack = useCallback(() => {
     if (folderPath.length > 0) {

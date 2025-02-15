@@ -1,33 +1,28 @@
+import { cn } from "@/helpers/cn"
 import { SearchIcon } from "lucide-react"
-import React, { useState } from "react"
+import React from "react"
 
-import { Button } from "../ui/button"
-import { Input } from "../ui/input"
+type Props = {
+  isOpen: boolean
+  setIsOpen: (isOpen: boolean) => void
+}
 
-const Searchbar1 = () => {
-  const [searchQuery, setSearchQuery] = useState("")
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    window.location.href = `https://www.google.com/search?q=${searchQuery}`
-  }
+const Searchbar1 = ({ isOpen, setIsOpen }: Props) => {
   return (
-    <form onSubmit={handleSubmit} className="flex items-center space-x-2">
-      <div className="flex-grow">
-        <Input
-          type="text"
-          placeholder="Search Google..."
-          className="w-full rounded-full px-4 py-2 border-2 border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+    <div
+      onClick={() => setIsOpen(true)}
+      className={cn(
+        "flex items-center space-x-2 w-full mx-auto cursor-text group transition-all relative duration-100",
+        isOpen ? "-top-96" : "top-0"
+      )}>
+      <div
+        className={cn(
+          "flex-grow flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:cursor-default disabled:opacity-50 md:text-sm relative group-hover:border-accent group-hover:shadow-lg"
+        )}>
+        <span className="text-muted-foreground">Search the web...</span>
+        <SearchIcon className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground size-4" />
       </div>
-      <Button
-        type="submit"
-        className="rounded-full bg-blue-500 hover:bg-blue-600 text-white px-6 py-2">
-        <SearchIcon className="h-5 w-5" />
-        <span className="sr-only">Search</span>
-      </Button>
-    </form>
+    </div>
   )
 }
 

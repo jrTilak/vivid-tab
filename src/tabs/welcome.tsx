@@ -4,7 +4,7 @@ import ImportFromPreviousInstall from "@/components/welcome/import-from-previous
 import ImportTab from "@/components/welcome/import-tab"
 import RootProvider from "@/providers/root-provider"
 import background from "data-base64:@/assets/scene.jpg"
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { useMemo, useState } from "react"
 
 export type Tab =
   | "WELCOME"
@@ -38,34 +38,10 @@ const Welcome = () => {
 
   const TABS = useMemo(
     () => ({
-      WELCOME: (
-        <WelcomeTab
-          scrollToTab={scrollToTab}
-          animation={animation}
-          setAnimation={setAnimation}
-        />
-      ),
-      IMPORT: (
-        <ImportTab
-          scrollToTab={scrollToTab}
-          animation={animation}
-          setAnimation={setAnimation}
-        />
-      ),
-      IMPORT_FROM_PREVIOUS_INSTALL: (
-        <ImportFromPreviousInstall
-          scrollToTab={scrollToTab}
-          animation={animation}
-          setAnimation={setAnimation}
-        />
-      ),
-      IMPORT_FROM_BROWSER_BOOKMARKS: (
-        <ImportFromBrowserBookmarks
-          scrollToTab={scrollToTab}
-          animation={animation}
-          setAnimation={setAnimation}
-        />
-      )
+      WELCOME: WelcomeTab,
+      IMPORT: ImportTab,
+      IMPORT_FROM_PREVIOUS_INSTALL: ImportFromPreviousInstall,
+      IMPORT_FROM_BROWSER_BOOKMARKS: ImportFromBrowserBookmarks
     }),
     [scrollToTab, animation]
   )
@@ -80,7 +56,16 @@ const Welcome = () => {
         />
         <div className="relative z-10 h-screen w-screen backdrop-blur-sm bg-black/40 flex items-center justify-center">
           <div className="w-screen h-screen flex items-center justify-center">
-            {TABS[currentTab]}
+            {(() => {
+              const Comp = TABS[currentTab]
+              return (
+                <Comp
+                  scrollToTab={scrollToTab}
+                  animation={animation}
+                  setAnimation={setAnimation}
+                />
+              )
+            })()}
           </div>
         </div>
       </main>

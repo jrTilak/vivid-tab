@@ -44,18 +44,11 @@ import TimerSettings from "./tabs/timer"
 import WallpaperSettings from "./tabs/wallpapers"
 
 export function Settings() {
-  const { settings, resetSettings } = useSettings()
-  const config = settings.others.triggerButton
+  const { setSettings, settings } = useSettings()
+  const [prevSettings, setPrevSettings] = useState(settings)
 
-  const [triggerPosition, setTriggerPosition] = useState(() =>
-    stylesFns.settingsTriggerPosition(config.position)
-  )
   const [activeTabIndex, setActiveTabIndex] = useState(0)
   const [open, setOpen] = useState(false)
-
-  useEffect(() => {
-    setTriggerPosition(stylesFns.settingsTriggerPosition(config.position))
-  }, [config.position])
 
   const TABS = [
     {
@@ -100,12 +93,16 @@ export function Settings() {
     }
   ]
 
+  useEffect(() => {
+    if (open) {
+      setPrevSettings(settings)
+    }
+  }, [open])
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        style={{ ...triggerPosition }}
-        className="fixed z-50 aspect-square rounded-full !inline size-fit">
-        <SettingsIcon size={config.size} opacity={config.opacity} />
+      <DialogTrigger className="fixed z-50 aspect-square rounded-full !inline size-fit top-4 right-4">
+        <SettingsIcon size={20} opacity={0.7} />
       </DialogTrigger>
       <DialogContent className="flex max-w-4xl gap-0 p-0 z-50 bg-black/90 max-h-[632px] h-full">
         <div className="w-60 border-r">
@@ -140,9 +137,10 @@ export function Settings() {
               size="sm"
               variant="ghost"
               onClick={() => {
-                resetSettings()
+                setOpen(false)
+                setSettings(prevSettings)
               }}>
-              Reset to default
+              Cancel
             </Button>
             <Button
               onClick={() => {

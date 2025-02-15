@@ -1,6 +1,7 @@
 import type { BookmarkFolderNode } from "@/types/bookmark-types"
-import { FolderIcon, FolderOpenIcon } from "lucide-react"
+import { FolderClosedIcon, FolderIcon } from "lucide-react"
 import React from "react"
+import folderIcon from "data-base64:@/assets/folder-svgrepo-com.svg"
 
 type Props = BookmarkFolderNode & {
   onOpenFolder: () => void
@@ -12,37 +13,22 @@ const BookmarkFolder = (props: Props) => {
     return (
       <button
         onClick={props.onOpenFolder}
-        className="flex items-center justify-center flex-col space-y-2 p-2 rounded-lg hover:scale-105 transition-transform text-center truncate">
-        {props?.children?.length > 0 ? (
-          <FolderOpenIcon
-            style={{
-              strokeWidth: 1
-            }}
-            className="size-12 fill-gray-200 text-gray-400 outline-none"
-          />
-        ) : (
-          <FolderIcon
-            style={{
-              strokeWidth: 1
-            }}
-            className="size-12 fill-gray-200 text-gray-400"
-          />
-        )}
-        <p>{props.title.substring(0, 8)}</p>
+        className="flex flex-col  space-y-1 p-2 rounded-lg hover:scale-105 transition-transform w-24">
+        <img src={folderIcon} alt="" className="size-12 mx-auto" />
+        <p className="text-center line-clamp-2 text-xs">{props.title}</p>
       </button>
     )
   } else {
     return (
       <button
         onClick={props.onOpenFolder}
-        className="flex items-center space-x-2 p-2 rounded-lg transition-colors">
-        <FolderIcon
-          style={{
-            strokeWidth: 1
-          }}
-          className="size-12 fill-gray-200 text-gray-400"
-        />
-        <p>{props.title}</p>
+        className="flex space-x-1 p-2 items-center rounded-lg transition-colors">
+        <img src={folderIcon} alt="" className="size-12" />
+        <p className="text-xs w-full text-left line-clamp-2">
+          {props.title}
+          <br />
+          {props.children?.length} items
+        </p>
       </button>
     )
   }

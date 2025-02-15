@@ -1,11 +1,10 @@
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/helpers/cn"
-import { useBookmarkFolderNavigation } from "@/hooks/use-bookmarks-folder-navigation"
+import useBookmarks from "@/hooks/use-bookmarks"
+import useHistory from "@/hooks/use-history"
 import { useSettings } from "@/providers/settings-provider"
 import type {
+  Bookmark,
   BookmarkFolderNode,
   BookmarkUrlNode
 } from "@/types/bookmark-types"
@@ -17,46 +16,64 @@ import BookmarkUrl from "./url"
 
 const Bookmarks = () => {
   const [activeRootFolder, setActiveRootFolder] = React.useState("home")
+  const [rootChildren, setRootChildren] = React.useState<BookmarkUrlNode[]>([])
+  const [rootFolders, setRootFolders] = React.useState<BookmarkFolderNode[]>([])
+  const [folderStack, setFolderStack] = React.useState<Bookmark[]>([])
+  const history = useHistory()
   const {
     settings: { general }
   } = useSettings()
+  const bookmarks = useBookmarks(general.rootFolder)
 
-  const { currentFolders, folderPath, goBack, openFolder } =
-    useBookmarkFolderNavigation(general.rootFolder)
+  useEffect(() => {
+    if (bookmarks.length) {
+      setRootChildren(
+        bookmarks.filter((item) => !("children" in item)) as BookmarkUrlNode[]
+      )
+      setRootFolders(
+        bookmarks.filter((item) => "children" in item) as BookmarkFolderNode[]
+      )
+    }
+  }, [bookmarks])
 
   return (
     <div className="mb-6 col-span-6 h-[70vh] overflow-scroll">
-      {/* <Tabs
-        value={activeRootFolder}
-        onValueChange={(value) => {
-          if (value === "more") return
-          setActiveRootFolder(value)
-        }}>
-        <TabsList className="w-full flex gap-2.5 flex-wrap items-start justify-start bg-transparent">
-          <TabsTrigger value="home" className="text-sm">
-            {[{ title: "Home" }, ...folderPath].map((folder) => folder.title).join(" / ")}
-          </TabsTrigger> */}
-      {/* {history?.length > 0 && general.showHistory && (
-            <TabsTrigger value="history" className="text-sm">
-              History
-            </TabsTrigger>
-          )} */}
-      {/* {rootFolders.map((folder, index) => (
-            <TabsTrigger key={index} value={folder.id} className="text-sm">
-              {folder.title}
-            </TabsTrigger>
-          ))} */}
-      {/* <TabsTrigger
-            value="more"
-            onClick={() => console.log("add folder")}
-            className="text-sm">
-            <PlusIcon className="h-4 w-4" />
-          </TabsTrigger> */}
-      {/* </TabsList> */}
-      <div className="mt-5 bg-transparent">
-        {folderPath.length > 0 && (
+      <div className="flex gap-2.5 flex-wrap mb-4">
+        {[
+          {
+            id: "home",
+            label: "Home"
+          },
+          ...rootFolders.map((folder) => ({
+            id: folder.id,
+            label: folder.title,
+            ...folder
+          })),
+          {
+            id: "history",
+            label: "History"
+          }
+        ].map((item) => (
           <Button
-            onClick={() => goBack()}
+            key={item.id}
+            onClick={() => {
+              setActiveRootFolder(item.id)
+              setFolderStack([])
+            }}
+            variant={activeRootFolder === item.id ? "default" : "ghost"}
+            size="sm"
+            className={cn(
+              "text-xs px-2.5 py-1 h-fit rounded-sm",
+              activeRootFolder !== item.id && "bg-muted/20 hover:bg-muted/30"
+            )}>
+            {item.label}
+          </Button>
+        ))}
+      </div>
+      <div className="bg-transparent">
+        {folderStack.length > 0 && (
+          <Button
+            onClick={() => setFolderStack((prev) => prev.slice(0, -1))}
             variant="ghost"
             size="sm"
             className="text-xs hover:bg-transparent">
@@ -67,34 +84,52 @@ const Bookmarks = () => {
         <div
           className={cn(
             general.layout === "grid"
-              ? "grid grid-cols-6 sm:grid-cols-7 gap-4"
-              : "grid grid-cols-2 xl:grid-cols-3 gap-4"
+              ? "grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-4"
+              : "grid grid-cols-2 xl:grid-cols-3 gap-4",
+            "bg-black/20 backdrop-blur-[1px] rounded-lg p-2 min-h-[300px]"
           )}>
-          {currentFolders?.map((content, index) => {
-            if ((content as BookmarkFolderNode).children) {
-              return (
-                <BookmarkFolder
-                  {...content}
-                  key={index}
-                  onOpenFolder={() => {
-                    openFolder(content as BookmarkFolderNode)
-                  }}
-                  layout={general.layout}
-                />
-              )
-            } else {
-              return (
-                <BookmarkUrl
-                  {...(content as BookmarkUrlNode)}
-                  key={index}
-                  layout={general.layout}
-                />
-              )
-            }
-          })}
+          {activeRootFolder === "home" ? (
+            rootChildren.map((item) => (
+              <BookmarkUrl {...item} key={item.id} layout={general.layout} />
+            ))
+          ) : activeRootFolder === "history" ? (
+            history.map((item) => (
+              <BookmarkUrl
+                {...item}
+                key={item.id}
+                layout={general.layout}
+                dateAdded={item.lastVisitTime}
+              />
+            ))
+          ) : (
+            (folderStack?.length > 0
+              ? folderStack[folderStack.length - 1] as BookmarkFolderNode
+              : rootFolders?.find((folder) => folder.id === activeRootFolder))
+              ?.children?.map((item) => {
+                if ("children" in item) {
+                  return (
+                    <BookmarkFolder
+                      {...item}
+                      key={item.id}
+                      layout={general.layout}
+                      onOpenFolder={() => {
+                        setFolderStack((prev) => [...prev, item])
+                      }}
+                    />
+                  )
+                } else {
+                  return (
+                    <BookmarkUrl
+                      {...(item as BookmarkUrlNode)}
+                      key={item.id}
+                      layout={general.layout}
+                    />
+                  )
+                }
+              })
+          )}
         </div>
       </div>
-      {/* </Tabs> */}
     </div>
   )
 }

@@ -1,5 +1,5 @@
-import { DEFAULT_SETTINGS_CONFIG } from "@/common/settings"
-import type { SettingsConfig } from "@/types/setting-types"
+import { DEFAULT_SETTINGS } from "@/common/settings"
+import { SettingsSchema, type Settings } from "@/zod/settings"
 import React, {
   createContext,
   useCallback,
@@ -10,8 +10,8 @@ import React, {
 } from "react"
 
 interface SettingsContextState {
-  settings: SettingsConfig
-  setSettings: React.Dispatch<React.SetStateAction<SettingsConfig>>
+  settings: Settings
+  setSettings: React.Dispatch<React.SetStateAction<Settings>>
   resetSettings: () => void
 }
 
@@ -21,23 +21,21 @@ const SettingsContext = createContext<SettingsContextState | undefined>(
 
 const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isLoaded, setIsLoaded] = useState(false)
-  const [settings, setSettings] = useState<SettingsConfig>(
-    DEFAULT_SETTINGS_CONFIG
-  )
+  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS)
 
   const resetSettings = useCallback(() => {
-    setSettings(DEFAULT_SETTINGS_CONFIG)
+    setSettings(DEFAULT_SETTINGS)
   }, [])
 
   //  Load settings from storage
   useEffect(() => {
     chrome.storage.sync.get("settings", ({ settings }) => {
-      let s = DEFAULT_SETTINGS_CONFIG
+      let s = DEFAULT_SETTINGS
       if (settings) {
         try {
-          s = JSON.parse(settings)
+          s = SettingsSchema.parse(JSON.parse(settings))
         } catch (error) {
-          s = DEFAULT_SETTINGS_CONFIG
+          console.error(error)
         }
       }
       setSettings(s)

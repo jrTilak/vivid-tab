@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card"
 import useBookmarks from "@/hooks/use-bookmarks"
 import b from "@/lib/bookmarks"
+import { useSettings } from "@/providers/settings-provider"
 import { ANIMATIONS, type Tab } from "@/tabs/welcome"
 import type { Animation } from "@/tabs/welcome"
 import type {
@@ -48,7 +49,7 @@ const ImportFromBrowserBookmarks = ({
   const [folders, setFolders] = useState<Folder[]>([])
   const bookmarks = useBookmarks()
   const [selectedFolder, setSelectedFolder] = useState<string>("")
-
+  const { setSettings } = useSettings()
   useEffect(() => {
     if (bookmarks && bookmarks.length > 0) {
       const flattenBookmarks = (
@@ -72,8 +73,6 @@ const ImportFromBrowserBookmarks = ({
       }
 
       const bookmarkFolders = flattenBookmarks(bookmarks)
-
-      console.log(bookmarkFolders)
 
       setFolders(bookmarkFolders)
     }
@@ -134,6 +133,13 @@ const ImportFromBrowserBookmarks = ({
           <Button
             disabled={!selectedFolder}
             onClick={() => {
+              setSettings((prev) => ({
+                ...prev,
+                general: {
+                  ...prev.general,
+                  rootFolder: selectedFolder
+                }
+              }))
               chrome.tabs.discard()
               chrome.tabs.create({})
             }}

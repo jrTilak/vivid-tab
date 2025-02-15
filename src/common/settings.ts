@@ -1,23 +1,6 @@
-import type { SettingsConfig } from "@/types/setting-types"
+import type { Settings } from "@/zod/settings"
 
-export const SETTING_TRIGGER_POSITIONS = {
-  TOP_LEFT: "top-left",
-  TOP_RIGHT: "top-right",
-  BOTTOM_LEFT: "bottom-left",
-  BOTTOM_RIGHT: "bottom-right"
-} as const
-
-export type SettingIconPosition =
-  (typeof SETTING_TRIGGER_POSITIONS)[keyof typeof SETTING_TRIGGER_POSITIONS]
-
-export const DEFAULT_SETTINGS_CONFIG: SettingsConfig = {
-  others: {
-    triggerButton: {
-      position: SETTING_TRIGGER_POSITIONS.BOTTOM_RIGHT,
-      size: 20,
-      opacity: 0.7
-    }
-  },
+export const DEFAULT_SETTINGS = {
   timer: {
     timeFormat: "12h",
     showSeconds: false
@@ -52,4 +35,4 @@ export const DEFAULT_SETTINGS_CONFIG: SettingsConfig = {
     showHistory: true,
     layout: "grid"
   }
-}
+} as any

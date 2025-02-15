@@ -18,9 +18,10 @@ const BookmarkUrl = (props: Props) => {
       const res = await fetchTitleAndFavicon(props.url || "")
       setData({
         image: res.favicon,
-        title: res.title || props.title
+        title: props.title
       })
     }
+
     fn()
   }, [props.url])
 
@@ -28,14 +29,14 @@ const BookmarkUrl = (props: Props) => {
     return (
       <a
         href={props.url}
-        className="flex items-center flex-col space-x-2 p-2 rounded-lg hover:scale-105 transition-transform text-center truncate">
-        <Avatar>
+        className="flex items-center flex-col space-y-1 p-2 rounded-lg hover:scale-105 transition-transform text-center text-xs w-24">
+        <Avatar className="rounded-none mx-auto">
           <AvatarImage
             src={data.image}
             alt={props.title}
-            className="rounded-none object-contain object-center"
+            className="rounded-md object-contain object-center size-12"
           />
-          <AvatarFallback>
+          <AvatarFallback className="size-12">
             {data.title
               .replace(/[^a-zA-Z ]/g, "")
               .trim()
@@ -46,7 +47,7 @@ const BookmarkUrl = (props: Props) => {
               .substring(0, 2)}
           </AvatarFallback>
         </Avatar>
-        <p>{data.title.substring(0, 8)}</p>
+        <p className="text-center line-clamp-2 text-xs">{data.title}</p>
       </a>
     )
   } else {
@@ -58,9 +59,9 @@ const BookmarkUrl = (props: Props) => {
           <AvatarImage
             src={data.image}
             alt={props.title}
-            className="rounded-none object-contain object-center"
+            className="rounded-md object-contain object-center size-12"
           />
-          <AvatarFallback>
+          <AvatarFallback className="size-12">
             {data.title
               .replace(/[^a-zA-Z ]/g, "")
               .trim()
@@ -73,7 +74,7 @@ const BookmarkUrl = (props: Props) => {
         </Avatar>
         <p className="truncate flex flex-col gap-1">
           <span> {data.title}</span>
-          <span className="text-xs text-gray-400 truncate">{props.url}</span>
+          <span className="text-xs truncate">{props.url}</span>
         </p>
       </a>
     )
