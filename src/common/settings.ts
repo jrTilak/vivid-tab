@@ -33,6 +33,7 @@ export const DEFAULT_SETTINGS = {
   general: {
     rootFolder: "0",
     showHistory: true,
-    layout: "grid"
+    layout: "grid",
+    openUrlIn: "current-tab"
   }
 } as any

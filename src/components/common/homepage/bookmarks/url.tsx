@@ -47,15 +47,15 @@ const BookmarkUrl = (props: Props) => {
               .substring(0, 2)}
           </AvatarFallback>
         </Avatar>
-        <p className="text-center line-clamp-2 text-xs">{data.title}</p>
+        <p className="text-center line-clamp-2 text-xs break-all">{data.title}</p>
       </a>
     )
   } else {
     return (
       <a
         href={props.url}
-        className="flex items-center space-x-2 p-2 rounded-lg  transition-colors">
-        <Avatar>
+        className="flex items-center space-x-2 p-2 rounded-lg  transition-colors hover:bg-accent/10">
+        <Avatar className="rounded-none">
           <AvatarImage
             src={data.image}
             alt={props.title}

@@ -36,11 +36,17 @@ const Bookmarks = () => {
     }
   }, [bookmarks])
 
+  useEffect(() => {
+    if (rootChildren.length === 0 && rootFolders.length > 0) {
+      setActiveRootFolder(rootFolders[0].id)
+    }
+  }, [rootChildren, rootFolders])
+
   return (
     <div className="mb-6 col-span-6 h-[70vh] overflow-scroll">
       <div className="flex gap-2.5 flex-wrap mb-4">
         {[
-          {
+          rootChildren.length > 0 && {
             id: "home",
             label: "Home"
           },
@@ -49,11 +55,11 @@ const Bookmarks = () => {
             label: folder.title,
             ...folder
           })),
-          {
+          general.showHistory && {
             id: "history",
             label: "History"
           }
-        ].map((item) => (
+        ].filter(Boolean).map((item) => (
           <Button
             key={item.id}
             onClick={() => {
@@ -84,9 +90,9 @@ const Bookmarks = () => {
         <div
           className={cn(
             general.layout === "grid"
-              ? "grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-4"
+              ? "grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-x-4 gap-y-2"
               : "grid grid-cols-2 xl:grid-cols-3 gap-4",
-            "bg-black/20 backdrop-blur-[1px] rounded-lg p-2 min-h-[300px]"
+            "bg-black/20 backdrop-blur-[1px] rounded-lg p-2 px-5 min-h-[100px]"
           )}>
           {activeRootFolder === "home" ? (
             rootChildren.map((item) => (

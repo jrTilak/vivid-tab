@@ -86,7 +86,7 @@ const GeneralSettings = () => {
           <ChooseBookmarkFolder />
         </div>
       </div>
-      {/* <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <div className="space-y-0.5">
           <Label className="text-sm font-medium">Show History</Label>
         </div>
@@ -96,7 +96,7 @@ const GeneralSettings = () => {
             handleSettingsChange("showHistory", checked)
           }
         />
-      </div> */}
+      </div>
       <div className="flex items-center justify-between">
         <div className="space-y-0.5">
           <label className="text-sm font-medium">Layout</label>
