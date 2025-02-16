@@ -12,8 +12,9 @@ const BookmarkFolder = (props: Props) => {
   if (props.layout === "grid") {
     return (
       <button
+        disabled={props.children?.length === 0}
         onClick={props.onOpenFolder}
-        className="flex flex-col  space-y-1 p-2 rounded-lg hover:scale-105 transition-transform w-24">
+        className="flex flex-col  space-y-1 p-2 rounded-lg hover:scale-105 transition-transform w-24 disabled:opacity-50">
         <img src={folderIcon} alt="" className="size-12 mx-auto" />
         <p className="text-center line-clamp-2 text-xs break-all">{props.title}</p>
       </button>
