@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { fetchTitleAndFavicon } from "@/helpers/fetch-title-and-favicon"
+import { useSettings } from "@/providers/settings-provider"
 import type { BookmarkUrlNode } from "@/types/bookmark-types"
 import React, { useEffect } from "react"
 
@@ -8,6 +9,7 @@ type Props = BookmarkUrlNode & {
 }
 
 const BookmarkUrl = (props: Props) => {
+  const { settings: { general } } = useSettings()
   const [data, setData] = React.useState({
     title: props.title,
     image: ""
@@ -29,6 +31,7 @@ const BookmarkUrl = (props: Props) => {
     return (
       <a
         href={props.url}
+        target={general.openUrlIn === "new-tab" ? "_blank" : "_self"}
         className="flex items-center flex-col space-y-1 p-2 rounded-lg hover:scale-105 transition-transform text-center text-xs w-24">
         <Avatar className="rounded-none mx-auto">
           <AvatarImage
@@ -54,6 +57,7 @@ const BookmarkUrl = (props: Props) => {
     return (
       <a
         href={props.url}
+        target={general.openUrlIn === "new-tab" ? "_blank" : "_self"}
         className="flex items-center space-x-2 p-2 rounded-lg  transition-colors hover:bg-accent/10">
         <Avatar className="rounded-none">
           <AvatarImage

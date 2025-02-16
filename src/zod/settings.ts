@@ -58,12 +58,12 @@ export const SettingsSchema = z
         showHistory: z.boolean().default(DEFAULT_SETTINGS.general.showHistory),
         layout: z
           .enum(["grid", "list"])
-          .default(DEFAULT_SETTINGS.general.layout)
+          .default(DEFAULT_SETTINGS.general.layout),
+        openUrlIn: z
+          .enum(["new-tab", "current-tab"])
+          .default(DEFAULT_SETTINGS.general.openUrlIn)
       })
-      .default(DEFAULT_SETTINGS.general),
-    openUrlIn: z
-      .enum(["new-tab", "current-tab"])
-      .default(DEFAULT_SETTINGS.general.openUrlIn)
+      .default(DEFAULT_SETTINGS.general)
   })
   .default(DEFAULT_SETTINGS)
 

@@ -21,7 +21,7 @@ import { ChooseBookmarkFolder } from "./choose-bookmar-folder"
 const GeneralSettings = () => {
   const {
     settings: {
-      general: { rootFolder, showHistory, layout }
+      general: { rootFolder, showHistory, layout, openUrlIn }
     },
     setSettings
   } = useSettings()
@@ -117,6 +117,36 @@ const GeneralSettings = () => {
                 {
                   label: "List",
                   value: "list"
+                }
+              ] as const
+            ).map(({ label, value }) => (
+              <SelectItem key={value} value={value}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="space-y-0.5">
+          <label className="text-sm font-medium">Open URL in</label>
+        </div>
+        <Select
+          value={openUrlIn}
+          onValueChange={(value) => handleSettingsChange("openUrlIn", value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select open URL in" />
+          </SelectTrigger>
+          <SelectContent>
+            {(
+              [
+                {
+                  label: "New Tab",
+                  value: "new-tab"
+                },
+                {
+                  label: "Current Tab",
+                  value: "current-tab"
                 }
               ] as const
             ).map(({ label, value }) => (
