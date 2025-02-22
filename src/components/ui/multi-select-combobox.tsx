@@ -8,14 +8,14 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
-  CommandList
+  CommandList,
 } from "@/components/ui/command"
 import {
   Popover,
   PopoverContent,
-  PopoverTrigger
+  PopoverTrigger,
 } from "@/components/ui/popover"
-import { cn } from "@/helpers/cn"
+import { cn } from "@/lib/cn"
 import { Check, ChevronsUpDown } from "lucide-react"
 import * as React from "react"
 
@@ -41,7 +41,7 @@ export function MultiSelectCombobox({
   selectedValues,
   onSelectedValuesChange,
   className,
-  disabled
+  disabled,
 }: MultiSelectComboboxProps) {
   const [open, setOpen] = React.useState(false)
 
@@ -49,7 +49,7 @@ export function MultiSelectCombobox({
     onSelectedValuesChange(
       selectedValues.includes(value)
         ? selectedValues.filter((v) => v !== value)
-        : [...selectedValues, value]
+        : [...selectedValues, value],
     )
   }
 
@@ -65,7 +65,8 @@ export function MultiSelectCombobox({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between">
+            className="w-full justify-between"
+          >
             {selectedValues.length > 0
               ? `${selectedValues.length} selected`
               : placeholder}
@@ -83,13 +84,14 @@ export function MultiSelectCombobox({
                 {options.map((option) => (
                   <CommandItem
                     key={option.value}
-                    onSelect={() => handleSelect(option.value)}>
+                    onSelect={() => handleSelect(option.value)}
+                  >
                     <Check
                       className={cn(
                         "mr-2 h-4 w-4",
                         selectedValues.includes(option.value)
                           ? "opacity-100"
-                          : "opacity-0"
+                          : "opacity-0",
                       )}
                     />
                     {option.label}
@@ -103,6 +105,7 @@ export function MultiSelectCombobox({
       <div className="mt-3">
         {selectedValues.map((value) => {
           const option = options.find((o) => o.value === value)
+
           return option ? (
             <Badge key={value} variant="secondary" className="mr-1 mb-1">
               {option.label}
@@ -117,7 +120,8 @@ export function MultiSelectCombobox({
                   e.preventDefault()
                   e.stopPropagation()
                 }}
-                onClick={() => handleRemove(value)}>
+                onClick={() => handleRemove(value)}
+              >
                 ✕
               </button>
             </Badge>

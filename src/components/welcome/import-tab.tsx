@@ -4,8 +4,9 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@/components/ui/card"
+import useActiveTab from "@/hooks/use-active-tab"
 import { ANIMATIONS, type Tab } from "@/tabs/welcome"
 import type { Animation } from "@/tabs/welcome"
 import {
@@ -13,7 +14,7 @@ import {
   ChevronRight,
   ChevronRightIcon,
   HistoryIcon,
-  StarIcon
+  StarIcon,
 } from "lucide-react"
 import { motion } from "motion/react"
 import React from "react"
@@ -25,6 +26,8 @@ type Props = {
 }
 
 const ImportTab = ({ scrollToTab, animation, setAnimation }: Props) => {
+  const activeTabId = useActiveTab()
+
   return (
     <motion.div {...ANIMATIONS[animation]}>
       <Card className="w-full max-w-lg bg-background text-center min-w-[512px]">
@@ -41,7 +44,8 @@ const ImportTab = ({ scrollToTab, animation, setAnimation }: Props) => {
               setAnimation("rightToLeft")
             }}
             variant="ghost"
-            className="w-full justify-start h-14 bg-muted/50 hover:bg-muted">
+            className="w-full justify-start h-14 bg-muted/50 hover:bg-muted"
+          >
             <HistoryIcon className="mr-2 h-4 w-4" />
             Restore bookmarks from the previous install
             <ChevronRightIcon className="ml-auto h-4 w-4 text-muted-foreground" />
@@ -52,7 +56,8 @@ const ImportTab = ({ scrollToTab, animation, setAnimation }: Props) => {
               setAnimation("rightToLeft")
             }}
             variant="ghost"
-            className="w-full justify-start h-14 bg-muted/50 hover:bg-muted">
+            className="w-full justify-start h-14 bg-muted/50 hover:bg-muted"
+          >
             <StarIcon className="mr-2 h-4 w-4" />
             Import from browser bookmarks
             <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
@@ -65,17 +70,19 @@ const ImportTab = ({ scrollToTab, animation, setAnimation }: Props) => {
               setAnimation("leftToRight")
             }}
             variant="ghost"
-            size="sm">
+            size="sm"
+          >
             <ChevronLeftIcon className="mr-1 h-4 w-4" />
             BACK
           </Button>
           <Button
             onClick={() => {
-              chrome.tabs.discard()
               chrome.tabs.create({})
+              chrome.tabs.remove(activeTabId)
             }}
             variant="ghost"
-            size="sm">
+            size="sm"
+          >
             SKIP
             <ChevronRight className="ml-1 h-4 w-4" />
           </Button>

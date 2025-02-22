@@ -1,6 +1,9 @@
 import type { HistoryItem } from "@/types/history-types"
 import { useEffect, useState } from "react"
 
+/**
+ * Custom hook to fetch and manage browser history items.
+ */
 const useHistory = () => {
   const [history, setHistory] = useState<HistoryItem[]>([])
 
@@ -14,10 +17,10 @@ const useHistory = () => {
             title: item.title,
             url: item.url,
             lastVisitTime: item.lastVisitTime,
-            visitCount: item.visitCount
-          })) || []
+            visitCount: item.visitCount,
+          })) || [],
         )
-      }
+      },
     )
   }, [])
 

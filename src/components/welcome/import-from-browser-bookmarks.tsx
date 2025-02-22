@@ -1,33 +1,28 @@
-import { NAMES } from "@/common/constants"
 import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@/components/ui/card"
-import useBookmarks from "@/hooks/use-bookmarks"
-import b from "@/lib/bookmarks"
 import { useSettings } from "@/providers/settings-provider"
 import { ANIMATIONS, type Tab } from "@/tabs/welcome"
 import type { Animation } from "@/tabs/welcome"
-import type {
-  Bookmark,
-  BookmarkFolderNode,
-  Bookmarks
-} from "@/types/bookmark-types"
+
 import { ChevronLeftIcon, ChevronRight } from "lucide-react"
 import { motion } from "motion/react"
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "../ui/select"
+import useActiveTab from "@/hooks/use-active-tab"
+import useFlattenBookmarkFolders from "@/hooks/use-flatten-bookmark-folders"
 
 type Props = {
   scrollToTab: (tab: Tab) => void
@@ -35,48 +30,15 @@ type Props = {
   setAnimation: (animation: Animation) => void
 }
 
-type Folder = {
-  id: string
-  title: string
-  depth: number
-}
-
 const ImportFromBrowserBookmarks = ({
   scrollToTab,
   animation,
-  setAnimation
+  setAnimation,
 }: Props) => {
-  const [folders, setFolders] = useState<Folder[]>([])
-  const bookmarks = useBookmarks()
+  const folders = useFlattenBookmarkFolders()
   const [selectedFolder, setSelectedFolder] = useState<string>("")
   const { setSettings } = useSettings()
-  useEffect(() => {
-    if (bookmarks && bookmarks.length > 0) {
-      const flattenBookmarks = (
-        nodes: Bookmark[],
-        depth: number = 0
-      ): Folder[] => {
-        let flatArray: Folder[] = []
-
-        for (const node of nodes) {
-          if ((node as BookmarkFolderNode).children) {
-            const indentedTitle = " ".repeat(depth) + node.title
-            flatArray.push({ id: node.id, title: indentedTitle, depth })
-
-            flatArray = flatArray.concat(
-              flattenBookmarks((node as BookmarkFolderNode).children, depth + 2)
-            )
-          }
-        }
-
-        return flatArray
-      }
-
-      const bookmarkFolders = flattenBookmarks(bookmarks)
-
-      setFolders(bookmarkFolders)
-    }
-  }, [bookmarks])
+  const activeTabId = useActiveTab()
 
   return (
     <motion.div {...ANIMATIONS[animation]}>
@@ -94,7 +56,8 @@ const ImportFromBrowserBookmarks = ({
             <Select
               value={selectedFolder}
               disabled={folders.length === 0}
-              onValueChange={(value) => setSelectedFolder(value)}>
+              onValueChange={(value) => setSelectedFolder(value)}
+            >
               <SelectTrigger value={null}>
                 <SelectValue
                   placeholder={
@@ -109,8 +72,9 @@ const ImportFromBrowserBookmarks = ({
                   <SelectItem key={folder.id} value={folder.id}>
                     <span
                       style={{
-                        paddingLeft: folder.depth * 10
-                      }}>
+                        paddingLeft: folder.depth * 10,
+                      }}
+                    >
                       {folder.title}
                     </span>
                   </SelectItem>
@@ -126,7 +90,8 @@ const ImportFromBrowserBookmarks = ({
               setAnimation("leftToRight")
             }}
             variant="ghost"
-            size="sm">
+            size="sm"
+          >
             <ChevronLeftIcon className="mr-1 h-4 w-4" />
             BACK
           </Button>
@@ -137,14 +102,15 @@ const ImportFromBrowserBookmarks = ({
                 ...prev,
                 general: {
                   ...prev.general,
-                  rootFolder: selectedFolder
-                }
+                  rootFolder: selectedFolder,
+                },
               }))
-              chrome.tabs.discard()
               chrome.tabs.create({})
+              chrome.tabs.remove(activeTabId)
             }}
             variant="ghost"
-            size="sm">
+            size="sm"
+          >
             FINISH
             <ChevronRight className="ml-1 h-4 w-4" />
           </Button>

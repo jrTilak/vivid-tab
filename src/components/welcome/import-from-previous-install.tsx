@@ -1,25 +1,18 @@
-import { NAMES } from "@/common/constants"
 import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@/components/ui/card"
 import useBookmarks from "@/hooks/use-bookmarks"
 import b from "@/lib/bookmarks"
 import { useSettings } from "@/providers/settings-provider"
 import { ANIMATIONS, type Tab } from "@/tabs/welcome"
 import type { Animation } from "@/tabs/welcome"
-import type { Bookmark, Bookmarks } from "@/types/bookmark-types"
-import {
-  ChevronLeftIcon,
-  ChevronRight,
-  ChevronRightIcon,
-  HistoryIcon,
-  StarIcon
-} from "lucide-react"
+import type { Bookmark } from "@/types/bookmark-types"
+import { ChevronLeftIcon, ChevronRight } from "lucide-react"
 import { motion } from "motion/react"
 import React, { useEffect, useState } from "react"
 
@@ -28,8 +21,10 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "../ui/select"
+import { NAMES } from "@/constants/common"
+import useActiveTab from "@/hooks/use-active-tab"
 
 type Props = {
   scrollToTab: (tab: Tab) => void
@@ -40,7 +35,7 @@ type Props = {
 const ImportFromPreviousInstall = ({
   scrollToTab,
   animation,
-  setAnimation
+  setAnimation,
 }: Props) => {
   const [folders, setFolders] = useState<
     { bookmark: Bookmark; path: string }[]
@@ -48,10 +43,15 @@ const ImportFromPreviousInstall = ({
   const bookmarks = useBookmarks()
   const [selectedFolder, setSelectedFolder] = useState<string>("")
   const { setSettings } = useSettings()
+  const activeTabId = useActiveTab()
+
+  /**
+   * Search for bookmarks named vivid...
+   */
   useEffect(() => {
     const folders = b.searchBookmarkFoldersByName(
       bookmarks,
-      NAMES.DEFAULT_BOOKMARK_FOLDER_NAME
+      NAMES.DEFAULT_BOOKMARK_FOLDER_NAME,
     )
     setFolders(folders)
   }, [bookmarks])
@@ -70,7 +70,8 @@ const ImportFromPreviousInstall = ({
             <Select
               value={selectedFolder}
               disabled={folders.length === 0}
-              onValueChange={(value) => setSelectedFolder(value)}>
+              onValueChange={(value) => setSelectedFolder(value)}
+            >
               <SelectTrigger value={null}>
                 <SelectValue
                   placeholder={
@@ -97,7 +98,8 @@ const ImportFromPreviousInstall = ({
               setAnimation("leftToRight")
             }}
             variant="ghost"
-            size="sm">
+            size="sm"
+          >
             <ChevronLeftIcon className="mr-1 h-4 w-4" />
             BACK
           </Button>
@@ -108,14 +110,15 @@ const ImportFromPreviousInstall = ({
                 ...prev,
                 general: {
                   ...prev.general,
-                  rootFolder: selectedFolder
-                }
+                  rootFolder: selectedFolder,
+                },
               }))
-              chrome.tabs.discard()
               chrome.tabs.create({})
+              chrome.tabs.remove(activeTabId)
             }}
             variant="ghost"
-            size="sm">
+            size="sm"
+          >
             FINISH
             <ChevronRight className="ml-1 h-4 w-4" />
           </Button>

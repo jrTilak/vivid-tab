@@ -6,12 +6,12 @@ const useUserLocation = () => {
   const [isLoading, setIsLoading] = React.useState(true)
   const [error, setError] = React.useState({
     message: "",
-    err: false
+    err: false,
   })
   const [position, setPosition] = React.useState({
     lat: 0,
     lon: 0,
-    accurate: false
+    accurate: false,
   })
   useAsyncEffect(async () => {
     if ("geolocation" in navigator) {
@@ -20,17 +20,17 @@ const useUserLocation = () => {
           setPosition({
             lat: Number(position.coords.latitude),
             lon: Number(position.coords.longitude),
-            accurate: true
+            accurate: true,
           })
           setIsLoading(false)
         },
         (error) => {
           setError({
             message: error.message,
-            err: true
+            err: true,
           })
           setIsLoading(false)
-        }
+        },
       )
     } else {
       const location = await fetch("https://ipapi.co/json/")
@@ -39,8 +39,9 @@ const useUserLocation = () => {
         setError({
           message:
             "Failed to get your location, Either enable geolocation or internet connection",
-          err: true
+          err: true,
         })
+
         return
       }
 
@@ -49,7 +50,7 @@ const useUserLocation = () => {
       setPosition({
         lat: Number(data.latitude),
         lon: Number(data.longitude),
-        accurate: false
+        accurate: false,
       })
       setIsLoading(false)
     }

@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS } from "@/common/settings"
+import { DEFAULT_SETTINGS } from "@/constants/settings"
 import { SettingsSchema, type Settings } from "@/zod/settings"
 import React, {
   createContext,
@@ -6,7 +6,7 @@ import React, {
   useContext,
   useEffect,
   useState,
-  type ReactNode
+  type ReactNode,
 } from "react"
 
 interface SettingsContextState {
@@ -16,7 +16,7 @@ interface SettingsContextState {
 }
 
 const SettingsContext = createContext<SettingsContextState | undefined>(
-  undefined
+  undefined,
 )
 
 const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -30,7 +30,8 @@ const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   //  Load settings from storage
   useEffect(() => {
     chrome.storage.sync.get("settings", ({ settings }) => {
-      let s = DEFAULT_SETTINGS
+      let s: Settings = DEFAULT_SETTINGS
+
       if (settings) {
         try {
           s = SettingsSchema.parse(JSON.parse(settings))
@@ -38,6 +39,7 @@ const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
           console.error(error)
         }
       }
+
       setSettings(s)
       setIsLoaded(true)
     })
@@ -53,7 +55,7 @@ const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const value: SettingsContextState = {
     setSettings,
     settings,
-    resetSettings
+    resetSettings,
   }
 
   return (
@@ -65,9 +67,11 @@ const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
 const useSettings = () => {
   const context = useContext(SettingsContext)
+
   if (context === undefined) {
     throw new Error("useSettings must be used within a SettingsProvider")
   }
+
   return context
 }
 

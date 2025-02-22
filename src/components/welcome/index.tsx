@@ -33,7 +33,8 @@ const WelcomeTab = ({ scrollToTab, animation, setAnimation }: Props) => {
             }}
             variant="outline"
             size="lg"
-            className="font-semibold">
+            className="font-semibold"
+          >
             START <ArrowRightIcon className="size-4" />
           </Button>
         </CardFooter>

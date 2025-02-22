@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useState } from "react"
 
 import Searchbar1 from "./1"
 import SearchDialog from "./search-dialog"
@@ -9,7 +9,11 @@ const Searchbar = () => {
   return (
     <>
       <Searchbar1 isOpen={isOpen} setIsOpen={setIsOpen} />
-      <SearchDialog defaultOpen={isOpen} onOpenChange={setIsOpen} />
+      <SearchDialog
+        defaultOpen={isOpen}
+        onOpenChange={setIsOpen}
+        isNewTab={true}
+      />
     </>
   )
 }
