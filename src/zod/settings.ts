@@ -1,6 +1,9 @@
-import { DEFAULT_SETTINGS } from "@/common/settings"
+import { DEFAULT_SETTINGS } from "@/constants/settings"
 import { z } from "zod"
 
+/**
+ * Zod schema to parse settings
+ */
 export const SettingsSchema = z
   .object({
     timer: z
@@ -8,21 +11,21 @@ export const SettingsSchema = z
         timeFormat: z
           .enum(["12h", "24h"])
           .default(DEFAULT_SETTINGS.timer.timeFormat),
-        showSeconds: z.boolean().default(DEFAULT_SETTINGS.timer.showSeconds)
+        showSeconds: z.boolean().default(DEFAULT_SETTINGS.timer.showSeconds),
       })
       .default(DEFAULT_SETTINGS.timer),
     temperature: z
       .object({
         unit: z
           .enum(["celsius", "fahrenheit"])
-          .default(DEFAULT_SETTINGS.temperature.unit)
+          .default(DEFAULT_SETTINGS.temperature.unit),
       })
       .default(DEFAULT_SETTINGS.temperature),
     quotes: z
       .object({
         categories: z
           .array(z.string())
-          .default(DEFAULT_SETTINGS.quotes.categories)
+          .default(DEFAULT_SETTINGS.quotes.categories),
       })
       .default(DEFAULT_SETTINGS.quotes),
     todos: z
@@ -35,10 +38,10 @@ export const SettingsSchema = z
             durationInMinutes: z
               .number()
               .default(
-                DEFAULT_SETTINGS.todos.expireAfterCompleted.durationInMinutes
-              )
+                DEFAULT_SETTINGS.todos.expireAfterCompleted.durationInMinutes,
+              ),
           })
-          .default(DEFAULT_SETTINGS.todos.expireAfterCompleted)
+          .default(DEFAULT_SETTINGS.todos.expireAfterCompleted),
       })
       .default(DEFAULT_SETTINGS.todos),
     wallpapers: z
@@ -48,7 +51,7 @@ export const SettingsSchema = z
           .default(DEFAULT_SETTINGS.wallpapers.selectedImageId)
           .nullable()
           .nullish(),
-        images: z.array(z.string()).default(DEFAULT_SETTINGS.wallpapers.images)
+        images: z.array(z.string()).default(DEFAULT_SETTINGS.wallpapers.images),
       })
       .default(DEFAULT_SETTINGS.wallpapers),
     layout: z.record(z.string(), z.string()).default(DEFAULT_SETTINGS.layout),
@@ -61,10 +64,32 @@ export const SettingsSchema = z
           .default(DEFAULT_SETTINGS.general.layout),
         openUrlIn: z
           .enum(["new-tab", "current-tab"])
-          .default(DEFAULT_SETTINGS.general.openUrlIn)
+          .default(DEFAULT_SETTINGS.general.openUrlIn),
+        bookmarksCanTakeExtraSpaceIfAvailable: z
+          .boolean()
+          .default(
+            DEFAULT_SETTINGS.general.bookmarksCanTakeExtraSpaceIfAvailable,
+          ),
       })
-      .default(DEFAULT_SETTINGS.general)
+      .default(DEFAULT_SETTINGS.general),
+
+    searchbar: z
+      .object({
+        dialogBackground: z
+          .enum(["default", "transparent"])
+          .default(DEFAULT_SETTINGS.searchbar.dialogBackground),
+        shortcuts: z
+          .array(z.enum(["chatgpt", "gemini", "deepseek", "claude", "youtube"]))
+          .default(() => [...DEFAULT_SETTINGS.searchbar.shortcuts]),
+        submitDefaultAction: z
+          .enum(["default", "ask-chatgpt", "ask-claude", "search-on-youtube"])
+          .default(DEFAULT_SETTINGS.searchbar.submitDefaultAction),
+        searchSuggestions: z
+          .boolean()
+          .default(DEFAULT_SETTINGS.searchbar.searchSuggestions),
+      })
+      .default({}),
   })
-  .default(DEFAULT_SETTINGS)
+  .default({})
 
 export type Settings = z.infer<typeof SettingsSchema>

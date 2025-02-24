@@ -5,12 +5,12 @@
     ".plasmo/index.d.ts",
     "./**/*.ts",
     "./**/*.tsx",
-    "src/components/welcome/import-from-browser-bookmarks.tsx"
+    "src/components/welcome/import-from-browser-bookmarks.tsx",
   ],
   "compilerOptions": {
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
     },
-    "baseUrl": "."
-  }
+    "baseUrl": ".",
+  },
 }

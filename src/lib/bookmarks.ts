@@ -25,13 +25,13 @@
 import type {
   Bookmark,
   BookmarkFolderNode,
-  BookmarkTreeNode
+  BookmarkTreeNode,
 } from "@/types/bookmark-types"
 
 class Bookmarks {
   searchBookmarkFoldersByName(
     bookmarks: Bookmark[],
-    name: string
+    name: string,
   ): { bookmark: Bookmark; path: string }[] {
     const foundBookmarks: { bookmark: Bookmark; path: string }[] = []
 
@@ -49,13 +49,14 @@ class Bookmarks {
           findNode(
             (node as BookmarkFolderNode).children as BookmarkTreeNode[],
             name,
-            newPath
+            newPath,
           )
         }
       }
     }
 
     findNode(bookmarks, name, "")
+
     return foundBookmarks
   }
 }

@@ -8,12 +8,12 @@
     "reactHooks": "kebab-case"
   },
   "paths": {
-    "helperFunctions": "@/helpers",
+    "helperFunctions": "@/lib",
     "reactHooks": "@/hooks"
   },
   "resolve": {
     "alias": {
-      "@/helpers": "/src/helpers",
+      "@/lib": "/src/lib",
       "@/hooks": "/src/hooks"
     }
   }

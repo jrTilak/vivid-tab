@@ -4,6 +4,10 @@
 module.exports = {
   plugins: {
     tailwindcss: {},
-    autoprefixer: {}
-  }
+    autoprefixer: {},
+    "postcss-wrap": {
+      selector: ".__vivid-container", // Wrap all styles inside this class,
+      skip: [":root", ".dark"],
+    },
+  },
 }

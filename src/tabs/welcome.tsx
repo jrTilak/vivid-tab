@@ -17,14 +17,14 @@ export const ANIMATIONS = {
     initial: { opacity: 0, x: -100 },
     animate: { opacity: 1, x: 0 },
     exit: { opacity: 0, x: 100 },
-    duration: 0.5
+    duration: 0.5,
   },
   rightToLeft: {
     initial: { opacity: 0, x: 100 },
     animate: { opacity: 1, x: 0 },
     exit: { opacity: 0, x: -100 },
-    duration: 0.5
-  }
+    duration: 0.5,
+  },
 }
 
 export type Animation = keyof typeof ANIMATIONS
@@ -32,6 +32,7 @@ export type Animation = keyof typeof ANIMATIONS
 const Welcome = () => {
   const [currentTab, setCurrentTab] = useState<Tab>("WELCOME")
   const [animation, setAnimation] = useState<Animation>("leftToRight")
+
   const scrollToTab = (tab: Tab) => {
     setCurrentTab(tab)
   }
@@ -41,9 +42,9 @@ const Welcome = () => {
       WELCOME: WelcomeTab,
       IMPORT: ImportTab,
       IMPORT_FROM_PREVIOUS_INSTALL: ImportFromPreviousInstall,
-      IMPORT_FROM_BROWSER_BOOKMARKS: ImportFromBrowserBookmarks
+      IMPORT_FROM_BROWSER_BOOKMARKS: ImportFromBrowserBookmarks,
     }),
-    [scrollToTab, animation]
+    [scrollToTab, animation],
   )
 
   return (
@@ -58,6 +59,7 @@ const Welcome = () => {
           <div className="w-screen h-screen flex items-center justify-center">
             {(() => {
               const Comp = TABS[currentTab]
+
               return (
                 <Comp
                   scrollToTab={scrollToTab}

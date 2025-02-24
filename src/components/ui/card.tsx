@@ -1,4 +1,4 @@
-import { cn } from "@/helpers/cn"
+import { cn } from "@/lib/cn"
 import * as React from "react"
 
 const Card = React.forwardRef<
@@ -9,7 +9,7 @@ const Card = React.forwardRef<
     ref={ref}
     className={cn(
       "rounded-lg border-none text-card-foreground shadow-sm bg-black/20 backdrop-blur-[1px]",
-      className
+      className,
     )}
     {...props}
   />
@@ -36,7 +36,7 @@ const CardTitle = React.forwardRef<
     ref={ref}
     className={cn(
       "text-2xl font-semibold leading-none tracking-tight",
-      className
+      className,
     )}
     {...props}
   />

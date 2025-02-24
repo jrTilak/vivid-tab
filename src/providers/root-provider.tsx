@@ -1,5 +1,5 @@
 import { ThemeProvider, type Theme } from "@/providers/theme-provider"
-import React from "react"
+import React, { useEffect } from "react"
 
 import "@/styles/index.css"
 
@@ -11,6 +11,10 @@ type Props = {
 }
 
 const RootProvider = ({ children, theme }: Props) => {
+  useEffect(() => {
+    document.querySelector("html").classList.add("__vivid-container")
+  }, [])
+
   return (
     <SettingsProvider>
       <ThemeProvider theme={theme}>{children}</ThemeProvider>

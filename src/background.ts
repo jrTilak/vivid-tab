@@ -1,16 +1,78 @@
-import { BACKGROUND_ACTIONS } from "./common/constants"
+/* eslint-disable indent */
+import { z } from "zod"
+import { BACKGROUND_ACTIONS } from "./constants/background-actions"
 
-chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
+/**
+ * Handles background communication
+ */
+chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
   switch (message.action) {
     case BACKGROUND_ACTIONS.GET_BOOKMARKS:
       chrome.bookmarks.getTree((bookmarkTree) => {
         sendResponse(bookmarkTree)
       })
+
       return true
+
     case BACKGROUND_ACTIONS.GET_HISTORY:
       chrome.history.search({ text: "" }, (historyItems) => {
         sendResponse(historyItems?.slice(0, 30) || [])
       })
+
+      return true
+
+    case BACKGROUND_ACTIONS.GET_SEARCH_SUGGESTIONS: {
+      console.log("Getting search suggestions for:", message.query)
+      const results = await fetch(
+        `https://suggestqueries.google.com/complete/search?client=firefox&q=${message.query}`,
+      )
+      const data = await results.json()
+
+      sendResponse(data[1])
+
+      return true
+    }
+
+    case BACKGROUND_ACTIONS.SEARCH_QUERY:
+      {
+        // eslint-disable-next-line prefer-const
+        let { query, openIn } = message as {
+          query: string
+          openIn: "new-tab" | "current-tab"
+        }
+
+        let { success: isValidUrl } = z.string().url().safeParse(query)
+
+        // for example, google.com is a valid url
+        if (
+          !isValidUrl &&
+          query
+            .split(".")
+            .map((part) => part.trim())
+            .filter(Boolean).length >= 2
+        ) {
+          isValidUrl = true
+          query = "https://" + query
+        }
+
+        if (isValidUrl) {
+          if (openIn === "new-tab") {
+            chrome.tabs.create({ url: query })
+          } else {
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+              if (tabs.length > 0) {
+                chrome.tabs.update(tabs[0].id, { url: query })
+              }
+            })
+          }
+        } else {
+          chrome.search.query({
+            text: query,
+            disposition: openIn === "new-tab" ? "NEW_TAB" : "CURRENT_TAB",
+          })
+        }
+      }
+
       return true
   }
 })
