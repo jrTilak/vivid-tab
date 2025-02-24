@@ -8,6 +8,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
+import { removeIconFromLocalStorage } from "@/lib/icons-to-local"
 import { Trash2Icon } from "lucide-react"
 
 import React from "react"
@@ -17,13 +18,19 @@ type Props = {
   onOpenChange: (open: boolean) => void
   id: string
   label: string
+  url?: string
 }
 
-const DeleteDialog = ({ open, onOpenChange, id, label }: Props) => {
+const DeleteDialog = ({ open, onOpenChange, id, label, url }: Props) => {
   const deleteUrl = () => {
     chrome.bookmarks.remove(id, () => {
       onOpenChange(false)
     })
+    removeIconFromLocalStorage(`icon-${id}`)
+
+    if (url) {
+      removeIconFromLocalStorage(`favicon-${url}`)
+    }
   }
 
   return (

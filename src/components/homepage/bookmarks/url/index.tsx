@@ -16,6 +16,7 @@ import useAsyncEffect from "@/hooks/use-async-effect"
 import { DeleteIcon, EditIcon, ExternalLinkIcon, MoveIcon } from "lucide-react"
 import DeleteDialog from "../delete-dialog"
 import CreateABookmark from "../create-a-bookmark"
+import useIcon from "@/hooks/use-icon"
 
 type Props = BookmarkUrlNode & {
   layout: "grid" | "list"
@@ -25,12 +26,14 @@ type Props = BookmarkUrlNode & {
 const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const { icon } = useIcon({ id: props.id, defaultIcon: "" })
+
   const {
     settings: { general },
   } = useSettings()
   const [data, setData] = useState({
     title: props.title,
-    image: "",
+    image: icon,
   })
 
   useAsyncEffect(async () => {
@@ -98,6 +101,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
         onOpenChange={setIsDeleteDialogOpen}
         id={props.id}
         label={props.title + " bookmark"}
+        url={props.url}
       />
       <CreateABookmark
         open={editDialogOpen}
@@ -119,7 +123,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
             >
               <Avatar className="rounded-none mx-auto">
                 <AvatarImage
-                  src={data.image}
+                  src={icon || data.image}
                   alt={props.title}
                   className="rounded-md object-contain object-center size-12"
                 />
@@ -147,7 +151,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
             >
               <Avatar className="rounded-none">
                 <AvatarImage
-                  src={data.image}
+                  src={icon || data.image}
                   alt={props.title}
                   className="rounded-md object-contain object-center size-12"
                 />
@@ -177,7 +181,9 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
             </ContextMenuShortcut>
           </ContextMenuItem>
           <ContextMenuSeparator />
-          <ContextMenuItem onClick={() => setTimeout(() => setEditDialogOpen(true), 100)}>
+          <ContextMenuItem
+            onClick={() => setTimeout(() => setEditDialogOpen(true), 100)}
+          >
             Edit
             <ContextMenuShortcut>
               <EditIcon className="size-4" />

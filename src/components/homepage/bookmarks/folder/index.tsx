@@ -12,6 +12,7 @@ import folderIcon from "data-base64:@/assets/folder-svgrepo-com.svg"
 import DeleteDialog from "../delete-dialog"
 import { DeleteIcon, EditIcon, MoveIcon } from "lucide-react"
 import CreateAFolder from "../create-a-folder"
+import useIcon from "@/hooks/use-icon"
 
 type Props = BookmarkFolderNode & {
   onOpenFolder: () => void
@@ -21,6 +22,7 @@ type Props = BookmarkFolderNode & {
 const BookmarkFolder = (props: Props) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false)
+  const { icon, setIcon } = useIcon({ id: props.id, defaultIcon: folderIcon })
 
   return (
     <>
@@ -45,9 +47,14 @@ const BookmarkFolder = (props: Props) => {
               onClick={props.onOpenFolder}
               className="flex flex-col  space-y-1 p-2 rounded-lg hover:scale-105 transition-transform w-24 disabled:opacity-50"
             >
-              <img src={folderIcon} alt="" className="size-12 mx-auto" />
+              <img
+                src={icon}
+                alt=""
+                className="size-12 mx-auto rounded-md object-contain object-center"
+                onError={() => setIcon(folderIcon)}
+              />
               <p className="text-center line-clamp-2 text-xs break-all">
-                {props.title}
+                {props.title} ({props.children.length})
               </p>
             </button>
           ) : (
@@ -55,7 +62,12 @@ const BookmarkFolder = (props: Props) => {
               onClick={props.onOpenFolder}
               className="flex space-x-1 p-2 items-center rounded-lg transition-colors disabled:opacity-50"
             >
-              <img src={folderIcon} alt="" className="size-12" />
+              <img
+                src={icon}
+                alt=""
+                className="size-12 rounded-md object-contain object-center"
+                onError={() => setIcon(folderIcon)}
+              />
               <p className="text-xs w-full text-left line-clamp-2">
                 {props.title}
                 <br />
@@ -67,7 +79,9 @@ const BookmarkFolder = (props: Props) => {
           )}
         </ContextMenuTrigger>
         <ContextMenuContent className="w-fit min-w-40">
-          <ContextMenuItem onClick={() => setTimeout(() => setIsUpdateDialogOpen(true), 100)}>
+          <ContextMenuItem
+            onClick={() => setTimeout(() => setIsUpdateDialogOpen(true), 100)}
+          >
             Edit
             <ContextMenuShortcut>
               <EditIcon className="size-4" />
