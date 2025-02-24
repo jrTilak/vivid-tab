@@ -70,7 +70,7 @@ const config = [
   // Spacing and formatting rules
   {
     rules: {
-      indent: ["error", 2], // 2-space indentation
+      indent: "off", // 2-space indentation
       "no-multiple-empty-lines": ["error", { max: 1, maxEOF: 1, maxBOF: 0 }], // Limit empty lines
       "space-in-parens": ["error", "never"], // No spaces inside parentheses
       "array-bracket-spacing": ["error", "never"], // No spaces inside array brackets

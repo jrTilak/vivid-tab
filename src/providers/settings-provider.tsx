@@ -21,16 +21,18 @@ const SettingsContext = createContext<SettingsContextState | undefined>(
 
 const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isLoaded, setIsLoaded] = useState(false)
-  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS)
+  const [settings, setSettings] = useState<Settings>(
+    DEFAULT_SETTINGS as unknown as Settings,
+  )
 
   const resetSettings = useCallback(() => {
-    setSettings(DEFAULT_SETTINGS)
+    setSettings(DEFAULT_SETTINGS as unknown as Settings)
   }, [])
 
   //  Load settings from storage
   useEffect(() => {
     chrome.storage.sync.get("settings", ({ settings }) => {
-      let s: Settings = DEFAULT_SETTINGS
+      let s: Settings = DEFAULT_SETTINGS as unknown as Settings
 
       if (settings) {
         try {

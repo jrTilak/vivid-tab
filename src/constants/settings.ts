@@ -39,12 +39,6 @@ export const DEFAULT_SETTINGS = {
     dialogBackground: "default",
     shortcuts: ["chatgpt", "deepseek", "claude", "youtube"],
     submitDefaultAction: "default",
-    searchSuggestions: true,
-    historySuggestions: true,
-    bookmarkSuggestions: true,
-    searchbarAutoComplete: true,
-    openResultInFromNewTab: "current-tab",
-    openResultInFromWebPage: "new-tab",
-    shortcut: ["Ctrl", ","],
+    searchSuggestions: false,
   },
 } as const

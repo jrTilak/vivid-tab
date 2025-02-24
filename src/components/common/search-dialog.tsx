@@ -1,11 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { motion } from "motion/react"
-// because variables are not working in the shadow DOM, we need to import the styles here
-import "@/styles/index.css"
 import { AnimatePresence } from "motion/react"
 import { cn } from "@/lib/cn"
 import { SearchIcon } from "lucide-react"
-import { z } from "zod"
 import { useSettings } from "@/providers/settings-provider"
 import chatgpt from "data-base64:@/assets/openai.svg"
 import claude from "data-base64:@/assets/claude.svg"
@@ -17,25 +14,21 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import useDebouncedValue from "@/hooks/use-debounced-value"
 import useSearchSuggestions from "@/hooks/use-search-suggestions"
+import { BACKGROUND_ACTIONS } from "@/constants/background-actions"
 
 type Props = {
   defaultOpen?: boolean
   onOpenChange?: (open: boolean) => void
-  isNewTab: boolean // determines if user is in new tab page or browsing some website
   portalRef?: React.RefObject<HTMLElement>
 }
 
-const SearchDialog = ({
-  defaultOpen,
-  onOpenChange,
-  isNewTab,
-  portalRef,
-}: Props) => {
+const SearchDialog = ({ defaultOpen, onOpenChange, portalRef }: Props) => {
   const [open, setOpen] = useState(defaultOpen)
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 300)
+
   const {
-    settings: { searchbar },
+    settings: { searchbar, general },
   } = useSettings()
 
   const searchSuggestions = useSearchSuggestions({
@@ -61,102 +54,64 @@ const SearchDialog = ({
     setSearchQuery("")
   }, [open])
 
+  useEffect(() => {}, [debouncedSearchQuery])
+
   const handleSearchQuery = useCallback(
     (query: string) => {
-      const { success } = z.string().url().safeParse(query)
-
-      // open the url directly if it's a valid url
-      if (success) {
-        if (!isNewTab) {
-          if (searchbar.openResultInFromNewTab === "new-tab") {
-            chrome.tabs.create({ url: query })
-          } else {
-            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-              if (tabs.length > 0) {
-                chrome.tabs.update(tabs[0].id, { url: query })
-              }
-            })
-          }
-        } else {
-          if (searchbar.openResultInFromWebPage === "new-tab") {
-            const a = document.createElement("a")
-            a.href = query
-            a.target = "_blank"
-            a.click()
-          } else {
-            window.location.href = query
-          }
-        }
-        // else search the web
-      } else {
-        if (isNewTab) {
-          chrome.search.query({
-            text: query,
-            disposition:
-              searchbar.openResultInFromNewTab === "new-tab"
-                ? "NEW_TAB"
-                : "CURRENT_TAB",
-          })
-        } else {
-          chrome.search.query({
-            text: query,
-            disposition:
-              searchbar.openResultInFromWebPage === "new-tab"
-                ? "NEW_TAB"
-                : "CURRENT_TAB",
-          })
-        }
-      }
+      chrome.runtime.sendMessage({
+        action: BACKGROUND_ACTIONS.SEARCH_QUERY,
+        query,
+        openIn: general.openUrlIn,
+      })
+      onOpenChange(false)
+      setSearchQuery("")
     },
-    [
-      isNewTab,
-      searchbar.openResultInFromNewTab,
-      searchbar.openResultInFromWebPage,
-    ],
+    [general.openUrlIn],
   )
 
   const SHORTCUTS = useMemo(
-    () => [
-      {
-        name: "Ask ChatGPT",
-        id: "chatgpt",
-        available: true,
-        icon: chatgpt,
-        onQuery: (query: string) => {
-          handleSearchQuery(`https://chatgpt.com/?q=${query}`)
+    () =>
+      [
+        {
+          name: "Ask ChatGPT",
+          id: "chatgpt",
+          available: true,
+          icon: chatgpt,
+          onQuery: (query: string) => {
+            handleSearchQuery(`https://chatgpt.com/?q=${query}`)
+          },
         },
-      },
-      {
-        name: "Ask Claude",
-        available: true,
-        id: "claude",
-        icon: claude,
-        onQuery: (query: string) => {
-          handleSearchQuery(`https://claude.ai/new?q=${query}`)
-        }
-      },
-      {
-        name: "Ask Gemini",
-        available: false,
-        icon: gemini,
-        id: "gemini",
-      },
-      {
-        name: "Ask DeepSeek",
-        available: false,
-        icon: deepseek,
-        id: "deepseek",
-      },
-      {
-        name: "Open Youtube",
-        available: true,
-        icon: "https://www.svgrepo.com/show/475700/youtube-color.svg",
-        id: "youtube",
-        onQuery: (query: string) => {
-          handleSearchQuery(`https://youtube.com/search?q=${query}`)
-        }
-      }
-    ] as const,
+        {
+          name: "Ask Claude",
+          available: true,
+          id: "claude",
+          icon: claude,
+          onQuery: (query: string) => {
+            handleSearchQuery(`https://claude.ai/new?q=${query}`)
+          },
+        },
+        {
+          name: "Ask Gemini",
+          available: false,
+          icon: gemini,
+          id: "gemini",
+        },
+        {
+          name: "Ask DeepSeek",
+          available: false,
+          icon: deepseek,
+          id: "deepseek",
+        },
+        {
+          name: "Open Youtube",
+          available: true,
+          icon: "https://www.svgrepo.com/show/475700/youtube-color.svg",
+          id: "youtube",
+          onQuery: (query: string) => {
+            handleSearchQuery(`https://youtube.com/search?q=${query}`)
+          },
+        },
+      ] as const,
     [],
   )
 
@@ -179,10 +134,10 @@ const SearchDialog = ({
             ? "bg-transparent"
             : "bg-background",
         )}
-        overlayClassName="bg-black/40 backdrop-blur-md"
+        overlayClassName="bg-black/40 backdrop-blur-[12px]"
         portalContainer={portalRef?.current}
       >
-        <div className="flex flex-col items-center justify-center gap-4">
+        <div className="flex flex-col items-center backdrop-blur-md justify-center gap-4">
           {/* search form */}
           <motion.div
             initial={{ opacity: 0, y: 100 }}
@@ -194,7 +149,27 @@ const SearchDialog = ({
             <form
               onSubmit={(e) => {
                 e.preventDefault()
-                handleSearchQuery(searchQuery)
+
+                switch (searchbar.submitDefaultAction) {
+                  case "default":
+                    handleSearchQuery(searchQuery)
+                    break
+                  case "ask-chatgpt":
+                    SHORTCUTS.find((s) => s.id === "chatgpt")?.onQuery?.(
+                      searchQuery,
+                    )
+                    break
+                  case "ask-claude":
+                    SHORTCUTS.find((s) => s.id === "claude")?.onQuery?.(
+                      searchQuery,
+                    )
+                    break
+                  case "search-on-youtube":
+                    SHORTCUTS.find((s) => s.id === "youtube")?.onQuery?.(
+                      searchQuery,
+                    )
+                    break
+                }
               }}
               className={cn(
                 "flex-grow flex h-10 w-full text-base bg-transparent gap-1",
@@ -203,6 +178,7 @@ const SearchDialog = ({
               <input
                 autoFocus
                 type="text"
+                id="vivid-search-bar"
                 placeholder="Search the web..."
                 className="w-full h-full !outline-none rounded-l-md bg-background px-3 py-2 placeholder:text-muted-foreground flex-grow border border-input"
                 value={searchQuery}
@@ -242,7 +218,12 @@ const SearchDialog = ({
                       <Button
                         disabled={!engine.available}
                         variant="none"
-                        className={cn("w-full h-full flex flex-col gap-1 items-center justify-center p-2 py-5 rounded-md relative hover:border hover:border-input focus-visible:ring-destructive", searchbar.dialogBackground === "transparent" ? "bg-background" : "bg-black/10 dark:bg-white/10")}
+                        className={cn(
+                          "w-full h-full flex flex-col gap-1 items-center justify-center p-2 py-5 rounded-md relative hover:border hover:border-input focus-visible:ring-destructive",
+                          searchbar.dialogBackground === "transparent"
+                            ? "bg-background"
+                            : "bg-black/10 dark:bg-white/10",
+                        )}
                       >
                         <img
                           src={engine.icon}
@@ -287,7 +268,12 @@ const SearchDialog = ({
                     className="h-fit w-auto focus-visible:ring-destructive !px-0 !py-0"
                     onClick={() => handleSearchQuery(result)}
                   >
-                    <Badge variant="secondary" className="text-xs truncate font-normal">{result}</Badge>
+                    <Badge
+                      variant="secondary"
+                      className="text-xs truncate font-normal"
+                    >
+                      {result}
+                    </Badge>
                   </Button>
                 ))}
               </motion.div>
@@ -295,7 +281,7 @@ const SearchDialog = ({
           )}
         </div>
       </DialogContent>
-    </Dialog >
+    </Dialog>
   )
 }
 

@@ -87,21 +87,6 @@ export const SettingsSchema = z
         searchSuggestions: z
           .boolean()
           .default(DEFAULT_SETTINGS.searchbar.searchSuggestions),
-        historySuggestions: z
-          .boolean()
-          .default(DEFAULT_SETTINGS.searchbar.historySuggestions),
-        bookmarkSuggestions: z
-          .boolean()
-          .default(DEFAULT_SETTINGS.searchbar.bookmarkSuggestions),
-        searchbarAutoComplete: z
-          .boolean()
-          .default(DEFAULT_SETTINGS.searchbar.searchbarAutoComplete),
-        openResultInFromNewTab: z
-          .enum(["new-tab", "current-tab"])
-          .default(DEFAULT_SETTINGS.searchbar.openResultInFromNewTab),
-        openResultInFromWebPage: z
-          .enum(["new-tab", "current-tab"])
-          .default(DEFAULT_SETTINGS.searchbar.openResultInFromWebPage),
       })
       .default({}),
   })

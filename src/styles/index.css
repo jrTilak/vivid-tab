@@ -15,17 +15,17 @@
   }
 
   /* hide scrollbar */
-  .__vivid_hide-scrollbar::-webkit-scrollbar {
+  *::-webkit-scrollbar {
     display: none;
   }
 
   /* hide scrollbar for Firefox */
-  .__vivid_hide-scrollbar {
+  * {
     scrollbar-width: none;
   }
 
   /* hide scrollbar for IE, Edge and Safari */
-  .__vivid_hide-scrollbar {
+  * {
     -ms-overflow-style: none;
   }
 }

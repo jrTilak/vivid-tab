@@ -6,6 +6,9 @@ type Props = {
   enabled?: boolean
 }
 
+/**
+ * Custom hook to fetch search suggestions based on the query.
+ */
 const useSearchSuggestions = ({ query, enabled = true }: Props) => {
   const [suggestions, setSuggestions] = useState<string[]>([])
 

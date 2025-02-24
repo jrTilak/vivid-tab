@@ -13,16 +13,7 @@ import { Switch } from "@/components/ui/switch"
 const SearchbarSettings = () => {
   const {
     settings: {
-      searchbar: {
-        bookmarkSuggestions,
-        dialogBackground,
-        historySuggestions,
-        openResultInFromNewTab,
-        openResultInFromWebPage,
-        searchSuggestions,
-        searchbarAutoComplete,
-        submitDefaultAction,
-      },
+      searchbar: { dialogBackground, searchSuggestions, submitDefaultAction },
     },
     setSettings,
   } = useSettings()
@@ -113,17 +104,7 @@ const SearchbarSettings = () => {
           </SelectContent>
         </Select>
       </div>
-      <div className="flex items-center justify-between">
-        <div className="space-y-0.5">
-          <Label className="text-sm font-medium">Searchbar Autocomplete</Label>
-        </div>
-        <Switch
-          checked={searchbarAutoComplete}
-          onCheckedChange={(checked) =>
-            handleSettingsChange("searchbarAutoComplete", checked)
-          }
-        />
-      </div>
+
       <div className="flex items-center justify-between">
         <div className="space-y-0.5">
           <Label className="text-sm font-medium">Search Suggestions</Label>
@@ -134,99 +115,6 @@ const SearchbarSettings = () => {
             handleSettingsChange("searchSuggestions", checked)
           }
         />
-      </div>
-      <div className="flex items-center justify-between">
-        <div className="space-y-0.5">
-          <Label className="text-sm font-medium">History Suggestions</Label>
-        </div>
-        <Switch
-          checked={historySuggestions}
-          onCheckedChange={(checked) =>
-            handleSettingsChange("historySuggestions", checked)
-          }
-        />
-      </div>
-      <div className="flex items-center justify-between">
-        <div className="space-y-0.5">
-          <Label className="text-sm font-medium">Bookmarks Suggestions</Label>
-        </div>
-        <Switch
-          checked={bookmarkSuggestions}
-          onCheckedChange={(checked) =>
-            handleSettingsChange("bookmarkSuggestions", checked)
-          }
-        />
-      </div>
-      <div className="flex items-center justify-between">
-        <div className="space-y-0.5">
-          <label className="text-sm font-medium">
-            Open results in (from homepage)
-          </label>
-        </div>
-        <Select
-          value={openResultInFromNewTab}
-          onValueChange={(value) =>
-            handleSettingsChange("openResultInFromNewTab", value)
-          }
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select a value" />
-          </SelectTrigger>
-          <SelectContent>
-            {(
-              [
-                {
-                  label: "New tab",
-                  value: "new-tab",
-                },
-                {
-                  label: "Current tab",
-                  value: "current-tab",
-                },
-              ] as const
-            ).map(({ label, value }) => (
-              <SelectItem key={value} value={value}>
-                {label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <div className="space-y-0.5">
-          <label className="text-sm font-medium">
-            Open results in (from webpages)
-          </label>
-        </div>
-        <Select
-          value={openResultInFromWebPage}
-          onValueChange={(value) =>
-            handleSettingsChange("openResultInFromWebPage", value)
-          }
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select a value" />
-          </SelectTrigger>
-          <SelectContent>
-            {(
-              [
-                {
-                  label: "New tab",
-                  value: "new-tab",
-                },
-                {
-                  label: "Current tab",
-                  value: "current-tab",
-                },
-              ] as const
-            ).map(({ label, value }) => (
-              <SelectItem key={value} value={value}>
-                {label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
     </div>
   )
