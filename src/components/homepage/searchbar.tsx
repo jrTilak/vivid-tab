@@ -1,14 +1,14 @@
 import { cn } from "@/lib/cn"
 import { SearchIcon } from "lucide-react"
 import React from "react"
-import { PopularApps } from "../homepage/searchbar/popular-apps"
+import { PopularApps } from "./popular-apps"
 
 type Props = {
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
 }
 
-const Searchbar1 = ({ isOpen, setIsOpen }: Props) => {
+const Searchbar = ({ isOpen, setIsOpen }: Props) => {
   return (
     <div
       className={cn(
@@ -30,4 +30,4 @@ const Searchbar1 = ({ isOpen, setIsOpen }: Props) => {
   )
 }
 
-export default Searchbar1
+export default Searchbar

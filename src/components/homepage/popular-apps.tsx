@@ -32,7 +32,7 @@ const POPULAR_APPS = [
     url: "https://www.notion.so/",
     icon: {
       dark: notionLight,
-      light: "https://www.svgrepo.com/show/504667/notion.svg"
+      light: "https://www.svgrepo.com/show/504667/notion.svg",
     },
   },
   {
@@ -40,13 +40,15 @@ const POPULAR_APPS = [
     url: "https://x.com",
     icon: {
       dark: xLight,
-      light: x
+      light: x,
     },
-  }, {
+  },
+  {
     title: "Whatsapp",
     url: "https://web.whatsapp.com/",
     icon: "https://www.svgrepo.com/show/475692/whatsapp-color.svg",
-  }, {
+  },
+  {
     title: "Linkedin",
     url: "https://www.linkedin.com/",
     icon: "https://www.svgrepo.com/show/475661/linkedin-color.svg",
@@ -60,15 +62,18 @@ const POPULAR_APPS = [
     title: "Youtube",
     url: "https://www.youtube.com/",
     icon: "https://www.svgrepo.com/show/475700/youtube-color.svg",
-  }, {
+  },
+  {
     title: "Drive",
     url: "https://drive.google.com/",
     icon: "https://www.svgrepo.com/show/475644/drive-color.svg",
-  }, {
+  },
+  {
     title: "Maps",
     url: "https://maps.google.com/",
     icon: "https://www.svgrepo.com/show/223049/maps-gps.svg",
-  }, {
+  },
+  {
     title: "News",
     url: "https://news.google.com/",
     icon: "https://www.svgrepo.com/show/223048/news.svg",
@@ -85,32 +90,59 @@ export function PopularApps() {
 
   return (
     <Popover>
-      <PopoverTrigger asChild >
-        <Button tabIndex={-1} variant="none" size="icon" className="w-auto aspect-square hover:scale-105 transition-transform [&_svg]:size-6 text-background dark:text-foreground">
+      <PopoverTrigger asChild>
+        <Button
+          tabIndex={-1}
+          variant="none"
+          size="icon"
+          className="w-auto aspect-square hover:scale-105 transition-transform [&_svg]:size-6 text-background dark:text-foreground"
+        >
           <LayoutGridIcon />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80">
         <div className="grid gap-4 grid-cols-3">
-          {
-            POPULAR_APPS.map((app, i) => (
-              <Button key={i} asChild variant="secondary" className="h-fit focus-visible:ring-destructive">
-                <a href={app.url} target={settings.general.openUrlIn === "current-tab" ? "_self" : "_blank"} rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center gap-1 text-center"
-                >
-                  {typeof app.icon === "string" ?
-                    <img src={app.icon} alt={app.title} className="size-12 rounded-lg" />
-                    :
-                    <>
-                      <img src={app.icon.light} alt={app.title} className="size-12 dark:hidden rounded-lg" />
-                      <img src={app.icon.dark} alt={app.title} className="size-12 hidden dark:block rounded-lg" />
-                    </>
-                  }
-                  <p className="text-xs text-muted-foreground">{app.title}</p>
-                </a>
-              </Button>
-            ))
-          }
+          {POPULAR_APPS.map((app, i) => (
+            <Button
+              key={i}
+              asChild
+              variant="secondary"
+              className="h-fit focus-visible:ring-destructive"
+            >
+              <a
+                href={app.url}
+                target={
+                  settings.general.openUrlIn === "current-tab"
+                    ? "_self"
+                    : "_blank"
+                }
+                rel="noopener noreferrer"
+                className="flex flex-col items-center justify-center gap-1 text-center"
+              >
+                {typeof app.icon === "string" ? (
+                  <img
+                    src={app.icon}
+                    alt={app.title}
+                    className="size-12 rounded-lg"
+                  />
+                ) : (
+                  <>
+                    <img
+                      src={app.icon.light}
+                      alt={app.title}
+                      className="size-12 dark:hidden rounded-lg"
+                    />
+                    <img
+                      src={app.icon.dark}
+                      alt={app.title}
+                      className="size-12 hidden dark:block rounded-lg"
+                    />
+                  </>
+                )}
+                <p className="text-xs text-muted-foreground">{app.title}</p>
+              </a>
+            </Button>
+          ))}
         </div>
       </PopoverContent>
     </Popover>

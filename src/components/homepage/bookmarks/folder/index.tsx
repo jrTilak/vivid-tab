@@ -24,10 +24,14 @@ const BookmarkFolder = (props: Props) => {
 
   return (
     <>
-      <CreateAFolder open={isUpdateDialogOpen} setOpen={setIsUpdateDialogOpen} defaultValues={{
-        id: props.id,
-        title: props.title
-      }} />
+      <CreateAFolder
+        open={isUpdateDialogOpen}
+        setOpen={setIsUpdateDialogOpen}
+        defaultValues={{
+          id: props.id,
+          title: props.title,
+        }}
+      />
       <DeleteDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
@@ -36,45 +40,40 @@ const BookmarkFolder = (props: Props) => {
       />
       <ContextMenu>
         <ContextMenuTrigger>
-          {
-            props.layout === "grid" ? (
-              <button
-                onClick={props.onOpenFolder}
-                className="flex flex-col  space-y-1 p-2 rounded-lg hover:scale-105 transition-transform w-24 disabled:opacity-50"
-              >
-                <img src={folderIcon} alt="" className="size-12 mx-auto" />
-                <p className="text-center line-clamp-2 text-xs break-all">
-                  {props.title}
-                </p>
-              </button>
-            ) : (
-              <button
-                onClick={props.onOpenFolder}
-                className="flex space-x-1 p-2 items-center rounded-lg transition-colors disabled:opacity-50"
-              >
-                <img src={folderIcon} alt="" className="size-12" />
-                <p className="text-xs w-full text-left line-clamp-2">
-                  {props.title}
-                  <br />
-                  {props.children?.filter((child) => "children" in child).length}f,{" "}
-                  {props.children?.filter((child) => "children" in child).length}b
-                </p>
-              </button>
-            )
-          }
+          {props.layout === "grid" ? (
+            <button
+              onClick={props.onOpenFolder}
+              className="flex flex-col  space-y-1 p-2 rounded-lg hover:scale-105 transition-transform w-24 disabled:opacity-50"
+            >
+              <img src={folderIcon} alt="" className="size-12 mx-auto" />
+              <p className="text-center line-clamp-2 text-xs break-all">
+                {props.title}
+              </p>
+            </button>
+          ) : (
+            <button
+              onClick={props.onOpenFolder}
+              className="flex space-x-1 p-2 items-center rounded-lg transition-colors disabled:opacity-50"
+            >
+              <img src={folderIcon} alt="" className="size-12" />
+              <p className="text-xs w-full text-left line-clamp-2">
+                {props.title}
+                <br />
+                {props.children?.filter((child) => "children" in child).length}
+                f,{" "}
+                {props.children?.filter((child) => "children" in child).length}b
+              </p>
+            </button>
+          )}
         </ContextMenuTrigger>
         <ContextMenuContent className="w-fit min-w-40">
-
-          <ContextMenuItem
-            onClick={() => setIsUpdateDialogOpen(true)}
-          >
+          <ContextMenuItem onClick={() => setIsUpdateDialogOpen(true)}>
             Edit
-            <ContextMenuShortcut
-            >
+            <ContextMenuShortcut>
               <EditIcon className="size-4" />
             </ContextMenuShortcut>
           </ContextMenuItem>
-          <ContextMenuItem >
+          <ContextMenuItem>
             Move
             <ContextMenuShortcut>
               <MoveIcon className="size-4" />
@@ -82,7 +81,8 @@ const BookmarkFolder = (props: Props) => {
           </ContextMenuItem>
           <ContextMenuItem
             onClick={() => setIsDeleteDialogOpen(true)}
-            className="text-destructive">
+            className="text-destructive"
+          >
             Delete
             <ContextMenuShortcut>
               <DeleteIcon className="size-4" />
@@ -92,7 +92,6 @@ const BookmarkFolder = (props: Props) => {
       </ContextMenu>
     </>
   )
-
 }
 
 export default BookmarkFolder

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from "react"
 import {
   Dialog,
   DialogClose,
@@ -8,8 +8,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
 type Props = {
   parentId?: string
@@ -22,7 +22,7 @@ type Props = {
 }
 
 const CreateAFolder = ({ parentId, defaultValues, open, setOpen }: Props) => {
-  const [value, setValue] = useState(defaultValues?.title || '');
+  const [value, setValue] = useState(defaultValues?.title || "")
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,22 +30,15 @@ const CreateAFolder = ({ parentId, defaultValues, open, setOpen }: Props) => {
     if (!value) return
 
     if (defaultValues) {
-      chrome.bookmarks.update(
-        defaultValues.id,
-        { title: value },
-        () => {
-          setValue('')
-          setOpen(false)
-        }
-      )
+      chrome.bookmarks.update(defaultValues.id, { title: value }, () => {
+        setValue("")
+        setOpen(false)
+      })
     } else {
-      chrome.bookmarks.create(
-        { 'parentId': parentId, 'title': value },
-        () => {
-          setValue('')
-          setOpen(false)
-        },
-      );
+      chrome.bookmarks.create({ parentId: parentId, title: value }, () => {
+        setValue("")
+        setOpen(false)
+      })
     }
   }
 
@@ -56,24 +49,34 @@ const CreateAFolder = ({ parentId, defaultValues, open, setOpen }: Props) => {
           <DialogClose />
           <DialogHeader>
             <DialogTitle>
-              {
-                defaultValues ? "Edit bookmark folder" : "Create a bookmark folder"
-              }
+              {defaultValues
+                ? "Edit bookmark folder"
+                : "Create a bookmark folder"}
             </DialogTitle>
             <DialogDescription>
-              {
-                defaultValues ? "Edit the folder you want to update." : "Enter the name of the folder you want to create."
-              }
+              {defaultValues
+                ? "Edit the folder you want to update."
+                : "Enter the name of the folder you want to create."}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <Input
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              id="name" placeholder='Bookmarks' className="col-span-3" />
+              id="name"
+              placeholder="Bookmarks"
+              className="col-span-3"
+            />
           </div>
           <DialogFooter>
-            <Button size='sm' className='min-w-32' disabled={value.length === 0} type="submit">Save </Button>
+            <Button
+              size="sm"
+              className="min-w-32"
+              disabled={value.length === 0}
+              type="submit"
+            >
+              Save{" "}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

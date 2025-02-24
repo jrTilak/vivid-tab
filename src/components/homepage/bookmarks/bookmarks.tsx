@@ -8,7 +8,12 @@ import type {
   BookmarkFolderNode,
   BookmarkUrlNode,
 } from "@/types/bookmark-types"
-import { ArrowLeftIcon, BookmarkPlusIcon, FolderPlusIcon, PlusIcon } from "lucide-react"
+import {
+  ArrowLeftIcon,
+  BookmarkPlusIcon,
+  FolderPlusIcon,
+  PlusIcon,
+} from "lucide-react"
 import React, { useEffect, useState } from "react"
 
 import BookmarkFolder from "./folder"
@@ -24,12 +29,16 @@ const Bookmarks = () => {
   const history = useHistory()
 
   const {
-    settings: { general, },
+    settings: { general },
   } = useSettings()
   const bookmarks = useBookmarks(general.rootFolder)
-  const [createAFolderId, setCreateAFolderId] = useState<string | undefined>(general.rootFolder)
-  const [isCreateABookmarkDialogOpen, setIsCreateABookmarkDialogOpen] = useState(false)
-  const [isCreateAFolderDialogOpen, setIsCreateAFolderDialogOpen] = useState(false)
+  const [createAFolderId, setCreateAFolderId] = useState<string | undefined>(
+    general.rootFolder,
+  )
+  const [isCreateABookmarkDialogOpen, setIsCreateABookmarkDialogOpen] =
+    useState(false)
+  const [isCreateAFolderDialogOpen, setIsCreateAFolderDialogOpen] =
+    useState(false)
   const [createFolderParentId, setCreateFolderParentId] = useState("")
 
   useEffect(() => {
@@ -51,16 +60,26 @@ const Bookmarks = () => {
 
   useEffect(() => {
     if (activeRootFolder !== "history") {
-      setCreateAFolderId(activeRootFolder === "home" ? general.rootFolder : activeRootFolder)
+      setCreateAFolderId(
+        activeRootFolder === "home" ? general.rootFolder : activeRootFolder,
+      )
     }
   }, [activeRootFolder])
 
   return (
     <>
-      <CreateABookmark parentId={createAFolderId} open={isCreateABookmarkDialogOpen} setOpen={setIsCreateABookmarkDialogOpen} />
-      <CreateAFolder parentId={createFolderParentId} open={isCreateAFolderDialogOpen} setOpen={setIsCreateAFolderDialogOpen} />
+      <CreateABookmark
+        parentId={createAFolderId}
+        open={isCreateABookmarkDialogOpen}
+        setOpen={setIsCreateABookmarkDialogOpen}
+      />
+      <CreateAFolder
+        parentId={createFolderParentId}
+        open={isCreateAFolderDialogOpen}
+        setOpen={setIsCreateAFolderDialogOpen}
+      />
 
-      <div className="mb-6 col-span-6 h-[70vh] overflow-scroll">
+      <div className="mb-6 col-span-6 h-[70vh] overflow-scroll __vivid_hide-scrollbar">
         <div className="flex justify-between gap-6 mb-4">
           <div className="flex gap-2.5 flex-wrap ">
             {[
@@ -85,18 +104,17 @@ const Bookmarks = () => {
                   onClick={() => {
                     setActiveRootFolder(item.id)
                     setFolderStack([])
-
                   }}
                   onFocusCapture={() => {
                     setActiveRootFolder(item.id)
                     setFolderStack([])
-
                   }}
                   variant={activeRootFolder === item.id ? "default" : "ghost"}
                   size="sm"
                   className={cn(
                     "text-xs px-2.5 py-1 h-fit rounded-sm",
-                    activeRootFolder !== item.id && "bg-muted/20 hover:bg-muted/30",
+                    activeRootFolder !== item.id &&
+                      "bg-muted/20 hover:bg-muted/30",
                   )}
                 >
                   {item.label}
@@ -113,23 +131,28 @@ const Bookmarks = () => {
               }}
             >
               <PlusIcon className="h-4 w-4" />
-
             </Button>
           </div>
-          <div
-            className="flex gap-2.5 bg-muted/20 rounded-sm px-2.5 py-1"
-          >
+          <div className="flex gap-2.5 bg-muted/20 rounded-sm px-2.5 py-1">
             <button
               onClick={() => {
                 setIsCreateAFolderDialogOpen(true)
                 setCreateFolderParentId(createAFolderId)
               }}
-              disabled={activeRootFolder === "history"} tabIndex={-1} className="disabled:opacity-50">
+              disabled={activeRootFolder === "history"}
+              tabIndex={-1}
+              className="disabled:opacity-50"
+            >
               <FolderPlusIcon className="size-5 text-foreground" />
             </button>
             <button
-              onClick={() => { setIsCreateABookmarkDialogOpen(true) }}
-              disabled={activeRootFolder === "history"} tabIndex={-1} className="disabled:opacity-50">
+              onClick={() => {
+                setIsCreateABookmarkDialogOpen(true)
+              }}
+              disabled={activeRootFolder === "history"}
+              tabIndex={-1}
+              className="disabled:opacity-50"
+            >
               <BookmarkPlusIcon className="size-5 text-foreground" />
             </button>
           </div>
@@ -156,45 +179,51 @@ const Bookmarks = () => {
           >
             {activeRootFolder === "home"
               ? rootChildren.map((item) => (
-                <BookmarkUrl {...item} key={item.id} layout={general.layout} />
-              ))
-              : activeRootFolder === "history"
-                ? history.map((item) => (
                   <BookmarkUrl
                     {...item}
                     key={item.id}
                     layout={general.layout}
-                    dateAdded={item.lastVisitTime}
-                    disableContextMenu={activeRootFolder === "history"}
                   />
                 ))
+              : activeRootFolder === "history"
+                ? history.map((item) => (
+                    <BookmarkUrl
+                      {...item}
+                      key={item.id}
+                      layout={general.layout}
+                      dateAdded={item.lastVisitTime}
+                      disableContextMenu={activeRootFolder === "history"}
+                    />
+                  ))
                 : (folderStack?.length > 0
-                  ? (folderStack[folderStack.length - 1] as BookmarkFolderNode)
-                  : rootFolders?.find(
-                    (folder) => folder.id === activeRootFolder,
-                  )
-                )?.children?.map((item) => {
-                  if ("children" in item) {
-                    return (
-                      <BookmarkFolder
-                        {...item}
-                        key={item.id}
-                        layout={general.layout}
-                        onOpenFolder={() => {
-                          setFolderStack((prev) => [...prev, item])
-                        }}
-                      />
-                    )
-                  } else {
-                    return (
-                      <BookmarkUrl
-                        {...(item as BookmarkUrlNode)}
-                        key={item.id}
-                        layout={general.layout}
-                      />
-                    )
-                  }
-                })}
+                    ? (folderStack[
+                        folderStack.length - 1
+                      ] as BookmarkFolderNode)
+                    : rootFolders?.find(
+                        (folder) => folder.id === activeRootFolder,
+                      )
+                  )?.children?.map((item) => {
+                    if ("children" in item) {
+                      return (
+                        <BookmarkFolder
+                          {...item}
+                          key={item.id}
+                          layout={general.layout}
+                          onOpenFolder={() => {
+                            setFolderStack((prev) => [...prev, item])
+                          }}
+                        />
+                      )
+                    } else {
+                      return (
+                        <BookmarkUrl
+                          {...(item as BookmarkUrlNode)}
+                          key={item.id}
+                          layout={general.layout}
+                        />
+                      )
+                    }
+                  })}
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { useSettings } from "@/providers/settings-provider"
 import React, { useMemo } from "react"
-import { DndContext, type DragEndEvent } from '@dnd-kit/core';
+import { DndContext, type DragEndEvent } from "@dnd-kit/core"
 
 import PreviewCard from "./preview-card"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -11,7 +11,7 @@ import filterObj from "@/helpers/filter-obj"
 const LayoutsSettings = () => {
   const {
     settings: { layout },
-    setSettings
+    setSettings,
   } = useSettings()
 
   const COMPONENTS = useMemo(() => {
@@ -40,8 +40,16 @@ const LayoutsSettings = () => {
     }
   }, [])
 
-  const onDragEnd = ({ active: { id: from, data: { current: activeCurrent } }, over: { id: to, data: { current } } }: DragEndEvent) => {
-
+  const onDragEnd = ({
+    active: {
+      id: from,
+      data: { current: activeCurrent },
+    },
+    over: {
+      id: to,
+      data: { current },
+    },
+  }: DragEndEvent) => {
     console.log(`${from} -> ${to} with index ${current.index}`)
 
     if (from === to) {
@@ -57,9 +65,7 @@ const LayoutsSettings = () => {
     }
 
     if (from === "searchbar" && !(current.index === 0 || current.index === 8)) {
-      console.log(
-        "Searchbar can only be moved to the top or bottom, returning",
-      )
+      console.log("Searchbar can only be moved to the top or bottom, returning")
 
       return
     }
@@ -69,72 +75,73 @@ const LayoutsSettings = () => {
         ...prevSettings,
         layout: {
           ...prevSettings.layout,
-          ...from.toString().startsWith("empty") ? {} : { [current.index]: from },
-          ...to.toString().startsWith("empty") ? {} : { [activeCurrent.index]: to },
+          ...(from.toString().startsWith("empty")
+            ? {}
+            : { [current.index]: from }),
+          ...(to.toString().startsWith("empty")
+            ? {}
+            : { [activeCurrent.index]: to }),
         },
       }
     })
-
   }
 
   return (
     <div className="flex flex-col gap-6 p-4">
       <div className="grid gap-4 grid-cols-4">
-        {
-          Object.keys(COMPONENTS).map((key) => (
-            <div key={key} className="flex items-center space-x-2">
-              <Checkbox
-                onCheckedChange={(val) => {
-                  if (val) {
+        {Object.keys(COMPONENTS).map((key) => (
+          <div key={key} className="flex items-center space-x-2">
+            <Checkbox
+              onCheckedChange={(val) => {
+                if (val) {
+                  const newLayout = layout
 
-                    const newLayout = layout;
-
-                    if (key === "bookmarks") {
-                      newLayout[4] = "bookmarks"
-                    } else if (key === "searchbar") {
-                      newLayout[0] = "searchbar"
-                    } else {
-                      const canBeUsedIndex = [1, 2, 3, 5, 6, 7]
-                      const usedIndex = Object.keys(layout).map((k) => Number(k))
-
-                      const available = canBeUsedIndex.filter((v) => !usedIndex.includes(v))
-
-                      newLayout[available[0]] = key
-                    }
-
-                    setSettings((prev) => ({
-                      ...prev,
-                      layout: newLayout
-                    }))
-
+                  if (key === "bookmarks") {
+                    newLayout[4] = "bookmarks"
+                  } else if (key === "searchbar") {
+                    newLayout[0] = "searchbar"
                   } else {
-                    const filtered = filterObj(layout, ((val) => val !== key))
-                    setSettings((prev) => ({
-                      ...prev,
-                      layout: filtered
-                    }))
+                    const canBeUsedIndex = [1, 2, 3, 5, 6, 7]
+                    const usedIndex = Object.keys(layout).map((k) => Number(k))
+
+                    const available = canBeUsedIndex.filter(
+                      (v) => !usedIndex.includes(v),
+                    )
+
+                    newLayout[available[0]] = key
                   }
-                }}
-                checked={Object.values(layout).includes(key)}
-                id="terms" />
-              <Label
-                htmlFor="terms"
-                className="text-sm capitalize text-muted-foreground"
-              >
-                {key}
-              </Label>
-            </div>
-          ))
-        }
+
+                  setSettings((prev) => ({
+                    ...prev,
+                    layout: newLayout,
+                  }))
+                } else {
+                  const filtered = filterObj(layout, (val) => val !== key)
+                  setSettings((prev) => ({
+                    ...prev,
+                    layout: filtered,
+                  }))
+                }
+              }}
+              checked={Object.values(layout).includes(key)}
+              id="terms"
+            />
+            <Label
+              htmlFor="terms"
+              className="text-sm capitalize text-muted-foreground"
+            >
+              {key}
+            </Label>
+          </div>
+        ))}
       </div>
       <Separator />
-      <DndContext
-        onDragEnd={onDragEnd}
-      >
+      <DndContext onDragEnd={onDragEnd}>
         <div className="space-y-5 w-full ">
-          <p className="text-destructive text-xs">(Draggable doesn&apos;t work properly ⚠️)</p>
+          <p className="text-destructive text-xs">
+            (Draggable doesn&apos;t work properly ⚠️)
+          </p>
           <div className="relative">
-
             {/* Tabs */}
 
             <div className="grid grid-cols-12 gap-x-9">
@@ -151,9 +158,7 @@ const LayoutsSettings = () => {
                     <PreviewCard index={0} className="h-9 mx-auto " />
                   )}
                 </div>
-                <div className="flex-grow">
-                  {COMPONENTS[layout[4]]}
-                </div>
+                <div className="flex-grow">{COMPONENTS[layout[4]]}</div>
                 <div className="mt-6 flex items-center justify-center">
                   {COMPONENTS[layout[8]] || (
                     <PreviewCard index={8} className="h-9 mx-auto" />

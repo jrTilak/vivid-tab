@@ -16,22 +16,32 @@ import useShortcutKey from "@/hooks/use-shortcut-key"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import useDebouncedValue from "@/hooks/use-debounced-value"
+import useSearchSuggestions from "@/hooks/use-search-suggestions"
 
 type Props = {
   defaultOpen?: boolean
   onOpenChange?: (open: boolean) => void
   isNewTab: boolean // determines if user is in new tab page or browsing some website
+  portalRef?: React.RefObject<HTMLElement>
 }
 
-const SearchDialog = ({ defaultOpen, onOpenChange, isNewTab }: Props) => {
+const SearchDialog = ({
+  defaultOpen,
+  onOpenChange,
+  isNewTab,
+  portalRef,
+}: Props) => {
   const [open, setOpen] = useState(defaultOpen)
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 300)
   const {
-    settings: { search },
+    settings: { searchbar },
   } = useSettings()
 
-  const [searchSuggestions, setSearchSuggestions] = useState<string[]>([])
+  const searchSuggestions = useSearchSuggestions({
+    query: debouncedSearchQuery,
+    enabled: debouncedSearchQuery && searchbar.searchSuggestions,
+  })
 
   useEffect(() => {
     setOpen(defaultOpen)
@@ -51,26 +61,14 @@ const SearchDialog = ({ defaultOpen, onOpenChange, isNewTab }: Props) => {
     setSearchQuery("")
   }, [open])
 
-  useEffect(() => {
-    const search = async () => {
-      const results = await fetch(
-        `https://suggestqueries.google.com/complete/search?client=firefox&q=${debouncedSearchQuery}`,
-      )
-      const data = await results.json()
-      setSearchSuggestions(data[1])
-    }
-
-    search()
-  }, [debouncedSearchQuery])
-
   const handleSearchQuery = useCallback(
     (query: string) => {
       const { success } = z.string().url().safeParse(query)
 
       // open the url directly if it's a valid url
       if (success) {
-        if (isNewTab) {
-          if (search.openResultInFromNewTab === "new-tab") {
+        if (!isNewTab) {
+          if (searchbar.openResultInFromNewTab === "new-tab") {
             chrome.tabs.create({ url: query })
           } else {
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -80,14 +78,13 @@ const SearchDialog = ({ defaultOpen, onOpenChange, isNewTab }: Props) => {
             })
           }
         } else {
-          if (search.openResultInFromWebPage === "new-tab") {
-            chrome.tabs.create({ url: query })
+          if (searchbar.openResultInFromWebPage === "new-tab") {
+            const a = document.createElement("a")
+            a.href = query
+            a.target = "_blank"
+            a.click()
           } else {
-            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-              if (tabs.length > 0) {
-                chrome.tabs.update(tabs[0].id, { url: query })
-              }
-            })
+            window.location.href = query
           }
         }
         // else search the web
@@ -96,7 +93,7 @@ const SearchDialog = ({ defaultOpen, onOpenChange, isNewTab }: Props) => {
           chrome.search.query({
             text: query,
             disposition:
-              search.openResultInFromNewTab === "new-tab"
+              searchbar.openResultInFromNewTab === "new-tab"
                 ? "NEW_TAB"
                 : "CURRENT_TAB",
           })
@@ -104,43 +101,62 @@ const SearchDialog = ({ defaultOpen, onOpenChange, isNewTab }: Props) => {
           chrome.search.query({
             text: query,
             disposition:
-              search.openResultInFromWebPage === "new-tab"
+              searchbar.openResultInFromWebPage === "new-tab"
                 ? "NEW_TAB"
                 : "CURRENT_TAB",
           })
         }
       }
     },
-    [isNewTab, search.openResultInFromNewTab, search.openResultInFromWebPage],
+    [
+      isNewTab,
+      searchbar.openResultInFromNewTab,
+      searchbar.openResultInFromWebPage,
+    ],
   )
 
-  const AI_ENGINES = useMemo(
+  const SHORTCUTS = useMemo(
     () => [
       {
-        name: "ChatGPT",
-        url: "https://chatgpt.com",
+        name: "Ask ChatGPT",
+        id: "chatgpt",
         available: true,
         icon: chatgpt,
+        onQuery: (query: string) => {
+          handleSearchQuery(`https://chatgpt.com/?q=${query}`)
+        },
       },
       {
-        name: "Claude",
-        url: "https://claude.ai/new",
+        name: "Ask Claude",
         available: true,
+        id: "claude",
         icon: claude,
+        onQuery: (query: string) => {
+          handleSearchQuery(`https://claude.ai/new?q=${query}`)
+        }
       },
       {
-        name: "Gemini",
-        url: "https://gemini.google.com",
+        name: "Ask Gemini",
         available: false,
         icon: gemini,
+        id: "gemini",
       },
       {
-        name: "DeepSeek",
-        url: "https://deepseek.com",
+        name: "Ask DeepSeek",
         available: false,
         icon: deepseek,
+        id: "deepseek",
       },
-    ],
+      {
+        name: "Open Youtube",
+        available: true,
+        icon: "https://www.svgrepo.com/show/475700/youtube-color.svg",
+        id: "youtube",
+        onQuery: (query: string) => {
+          handleSearchQuery(`https://youtube.com/search?q=${query}`)
+        }
+      }
+    ] as const,
     [],
   )
 
@@ -157,8 +173,14 @@ const SearchDialog = ({ defaultOpen, onOpenChange, isNewTab }: Props) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
-        className="shadow-none border-none bg-transparent"
+        className={cn(
+          "shadow-none w-fit !border-none !outline-none",
+          searchbar.dialogBackground === "transparent"
+            ? "bg-transparent"
+            : "bg-background",
+        )}
         overlayClassName="bg-black/40 backdrop-blur-md"
+        portalContainer={portalRef?.current}
       >
         <div className="flex flex-col items-center justify-center gap-4">
           {/* search form */}
@@ -189,7 +211,7 @@ const SearchDialog = ({ defaultOpen, onOpenChange, isNewTab }: Props) => {
               <button
                 disabled={!searchQuery}
                 type="submit"
-                className="h-full !outline-none rounded-r-md bg-background px-3 py-2 disabled:opacity-50 border border-input"
+                className="h-full !outline-none rounded-r-md bg-accent px-3 py-2 disabled:opacity-50 border border-input"
               >
                 <SearchIcon className="text-muted-foreground size-4" />
               </button>
@@ -198,51 +220,56 @@ const SearchDialog = ({ defaultOpen, onOpenChange, isNewTab }: Props) => {
 
           {/* ai */}
           <div className="grid grid-cols-4 gap-2 w-full max-w-[500px] mx-auto">
-            {AI_ENGINES.map((engine, index) => (
-              <AnimatePresence key={engine.name}>
-                <motion.div
-                  key={engine.name}
-                  initial={{ opacity: 0, y: 100 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 100 }}
-                  transition={{ duration: 0.1, delay: index * 0.1 + 0.1 }}
-                  onClick={() => {
-                    if (engine.available && searchQuery) {
-                      const url = `${engine.url}?q=${searchQuery}`
-                      window.open(url, "_blank")
-                    }
-                  }}
-                  className={cn("w-full aspect-square")}
-                >
-                  <Button
-                    disabled={!engine.available}
-                    variant="none"
-                    className="w-full h-full flex flex-col gap-1 items-center justify-center p-2 py-5 rounded-md bg-black/10 relative hover:border hover:border-input"
-                  >
-                    <img
-                      src={engine.icon}
-                      alt={engine.name}
-                      className="size-8"
-                    />
-                    <span className="text-sm">Ask {engine.name}</span>
-
-                    {!engine.available && (
-                      <Badge
-                        variant="default"
-                        className="absolute top-0 right-0 text-[10px] opacity-50 rounded-md rounded-tl-none rounded-br-none "
+            {SHORTCUTS.map((engine, index) => {
+              if (searchbar.shortcuts.includes(engine.id)) {
+                return (
+                  <AnimatePresence key={engine.name}>
+                    <motion.div
+                      key={engine.name}
+                      initial={{ opacity: 0, y: 100 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 100 }}
+                      transition={{ duration: 0.1, delay: index * 0.1 + 0.1 }}
+                      onClick={() => {
+                        if (engine.available && searchQuery) {
+                          if (engine.onQuery) {
+                            engine.onQuery(searchQuery)
+                          }
+                        }
+                      }}
+                      className={cn("w-full aspect-square")}
+                    >
+                      <Button
+                        disabled={!engine.available}
+                        variant="none"
+                        className={cn("w-full h-full flex flex-col gap-1 items-center justify-center p-2 py-5 rounded-md relative hover:border hover:border-input focus-visible:ring-destructive", searchbar.dialogBackground === "transparent" ? "bg-background" : "bg-black/10 dark:bg-white/10")}
                       >
-                        Coming Soon
-                      </Badge>
-                    )}
-                  </Button>
-                </motion.div>
-              </AnimatePresence>
-            ))}
+                        <img
+                          src={engine.icon}
+                          alt={engine.name}
+                          className="size-8"
+                        />
+                        <span className="text-sm">{engine.name}</span>
+
+                        {!engine.available && (
+                          <Badge
+                            variant="default"
+                            className="absolute top-0 right-0 text-[10px] opacity-50 rounded-md rounded-tl-none rounded-br-none "
+                          >
+                            Coming Soon
+                          </Badge>
+                        )}
+                      </Button>
+                    </motion.div>
+                  </AnimatePresence>
+                )
+              }
+            })}
           </div>
 
           {/* search suggestions */}
 
-          {searchQuery && (
+          {searchQuery && searchbar.searchSuggestions && (
             <AnimatePresence>
               <motion.div
                 initial={{ opacity: 0, y: 100 }}
@@ -255,12 +282,12 @@ const SearchDialog = ({ defaultOpen, onOpenChange, isNewTab }: Props) => {
               >
                 {searchSuggestions.slice(0, 5).map((result, i) => (
                   <Button
-                    key={i}
                     variant="none"
+                    key={i}
+                    className="h-fit w-auto focus-visible:ring-destructive !px-0 !py-0"
                     onClick={() => handleSearchQuery(result)}
-                    className="flex gap-2 flex-col bg-black/10 p-2 rounded-md"
                   >
-                    <span className="text-xs truncate">{result}</span>
+                    <Badge variant="secondary" className="text-xs truncate font-normal">{result}</Badge>
                   </Button>
                 ))}
               </motion.div>
@@ -268,7 +295,7 @@ const SearchDialog = ({ defaultOpen, onOpenChange, isNewTab }: Props) => {
           )}
         </div>
       </DialogContent>
-    </Dialog>
+    </Dialog >
   )
 }
 

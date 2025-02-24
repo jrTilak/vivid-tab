@@ -72,15 +72,39 @@ export const SettingsSchema = z
           ),
       })
       .default(DEFAULT_SETTINGS.general),
-    search: z.object({
-      openResultInFromNewTab: z
-        .enum(["new-tab", "current-tab"])
-        .default(DEFAULT_SETTINGS.search.openResultInFromNewTab),
-      openResultInFromWebPage: z
-        .enum(["new-tab", "current-tab"])
-        .default(DEFAULT_SETTINGS.search.openResultInFromWebPage),
-    }),
+
+    searchbar: z
+      .object({
+        dialogBackground: z
+          .enum(["default", "transparent"])
+          .default(DEFAULT_SETTINGS.searchbar.dialogBackground),
+        shortcuts: z
+          .array(z.enum(["chatgpt", "gemini", "deepseek", "claude", "youtube"]))
+          .default(() => [...DEFAULT_SETTINGS.searchbar.shortcuts]),
+        submitDefaultAction: z
+          .enum(["default", "ask-chatgpt", "ask-claude", "search-on-youtube"])
+          .default(DEFAULT_SETTINGS.searchbar.submitDefaultAction),
+        searchSuggestions: z
+          .boolean()
+          .default(DEFAULT_SETTINGS.searchbar.searchSuggestions),
+        historySuggestions: z
+          .boolean()
+          .default(DEFAULT_SETTINGS.searchbar.historySuggestions),
+        bookmarkSuggestions: z
+          .boolean()
+          .default(DEFAULT_SETTINGS.searchbar.bookmarkSuggestions),
+        searchbarAutoComplete: z
+          .boolean()
+          .default(DEFAULT_SETTINGS.searchbar.searchbarAutoComplete),
+        openResultInFromNewTab: z
+          .enum(["new-tab", "current-tab"])
+          .default(DEFAULT_SETTINGS.searchbar.openResultInFromNewTab),
+        openResultInFromWebPage: z
+          .enum(["new-tab", "current-tab"])
+          .default(DEFAULT_SETTINGS.searchbar.openResultInFromWebPage),
+      })
+      .default({}),
   })
-  .default(DEFAULT_SETTINGS)
+  .default({})
 
 export type Settings = z.infer<typeof SettingsSchema>

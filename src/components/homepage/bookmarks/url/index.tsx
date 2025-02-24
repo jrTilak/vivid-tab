@@ -99,93 +99,91 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
         id={props.id}
         label={props.title + " bookmark"}
       />
-      <CreateABookmark open={editDialogOpen} setOpen={setEditDialogOpen} defaultValues={{
-        id: props.id,
-        title: props.title,
-        url: props.url
-      }} />
-      <ContextMenu >
+      <CreateABookmark
+        open={editDialogOpen}
+        setOpen={setEditDialogOpen}
+        defaultValues={{
+          id: props.id,
+          title: props.title,
+          url: props.url,
+        }}
+      />
+      <ContextMenu>
         <ContextMenuTrigger disabled={disableContextMenu}>
-          {
-            props.layout === "grid" ? (
-              <a
-                href={props.url}
-                target={general.openUrlIn === "new-tab" ? "_blank" : "_self"}
-                className="flex items-center flex-col space-y-1 p-2 rounded-lg hover:scale-105 transition-transform text-center text-xs w-24"
-                rel="noreferrer"
-              >
-                <Avatar className="rounded-none mx-auto">
-                  <AvatarImage
-                    src={data.image}
-                    alt={props.title}
-                    className="rounded-md object-contain object-center size-12"
-                  />
-                  <AvatarFallback className="size-12">
-                    {data.title
-                      .replace(/[^a-zA-Z ]/g, "")
-                      .trim()
-                      .toLowerCase()
-                      .split(" ")
-                      .map((word) => word[0]?.toUpperCase())
-                      .join("")
-                      .substring(0, 2)}
-                  </AvatarFallback>
-                </Avatar>
-                <p className="text-center line-clamp-2 text-xs break-all">
-                  {data.title}
-                </p>
-              </a>
-            ) : (
-              <a
-                href={props.url}
-                target={general.openUrlIn === "new-tab" ? "_blank" : "_self"}
-                className="flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-accent/10"
-                rel="noreferrer"
-              >
-                <Avatar className="rounded-none">
-                  <AvatarImage
-                    src={data.image}
-                    alt={props.title}
-                    className="rounded-md object-contain object-center size-12"
-                  />
-                  <AvatarFallback className="size-12">
-                    {data.title
-                      .replace(/[^a-zA-Z ]/g, "")
-                      .trim()
-                      .toLowerCase()
-                      .split(" ")
-                      .map((word) => word[0]?.toUpperCase())
-                      .join("")
-                      .substring(0, 2)}
-                  </AvatarFallback>
-                </Avatar>
-                <p className="truncate flex flex-col gap-1">
-                  <span> {data.title}</span>
-                  <span className="text-xs truncate">{props.url}</span>
-                </p>
-              </a>
-            )
-          }
+          {props.layout === "grid" ? (
+            <a
+              href={props.url}
+              target={general.openUrlIn === "new-tab" ? "_blank" : "_self"}
+              className="flex items-center flex-col space-y-1 p-2 rounded-lg hover:scale-105 transition-transform text-center text-xs w-24"
+              rel="noreferrer"
+            >
+              <Avatar className="rounded-none mx-auto">
+                <AvatarImage
+                  src={data.image}
+                  alt={props.title}
+                  className="rounded-md object-contain object-center size-12"
+                />
+                <AvatarFallback className="size-12">
+                  {data.title
+                    .replace(/[^a-zA-Z ]/g, "")
+                    .trim()
+                    .toLowerCase()
+                    .split(" ")
+                    .map((word) => word[0]?.toUpperCase())
+                    .join("")
+                    .substring(0, 2)}
+                </AvatarFallback>
+              </Avatar>
+              <p className="text-center line-clamp-2 text-xs break-all">
+                {data.title}
+              </p>
+            </a>
+          ) : (
+            <a
+              href={props.url}
+              target={general.openUrlIn === "new-tab" ? "_blank" : "_self"}
+              className="flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-accent/10"
+              rel="noreferrer"
+            >
+              <Avatar className="rounded-none">
+                <AvatarImage
+                  src={data.image}
+                  alt={props.title}
+                  className="rounded-md object-contain object-center size-12"
+                />
+                <AvatarFallback className="size-12">
+                  {data.title
+                    .replace(/[^a-zA-Z ]/g, "")
+                    .trim()
+                    .toLowerCase()
+                    .split(" ")
+                    .map((word) => word[0]?.toUpperCase())
+                    .join("")
+                    .substring(0, 2)}
+                </AvatarFallback>
+              </Avatar>
+              <p className="truncate flex flex-col gap-1">
+                <span> {data.title}</span>
+                <span className="text-xs truncate">{props.url}</span>
+              </p>
+            </a>
+          )}
         </ContextMenuTrigger>
         <ContextMenuContent className="w-fit min-w-40">
-          <ContextMenuItem
-            onClick={() => openInNewTab(props.url)}
-          >
+          <ContextMenuItem onClick={() => openInNewTab(props.url)}>
             Open in new tab
             <ContextMenuShortcut>
               <ExternalLinkIcon className="size-4" />
             </ContextMenuShortcut>
           </ContextMenuItem>
           <ContextMenuSeparator />
-          <ContextMenuItem
-            onClick={() => setEditDialogOpen(true)}
-          >
+          <ContextMenuItem onClick={() => setEditDialogOpen(true)}>
             Edit
             <ContextMenuShortcut>
               <EditIcon className="size-4" />
             </ContextMenuShortcut>
           </ContextMenuItem>
-          <ContextMenuItem >
+          <ContextMenuItem>
             Move
             <ContextMenuShortcut>
               <MoveIcon className="size-4" />
@@ -193,7 +191,8 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
           </ContextMenuItem>
           <ContextMenuItem
             onClick={() => setIsDeleteDialogOpen(true)}
-            className="text-destructive">
+            className="text-destructive"
+          >
             Delete
             <ContextMenuShortcut>
               <DeleteIcon className="size-4" />
@@ -202,7 +201,6 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
         </ContextMenuContent>
       </ContextMenu>
     </>
-
   )
 }
 

@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Trash2Icon } from "lucide-react"
 
-import React from 'react'
+import React from "react"
 
 type Props = {
   open: boolean
@@ -20,14 +20,10 @@ type Props = {
 }
 
 const DeleteDialog = ({ open, onOpenChange, id, label }: Props) => {
-
   const deleteUrl = () => {
-    chrome.bookmarks.remove(
-      id,
-      () => {
-        onOpenChange(false)
-      }
-    )
+    chrome.bookmarks.remove(id, () => {
+      onOpenChange(false)
+    })
   }
 
   return (
@@ -41,12 +37,16 @@ const DeleteDialog = ({ open, onOpenChange, id, label }: Props) => {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <Button variant="destructive" onClick={deleteUrl} className="min-w-32">Delete <Trash2Icon className="h-4 w-4" />
+          <Button
+            variant="destructive"
+            onClick={deleteUrl}
+            className="min-w-32"
+          >
+            Delete <Trash2Icon className="h-4 w-4" />
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-
   )
 }
 

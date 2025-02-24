@@ -35,8 +35,16 @@ export const DEFAULT_SETTINGS = {
     openUrlIn: "current-tab",
     bookmarksCanTakeExtraSpaceIfAvailable: true,
   },
-  search: {
+  searchbar: {
+    dialogBackground: "default",
+    shortcuts: ["chatgpt", "deepseek", "claude", "youtube"],
+    submitDefaultAction: "default",
+    searchSuggestions: true,
+    historySuggestions: true,
+    bookmarkSuggestions: true,
+    searchbarAutoComplete: true,
     openResultInFromNewTab: "current-tab",
     openResultInFromWebPage: "new-tab",
+    shortcut: ["Ctrl", ","],
   },
 } as const

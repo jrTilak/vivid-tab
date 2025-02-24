@@ -1,22 +1,29 @@
-import React from "react"
+import React, { useRef } from "react"
 
-import SearchDialog from "./components/searchbars/search-dialog"
 import { SettingsProvider } from "./providers/settings-provider"
+import styleText from "data-text:@/styles/index.css"
+import SearchDialog from "./components/common/search-dialog"
 
 // Inject into the ShadowDOM
-// export const getStyle = () => {
-//   const style = document.createElement("style")
-//   style.textContent = cssText
+export const getStyle = () => {
+  const style = document.createElement("style")
+  style.textContent = styleText
 
-//   return style
-// }
+  return style
+}
 
 const Content = () => {
-  return null
+  const portalRef = useRef<HTMLDivElement>(null)
 
   return (
     <SettingsProvider>
-      <SearchDialog isNewTab={false} />
+      <div className="__vivid-container">
+        <div
+          className="antialiased bg-background text-foreground font-bricolage-grotesque min-h-screen min-w-screen"
+          ref={portalRef}
+        ></div>
+      </div>
+      <SearchDialog isNewTab={false} portalRef={portalRef} />
     </SettingsProvider>
   )
 }

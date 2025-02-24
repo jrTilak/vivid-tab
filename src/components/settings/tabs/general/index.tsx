@@ -18,7 +18,13 @@ const GeneralSettings = () => {
   const folders = useFlattenBookmarkFolders()
   const {
     settings: {
-      general: { showHistory, layout, openUrlIn, rootFolder, bookmarksCanTakeExtraSpaceIfAvailable },
+      general: {
+        showHistory,
+        layout,
+        openUrlIn,
+        rootFolder,
+        bookmarksCanTakeExtraSpaceIfAvailable,
+      },
     },
     setSettings,
     resetSettings,
@@ -153,7 +159,7 @@ const GeneralSettings = () => {
       </div>
       <div className="flex items-center justify-between">
         <div className="space-y-0.5">
-          <label className="text-sm font-medium">Open URL in</label>
+          <label className="text-sm font-medium">Open URL in (shortcuts)</label>
         </div>
         <Select
           value={openUrlIn}
@@ -191,7 +197,10 @@ const GeneralSettings = () => {
         <Switch
           checked={bookmarksCanTakeExtraSpaceIfAvailable}
           onCheckedChange={(checked) =>
-            handleSettingsChange("bookmarksCanTakeExtraSpaceIfAvailable", checked)
+            handleSettingsChange(
+              "bookmarksCanTakeExtraSpaceIfAvailable",
+              checked,
+            )
           }
         />
       </div>
@@ -199,11 +208,14 @@ const GeneralSettings = () => {
         <div className="space-y-0.5">
           <Label className="text-sm font-medium">Reset Settings</Label>
         </div>
-        <Button onClick={resetSettings} variant="outline" className="min-w-32 text-destructive" >
+        <Button
+          onClick={resetSettings}
+          variant="outline"
+          className="min-w-32 text-destructive"
+        >
           Reset <HistoryIcon />
         </Button>
       </div>
-
     </div>
   )
 }

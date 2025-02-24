@@ -17,6 +17,7 @@ import {
   ListTodoIcon,
   MonitorSmartphone,
   QuoteIcon,
+  SearchIcon,
   SettingsIcon,
   TimerIcon,
 } from "lucide-react"
@@ -30,6 +31,7 @@ import TemperatureSetting from "./tabs/temperature"
 import TimerSettings from "./tabs/timer"
 import WallpaperSettings from "./tabs/wallpapers"
 import TodosSettings from "./tabs/todos"
+import SearchbarSettings from "./tabs/searchbar"
 
 export function Settings() {
   const { setSettings, settings } = useSettings()
@@ -43,6 +45,11 @@ export function Settings() {
       label: "General",
       icon: MonitorSmartphone,
       component: GeneralSettings,
+    },
+    {
+      label: "Searchbar",
+      icon: SearchIcon,
+      component: SearchbarSettings,
     },
     {
       label: "Layout",

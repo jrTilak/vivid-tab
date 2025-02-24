@@ -51,7 +51,7 @@ const Quote = () => {
   }, [])
 
   if (!isLoaded) {
-    ; <Skeleton className="h-24" />
+    ;<Skeleton className="h-24" />
   }
 
   return (

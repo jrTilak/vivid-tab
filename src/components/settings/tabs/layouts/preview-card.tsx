@@ -15,22 +15,29 @@ const PreviewCard = ({
   id = "empty",
   label = "Empty",
   className,
-  index
+  index,
 }: Props) => {
-
   const { isOver, setNodeRef } = useDroppable({
     id: id === "empty" ? String(id) + index : id,
-    data: { index }
-  });
+    data: { index },
+  })
 
-  const { attributes, listeners, setNodeRef: draggableRed, isDragging, transform } = useDraggable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef: draggableRed,
+    isDragging,
+    transform,
+  } = useDraggable({
     id: id === "empty" ? String(id) + index : id,
-    data: { index }
-  });
+    data: { index },
+  })
 
-  const style = transform ? {
-    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-  } : undefined;
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
+    : undefined
 
   return (
     <Card
