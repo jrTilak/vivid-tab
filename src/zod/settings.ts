@@ -89,6 +89,14 @@ export const SettingsSchema = z
           .default(DEFAULT_SETTINGS.searchbar.searchSuggestions),
       })
       .default({}),
+    background: z
+      .object({
+        blurIntensity: z
+          .number()
+          .default(DEFAULT_SETTINGS.background.blurIntensity),
+        brightness: z.number().default(DEFAULT_SETTINGS.background.brightness),
+      })
+      .default(DEFAULT_SETTINGS.background),
   })
   .default({})
 
