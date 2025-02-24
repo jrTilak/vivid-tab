@@ -87,7 +87,6 @@ export default function Homepage() {
       <SearchDialog
         defaultOpen={isSearchDialogOpen}
         onOpenChange={setIsSearchDialogOpen}
-        isNewTab={true}
       />
       <div className="min-h-screen w-full bg-cover bg-center p-6 relative select-none">
         <img

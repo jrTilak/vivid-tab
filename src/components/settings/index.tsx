@@ -84,7 +84,7 @@ export function Settings() {
     {
       label: "Backup & Sync",
       icon: HistoryIcon,
-      component: () => <div>Coming soon...</div>,
+      component: () => <div className="p-4">Coming soon...</div>,
     },
   ]
 
@@ -96,7 +96,7 @@ export function Settings() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="fixed z-50 aspect-square rounded-full !inline size-fit top-4 right-4 text-background dark:text-foreground">
+      <DialogTrigger className="aspect-square rounded-full !inline size-fit text-background dark:text-foreground">
         <SettingsIcon size={20} opacity={0.9} />
       </DialogTrigger>
       <DialogContent className="flex max-w-4xl gap-0 p-0 z-50 bg-background max-h-[632px] h-full">

@@ -1,6 +1,5 @@
 import { useSettings } from "@/providers/settings-provider"
 import React, { useMemo } from "react"
-import { DndContext, type DragEndEvent } from "@dnd-kit/core"
 
 import PreviewCard from "./preview-card"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -40,51 +39,51 @@ const LayoutsSettings = () => {
     }
   }, [])
 
-  const onDragEnd = ({
-    active: {
-      id: from,
-      data: { current: activeCurrent },
-    },
-    over: {
-      id: to,
-      data: { current },
-    },
-  }: DragEndEvent) => {
-    console.log(`${from} -> ${to} with index ${current.index}`)
+  // const onDragEnd = ({
+  //   active: {
+  //     id: from,
+  //     data: { current: activeCurrent },
+  //   },
+  //   over: {
+  //     id: to,
+  //     data: { current },
+  //   },
+  // }: DragEndEvent) => {
+  //   console.log(`${from} -> ${to} with index ${current.index}`)
 
-    if (from === to) {
-      console.log("Same item, returning")
+  //   if (from === to) {
+  //     console.log("Same item, returning")
 
-      return
-    }
+  //     return
+  //   }
 
-    if (from === "bookmarks" || to === "bookmarks") {
-      console.log("Bookmarks can't be moved, returning")
+  //   if (from === "bookmarks" || to === "bookmarks") {
+  //     console.log("Bookmarks can't be moved, returning")
 
-      return
-    }
+  //     return
+  //   }
 
-    if (from === "searchbar" && !(current.index === 0 || current.index === 8)) {
-      console.log("Searchbar can only be moved to the top or bottom, returning")
+  //   if (from === "searchbar" && !(current.index === 0 || current.index === 8)) {
+  //     console.log("Searchbar can only be moved to the top or bottom, returning")
 
-      return
-    }
+  //     return
+  //   }
 
-    setSettings((prevSettings) => {
-      return {
-        ...prevSettings,
-        layout: {
-          ...prevSettings.layout,
-          ...(from.toString().startsWith("empty")
-            ? {}
-            : { [current.index]: from }),
-          ...(to.toString().startsWith("empty")
-            ? {}
-            : { [activeCurrent.index]: to }),
-        },
-      }
-    })
-  }
+  //   setSettings((prevSettings) => {
+  //     return {
+  //       ...prevSettings,
+  //       layout: {
+  //         ...prevSettings.layout,
+  //         ...(from.toString().startsWith("empty")
+  //           ? {}
+  //           : { [current.index]: from }),
+  //         ...(to.toString().startsWith("empty")
+  //           ? {}
+  //           : { [activeCurrent.index]: to }),
+  //       },
+  //     }
+  //   })
+  // }
 
   return (
     <div className="flex flex-col gap-6 p-4">
@@ -136,16 +135,15 @@ const LayoutsSettings = () => {
         ))}
       </div>
       <Separator />
-      <DndContext onDragEnd={onDragEnd}>
+      {/* disabling temporarily */}
+      {/* <DndContext onDragEnd={onDragEnd}>
         <div className="space-y-5 w-full ">
           <p className="text-destructive text-xs">
             (Draggable doesn&apos;t work properly ⚠️)
           </p>
           <div className="relative">
-            {/* Tabs */}
 
             <div className="grid grid-cols-12 gap-x-9">
-              {/* Left Sidebar */}
               <div className="col-span-3 space-y-6 opacity-80">
                 {COMPONENTS[layout[1]] || <PreviewCard index={1} />}
                 {COMPONENTS[layout[2]] || <PreviewCard index={2} />}
@@ -166,7 +164,6 @@ const LayoutsSettings = () => {
                 </div>
               </div>
 
-              {/* Right Sidebar */}
               <div className="col-span-3 space-y-6 opacity-80">
                 {COMPONENTS[layout[5]] || <PreviewCard index={5} />}
                 {COMPONENTS[layout[6]] || <PreviewCard index={6} />}
@@ -175,7 +172,7 @@ const LayoutsSettings = () => {
             </div>
           </div>
         </div>
-      </DndContext>
+      </DndContext> */}
     </div>
   )
 }
