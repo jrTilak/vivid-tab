@@ -23,6 +23,7 @@ export default function Homepage() {
       layout,
       wallpapers,
       general: { bookmarksCanTakeExtraSpaceIfAvailable },
+      background: backgroundSettings
     },
   } = useSettings()
 
@@ -51,8 +52,6 @@ export default function Homepage() {
 
       return
     }
-
-    console.log("called")
 
     // case 1: three cols are present
     if (
@@ -94,7 +93,12 @@ export default function Homepage() {
           alt="scene"
           className="h-full w-full object-cover object-center absolute inset-0"
         />
-        <div className="h-full w-full absolute inset-0 bg-black/10 backdrop-blur-[1px]" />
+        <div
+          style={{
+            backdropFilter: `blur(${backgroundSettings.blurIntensity}px)`,
+            backgroundColor: `rgba(0, 0, 0, ${(1 - ((backgroundSettings.brightness) / 10))})`,
+          }}
+          className={cn(`h-full w-full absolute inset-0`)} />
 
         <div className="mx-auto max-w-[1400px] relative mt-20">
           {/* Tabs */}

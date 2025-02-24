@@ -41,4 +41,8 @@ export const DEFAULT_SETTINGS = {
     submitDefaultAction: "default",
     searchSuggestions: false,
   },
+  background: {
+    blurIntensity: 1,
+    brightness: 9,
+  },
 } as const

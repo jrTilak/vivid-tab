@@ -13,6 +13,7 @@ import {
   CloudIcon,
   HistoryIcon,
   ImageIcon,
+  ImagePlusIcon,
   LayoutGridIcon,
   ListTodoIcon,
   MonitorSmartphone,
@@ -32,6 +33,7 @@ import TimerSettings from "./tabs/timer"
 import WallpaperSettings from "./tabs/wallpapers"
 import TodosSettings from "./tabs/todos"
 import SearchbarSettings from "./tabs/searchbar"
+import Background from "./tabs/background"
 
 export function Settings() {
   const { setSettings, settings } = useSettings()
@@ -58,8 +60,13 @@ export function Settings() {
     },
     {
       label: "Wallpaper",
-      icon: ImageIcon,
+      icon: ImagePlusIcon,
       component: WallpaperSettings,
+    },
+    {
+      label: "Background",
+      icon: ImageIcon,
+      component: Background,
     },
     {
       label: "Timer",
