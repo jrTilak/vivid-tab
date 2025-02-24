@@ -17,6 +17,7 @@ import { DeleteIcon, EditIcon, ExternalLinkIcon, MoveIcon } from "lucide-react"
 import DeleteDialog from "../delete-dialog"
 import CreateABookmark from "../create-a-bookmark"
 import useIcon from "@/hooks/use-icon"
+import MoveBookmarkDialog from "../move-bookmark-dialog"
 
 type Props = BookmarkUrlNode & {
   layout: "grid" | "list"
@@ -25,6 +26,7 @@ type Props = BookmarkUrlNode & {
 
 const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const { icon } = useIcon({ id: props.id, defaultIcon: "" })
 
@@ -112,6 +114,12 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
           url: props.url,
         }}
       />
+      <MoveBookmarkDialog
+        open={isMoveDialogOpen}
+        onOpenChange={setIsMoveDialogOpen}
+        id={props.id}
+        label={props.title + " bookmark"}
+      />
       <ContextMenu>
         <ContextMenuTrigger disabled={disableContextMenu}>
           {props.layout === "grid" ? (
@@ -189,7 +197,9 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
               <EditIcon className="size-4" />
             </ContextMenuShortcut>
           </ContextMenuItem>
-          <ContextMenuItem>
+          <ContextMenuItem
+            onClick={() => setTimeout(() => setIsMoveDialogOpen(true), 100)}
+          >
             Move
             <ContextMenuShortcut>
               <MoveIcon className="size-4" />
