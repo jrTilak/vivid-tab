@@ -67,7 +67,7 @@ const BookmarkFolder = (props: Props) => {
           )}
         </ContextMenuTrigger>
         <ContextMenuContent className="w-fit min-w-40">
-          <ContextMenuItem onClick={() => setIsUpdateDialogOpen(true)}>
+          <ContextMenuItem onClick={() => setTimeout(() => setIsUpdateDialogOpen(true), 100)}>
             Edit
             <ContextMenuShortcut>
               <EditIcon className="size-4" />
@@ -80,7 +80,7 @@ const BookmarkFolder = (props: Props) => {
             </ContextMenuShortcut>
           </ContextMenuItem>
           <ContextMenuItem
-            onClick={() => setIsDeleteDialogOpen(true)}
+            onClick={() => setTimeout(() => setIsDeleteDialogOpen(true), 100)}
             className="text-destructive"
           >
             Delete

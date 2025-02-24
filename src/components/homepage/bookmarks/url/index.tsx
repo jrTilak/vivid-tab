@@ -177,7 +177,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
             </ContextMenuShortcut>
           </ContextMenuItem>
           <ContextMenuSeparator />
-          <ContextMenuItem onClick={() => setEditDialogOpen(true)}>
+          <ContextMenuItem onClick={() => setTimeout(() => setEditDialogOpen(true), 100)}>
             Edit
             <ContextMenuShortcut>
               <EditIcon className="size-4" />
