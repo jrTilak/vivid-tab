@@ -10,6 +10,13 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { CloudUploadIcon } from "lucide-react"
+import {
+  removeIconFromLocalStorage,
+  saveIconsToLocalStorage,
+} from "@/lib/icons-to-local"
+import useIcon from "@/hooks/use-icon"
 
 type Props = {
   parentId?: string
@@ -23,6 +30,7 @@ type Props = {
 
 const CreateAFolder = ({ parentId, defaultValues, open, setOpen }: Props) => {
   const [value, setValue] = useState(defaultValues?.title || "")
+  const { icon, setIcon } = useIcon({ id: defaultValues?.id, defaultIcon: "" })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,14 +39,41 @@ const CreateAFolder = ({ parentId, defaultValues, open, setOpen }: Props) => {
 
     if (defaultValues) {
       chrome.bookmarks.update(defaultValues.id, { title: value }, () => {
-        setValue("")
         setOpen(false)
+
+        if (icon) {
+          removeIconFromLocalStorage(`icon-${defaultValues.id}`)
+          saveIconsToLocalStorage({
+            key: `icon-${defaultValues.id}`,
+            value: {
+              icon,
+            },
+          })
+
+          window.dispatchEvent(new Event("bookmarks:update"))
+        }
       })
     } else {
-      chrome.bookmarks.create({ parentId: parentId, title: value }, () => {
-        setValue("")
-        setOpen(false)
-      })
+      chrome.bookmarks.create(
+        { parentId: parentId, title: value },
+        ({ id }) => {
+          setValue("")
+          setOpen(false)
+          setIcon("")
+
+          if (icon) {
+            removeIconFromLocalStorage(`icon-${id}`)
+            saveIconsToLocalStorage({
+              key: `icon-${id}`,
+              value: {
+                icon,
+              },
+            })
+
+            window.dispatchEvent(new Event("bookmarks:update"))
+          }
+        },
+      )
     }
   }
 
@@ -59,14 +94,49 @@ const CreateAFolder = ({ parentId, defaultValues, open, setOpen }: Props) => {
                 : "Enter the name of the folder you want to create."}
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-4 py-4 grid-cols-[1fr_50px] items-center">
             <Input
               value={value}
               onChange={(e) => setValue(e.target.value)}
               id="name"
               placeholder="Bookmarks"
-              className="col-span-3"
             />
+            {/* icon input */}
+            <Label
+              htmlFor="icon"
+              className="rounded-full bg-muted flex items-center justify-center aspect-square h-12 w-12 cursor-pointer"
+            >
+              {icon ? (
+                <img
+                  src={icon}
+                  alt=""
+                  className="h-full w-full rounded-full object-contain object-center"
+                />
+              ) : (
+                <CloudUploadIcon className="h-6 w-6" />
+              )}
+              <input
+                type="file"
+                name="icon"
+                id="icon"
+                className="hidden"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+
+                  if (file) {
+                    // convert to base64
+                    const reader = new FileReader()
+
+                    reader.onload = (e) => {
+                      setIcon(e.target?.result as string)
+                    }
+
+                    reader.readAsDataURL(file)
+                  }
+                }}
+              />
+            </Label>
           </div>
           <DialogFooter>
             <Button
@@ -75,7 +145,7 @@ const CreateAFolder = ({ parentId, defaultValues, open, setOpen }: Props) => {
               disabled={value.length === 0}
               type="submit"
             >
-              Save{" "}
+              Save
             </Button>
           </DialogFooter>
         </form>

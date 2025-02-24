@@ -10,6 +10,13 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import useIcon from "@/hooks/use-icon"
+import {
+  removeIconFromLocalStorage,
+  saveIconsToLocalStorage,
+} from "@/lib/icons-to-local"
+import { Label } from "@/components/ui/label"
+import { CloudUploadIcon } from "lucide-react"
 
 type Props = {
   parentId?: string
@@ -23,6 +30,7 @@ type Props = {
 }
 
 const CreateABookmark = ({ parentId, defaultValues, open, setOpen }: Props) => {
+  const { icon, setIcon } = useIcon({ id: defaultValues?.id, defaultIcon: "" })
   const [value, setValue] = useState({
     url: defaultValues?.url || "",
     title: defaultValues?.title || "",
@@ -35,15 +43,39 @@ const CreateABookmark = ({ parentId, defaultValues, open, setOpen }: Props) => {
 
     if (defaultValues) {
       chrome.bookmarks.update(defaultValues.id, value, () => {
-        setValue({ url: "", title: "" })
         setOpen(false)
+
+        if (icon) {
+          removeIconFromLocalStorage(`icon-${defaultValues.id}`)
+          saveIconsToLocalStorage({
+            key: `icon-${defaultValues.id}`,
+            value: {
+              icon,
+            },
+          })
+
+          window.dispatchEvent(new Event("bookmarks:update"))
+        }
       })
     } else {
       chrome.bookmarks.create(
         { parentId: parentId, title: value.title, url: value.url },
-        () => {
+        ({ id }) => {
           setValue({ url: "", title: "" })
           setOpen(false)
+          setIcon("")
+
+          if (icon) {
+            removeIconFromLocalStorage(`icon-${id}`)
+            saveIconsToLocalStorage({
+              key: `icon-${id}`,
+              value: {
+                icon,
+              },
+            })
+
+            window.dispatchEvent(new Event("bookmarks:update"))
+          }
         },
       )
     }
@@ -65,7 +97,7 @@ const CreateABookmark = ({ parentId, defaultValues, open, setOpen }: Props) => {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2 py-4">
-            <div className="grid gap-4">
+            <div className="grid gap-4 grid-cols-[1fr_50px] items-center">
               <Input
                 value={value.title}
                 onChange={(e) =>
@@ -73,8 +105,45 @@ const CreateABookmark = ({ parentId, defaultValues, open, setOpen }: Props) => {
                 }
                 id="name"
                 placeholder="Name"
-                className="col-span-3"
+                className=""
               />
+
+              {/* icon input */}
+              <Label
+                htmlFor="icon"
+                className="rounded-full bg-muted flex items-center justify-center aspect-square h-12 w-12 cursor-pointer"
+              >
+                {icon ? (
+                  <img
+                    src={icon}
+                    alt=""
+                    className="h-full w-full rounded-full object-contain object-center"
+                  />
+                ) : (
+                  <CloudUploadIcon className="h-6 w-6" />
+                )}
+                <input
+                  type="file"
+                  name="icon"
+                  id="icon"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+
+                    if (file) {
+                      // convert to base64
+                      const reader = new FileReader()
+
+                      reader.onload = (e) => {
+                        setIcon(e.target?.result as string)
+                      }
+
+                      reader.readAsDataURL(file)
+                    }
+                  }}
+                />
+              </Label>
             </div>
             <div className="grid gap-4">
               <Input
