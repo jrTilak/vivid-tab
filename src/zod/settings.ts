@@ -101,3 +101,51 @@ export const SettingsSchema = z
   .default({})
 
 export type Settings = z.infer<typeof SettingsSchema>
+
+export const SettingsSchemaForImport = z.object({
+  timer: z.object({
+    timeFormat: z.enum(["12h", "24h"]),
+    showSeconds: z.boolean(),
+  }),
+  temperature: z.object({
+    unit: z.enum(["celsius", "fahrenheit"]),
+  }),
+  quotes: z.object({
+    categories: z.array(z.string()),
+  }),
+  todos: z.object({
+    expireAfterCompleted: z.object({
+      enabled: z.boolean(),
+      durationInMinutes: z.number(),
+    }),
+  }),
+  wallpapers: z.object({
+    selectedImageId: z.string().nullable().nullish(),
+    images: z.array(z.string()),
+  }),
+  layout: z.record(z.string(), z.string()),
+  general: z.object({
+    rootFolder: z.string(),
+    showHistory: z.boolean(),
+    layout: z.enum(["grid", "list"]),
+    openUrlIn: z.enum(["new-tab", "current-tab"]),
+    bookmarksCanTakeExtraSpaceIfAvailable: z.boolean(),
+  }),
+  searchbar: z.object({
+    dialogBackground: z.enum(["default", "transparent"]),
+    shortcuts: z.array(
+      z.enum(["chatgpt", "gemini", "deepseek", "claude", "youtube"]),
+    ),
+    submitDefaultAction: z.enum([
+      "default",
+      "ask-chatgpt",
+      "ask-claude",
+      "search-on-youtube",
+    ]),
+    searchSuggestions: z.boolean(),
+  }),
+  background: z.object({
+    blurIntensity: z.number(),
+    brightness: z.number(),
+  }),
+})

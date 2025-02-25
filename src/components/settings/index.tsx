@@ -11,6 +11,7 @@ import { cn } from "@/lib/cn"
 import { useSettings } from "@/providers/settings-provider"
 import {
   CloudIcon,
+  HandCoinsIcon,
   HistoryIcon,
   ImageIcon,
   ImagePlusIcon,
@@ -34,6 +35,8 @@ import WallpaperSettings from "./tabs/wallpapers"
 import TodosSettings from "./tabs/todos"
 import SearchbarSettings from "./tabs/searchbar"
 import Background from "./tabs/background"
+import BackupAndExportSettings from "./tabs/backup-and-export"
+import Support from "./tabs/support"
 
 export function Settings() {
   const { setSettings, settings } = useSettings()
@@ -89,9 +92,14 @@ export function Settings() {
       component: TodosSettings,
     },
     {
-      label: "Backup & Sync",
+      label: "Support",
+      icon: HandCoinsIcon,
+      component: Support,
+    },
+    {
+      label: "Backup & Export",
       icon: HistoryIcon,
-      component: () => <div className="p-4">Coming soon...</div>,
+      component: BackupAndExportSettings,
     },
   ]
 
