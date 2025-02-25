@@ -121,6 +121,10 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
     }
     : undefined
 
+  const handleClick = (url: string) => {
+    window.open(url, general.openUrlIn === "current-tab" ? "_self" : "_blank")
+  }
+
   return (
     <>
       <DeleteDialog
@@ -148,46 +152,47 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
       <ContextMenu>
         <ContextMenuTrigger disabled={disableContextMenu}>
           {props.layout === "grid" ? (
-            <a
-              ref={disableContextMenu ? null : setNodeRef}
-              style={style}
-              // href={props.url}
-              target={general.openUrlIn === "new-tab" ? "_blank" : "_self"}
-              className={cn("flex items-center flex-col space-y-1 p-2 rounded-lg hover:scale-105 text-center text-xs w-24", isOver && "bg-accent/10",)}
-              rel="noreferrer"
+            <div ref={disableContextMenu ? null : setNodeRef}
+              className={isDragging ? "scale-110" : ""}
             >
-              <Avatar
+              <button
                 ref={disableContextMenu ? null : draggableRef}
-                className={cn("rounded-none mx-auto transition-transform", isDragging && "scale-105")}
+                style={style}
+                onClick={() => handleClick(props.url)}
+                className={cn("flex items-center flex-col space-y-1 p-2 rounded-lg hover:scale-105 text-center text-xs w-24", isOver && "bg-accent/10",)}
                 {...(disableContextMenu ? {} : attributes)}
                 {...(disableContextMenu ? {} : listeners)}
               >
-                <AvatarImage
-                  src={icon || data.image}
-                  alt={props.title}
-                  className="rounded-md object-contain object-center size-12"
-                />
-                <AvatarFallback className="size-12">
-                  {data.title
-                    .replace(/[^a-zA-Z ]/g, "")
-                    .trim()
-                    .toLowerCase()
-                    .split(" ")
-                    .map((word) => word[0]?.toUpperCase())
-                    .join("")
-                    .substring(0, 2)}
-                </AvatarFallback>
-              </Avatar>
-              <p className="text-center line-clamp-2 text-xs break-all">
-                {data.title}
-              </p>
-            </a>
+                <Avatar
+                  className={cn("rounded-none mx-auto transition-transform")}
+
+                >
+                  <AvatarImage
+                    src={icon || data.image}
+                    alt={props.title}
+                    className="rounded-md object-contain object-center size-12"
+                  />
+                  <AvatarFallback className="size-12">
+                    {data.title
+                      .replace(/[^a-zA-Z ]/g, "")
+                      .trim()
+                      .toLowerCase()
+                      .split(" ")
+                      .map((word) => word[0]?.toUpperCase())
+                      .join("")
+                      .substring(0, 2)}
+                  </AvatarFallback>
+                </Avatar>
+                <p className="text-center line-clamp-2 text-xs break-all">
+                  {data.title}
+                </p>
+              </button>
+            </div>
           ) : (
-            <a
+            <button
               ref={disableContextMenu ? null : setNodeRef}
               style={style}
-              // href={props.url}
-              target={general.openUrlIn === "new-tab" ? "_blank" : "_self"}
+              onClick={() => handleClick(props.url)}
               className={cn("flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-accent/10", isOver && "bg-accent/10")}
               rel="noreferrer"
             >
@@ -217,7 +222,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
                 <span> {data.title}</span>
                 <span className="text-xs truncate">{props.url}</span>
               </p>
-            </a>
+            </button>
           )}
         </ContextMenuTrigger>
         <ContextMenuContent className="w-fit min-w-40">
@@ -254,7 +259,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
             </ContextMenuShortcut>
           </ContextMenuItem>
         </ContextMenuContent>
-      </ContextMenu>
+      </ContextMenu >
     </>
   )
 }

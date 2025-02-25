@@ -31,6 +31,7 @@ const RootFolderButton = ({
     listeners,
     setNodeRef: draggableRef,
     transform,
+    isDragging
   } = useDraggable({
     id: item.id,
     data: { index: item.index },
@@ -46,6 +47,7 @@ const RootFolderButton = ({
     <div
       style={style}
       ref={disableDragging ? null : setNodeRef}
+
     >
       <Button
         key={item.id}
@@ -58,6 +60,7 @@ const RootFolderButton = ({
           activeRootFolder !== item.id &&
           "bg-muted/20 hover:bg-muted/30",
           isOver && "bg-destructive",
+          isDragging && "scale-110"
         )}
         {...(disableDragging ? {} : { ref: draggableRef, ...listeners, ...attributes })}
       >

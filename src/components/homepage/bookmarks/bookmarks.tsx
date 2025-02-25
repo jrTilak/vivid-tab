@@ -20,7 +20,7 @@ import BookmarkFolder from "./folder"
 import BookmarkUrl from "./url"
 import CreateAFolder from "./create-a-folder"
 import CreateABookmark from "./create-a-bookmark"
-import { DndContext, type DragEndEvent } from "@dnd-kit/core"
+import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core"
 import RootFolderButton from "./root-folder-button"
 
 const Bookmarks = () => {
@@ -104,8 +104,25 @@ const Bookmarks = () => {
     })
   }, [rootChildren.length, rootFolders])
 
+  // Custom delayed sensors
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      delay: 250, // 250ms delay before drag starts
+      tolerance: 5, // Prevents unintended drags
+    },
+  });
+
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 250, // 250ms hold before dragging
+      tolerance: 10,
+    },
+  });
+
+  const sensors = useSensors(mouseSensor, touchSensor);
+
   return (
-    <DndContext onDragEnd={onDragEnd}>
+    <DndContext onDragEnd={onDragEnd} sensors={sensors}>
       <CreateABookmark
         parentId={createAFolderId}
         open={isCreateABookmarkDialogOpen}
