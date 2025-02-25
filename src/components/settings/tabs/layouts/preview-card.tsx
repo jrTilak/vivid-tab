@@ -8,7 +8,7 @@ type Props = {
   label?: string
   id?: string
   className?: string
-  index: number
+  index: string
 }
 
 const PreviewCard = ({
@@ -35,12 +35,13 @@ const PreviewCard = ({
 
   const style = transform
     ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-      }
+      transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+    }
     : undefined
 
   return (
     <Card
+      onClick={() => console.log(index, id)}
       ref={setNodeRef}
       className={cn(
         "relative w-full flex items-center justify-center text-center bg-muted text-foreground",
