@@ -13,16 +13,41 @@ import DeleteDialog from "../delete-dialog"
 import { DeleteIcon, EditIcon, MoveIcon } from "lucide-react"
 import CreateAFolder from "../create-a-folder"
 import useIcon from "@/hooks/use-icon"
+import { useDraggable, useDroppable } from "@dnd-kit/core"
+import { cn } from "@/lib/cn"
 
 type Props = BookmarkFolderNode & {
   onOpenFolder: () => void
   layout: "grid" | "list"
+  index: number
 }
 
 const BookmarkFolder = (props: Props) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false)
   const { icon, setIcon } = useIcon({ id: props.id, defaultIcon: folderIcon })
+
+  const { isOver, setNodeRef } = useDroppable({
+    id: props.id,
+    data: { index: props.index },
+  })
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef: draggableRef,
+    isDragging,
+    transform,
+  } = useDraggable({
+    id: props.id,
+    data: { index: props.index },
+  })
+
+  const style = transform
+    ? {
+      transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+    }
+    : undefined
 
   return (
     <>
@@ -44,13 +69,18 @@ const BookmarkFolder = (props: Props) => {
         <ContextMenuTrigger>
           {props.layout === "grid" ? (
             <button
+              ref={setNodeRef}
+              style={style}
               onClick={props.onOpenFolder}
-              className="flex flex-col  space-y-1 p-2 rounded-lg hover:scale-105 transition-transform w-24 disabled:opacity-50"
+              className={cn("flex flex-col  space-y-1 p-2 rounded-lg hover:scale-105 w-24 disabled:opacity-50", isOver && "bg-accent/10")}
             >
               <img
+                ref={draggableRef}
+                {...attributes}
+                {...listeners}
                 src={icon}
                 alt=""
-                className="size-12 mx-auto rounded-md object-contain object-center"
+                className={cn("size-12 mx-auto rounded-md object-contain object-center", isDragging && "scale-105")}
                 onError={() => setIcon(folderIcon)}
               />
               <p className="text-center line-clamp-2 text-xs break-all">
@@ -60,12 +90,17 @@ const BookmarkFolder = (props: Props) => {
           ) : (
             <button
               onClick={props.onOpenFolder}
-              className="flex space-x-1 p-2 items-center rounded-lg transition-colors disabled:opacity-50"
+              style={style}
+              ref={setNodeRef}
+              className={cn("flex space-x-1 p-2 items-center rounded-lg transition-colors disabled:opacity-50", isOver && "bg-accent/10")}
             >
               <img
                 src={icon}
+                ref={draggableRef}
+                {...attributes}
+                {...listeners}
                 alt=""
-                className="size-12 rounded-md object-contain object-center"
+                className={cn("size-12 rounded-md object-contain object-center", isDragging && "scale-105")}
                 onError={() => setIcon(folderIcon)}
               />
               <p className="text-xs w-full text-left line-clamp-2">

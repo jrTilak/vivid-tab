@@ -18,10 +18,13 @@ import DeleteDialog from "../delete-dialog"
 import CreateABookmark from "../create-a-bookmark"
 import useIcon from "@/hooks/use-icon"
 import MoveBookmarkDialog from "../move-bookmark-dialog"
+import { useDraggable, useDroppable } from "@dnd-kit/core"
+import { cn } from "@/lib/cn"
 
 type Props = BookmarkUrlNode & {
   layout: "grid" | "list"
   disableContextMenu?: boolean
+  index: number
 }
 
 const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
@@ -96,6 +99,28 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
     window.open(url, "_blank")
   }, [])
 
+  const { isOver, setNodeRef } = useDroppable({
+    id: props.id,
+    data: { index: props.index },
+  })
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef: draggableRef,
+    isDragging,
+    transform,
+  } = useDraggable({
+    id: props.id,
+    data: { index: props.index },
+  })
+
+  const style = transform
+    ? {
+      transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+    }
+    : undefined
+
   return (
     <>
       <DeleteDialog
@@ -124,12 +149,19 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
         <ContextMenuTrigger disabled={disableContextMenu}>
           {props.layout === "grid" ? (
             <a
-              href={props.url}
+              ref={disableContextMenu ? null : setNodeRef}
+              style={style}
+              // href={props.url}
               target={general.openUrlIn === "new-tab" ? "_blank" : "_self"}
-              className="flex items-center flex-col space-y-1 p-2 rounded-lg hover:scale-105 transition-transform text-center text-xs w-24"
+              className={cn("flex items-center flex-col space-y-1 p-2 rounded-lg hover:scale-105 text-center text-xs w-24", isOver && "bg-accent/10",)}
               rel="noreferrer"
             >
-              <Avatar className="rounded-none mx-auto">
+              <Avatar
+                ref={disableContextMenu ? null : draggableRef}
+                className={cn("rounded-none mx-auto transition-transform", isDragging && "scale-105")}
+                {...(disableContextMenu ? {} : attributes)}
+                {...(disableContextMenu ? {} : listeners)}
+              >
                 <AvatarImage
                   src={icon || data.image}
                   alt={props.title}
@@ -152,12 +184,19 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
             </a>
           ) : (
             <a
-              href={props.url}
+              ref={disableContextMenu ? null : setNodeRef}
+              style={style}
+              // href={props.url}
               target={general.openUrlIn === "new-tab" ? "_blank" : "_self"}
-              className="flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-accent/10"
+              className={cn("flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-accent/10", isOver && "bg-accent/10")}
               rel="noreferrer"
             >
-              <Avatar className="rounded-none">
+              <Avatar
+                ref={disableContextMenu ? null : draggableRef}
+                className={cn("rounded-none mx-auto transition-transform", isDragging && "scale-105")}
+                {...(disableContextMenu ? {} : attributes)}
+                {...(disableContextMenu ? {} : listeners)}
+              >
                 <AvatarImage
                   src={icon || data.image}
                   alt={props.title}

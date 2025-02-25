@@ -3,7 +3,7 @@ export interface BookmarkBaseNode {
   title: string // Title of the node
   dateAdded: number // Timestamp when the node was added
   parentId?: string // ID of the parent node
-  index?: number // Position of the node within its parent
+  index: number // Position of the node within its parent
 }
 
 // Type for folders
