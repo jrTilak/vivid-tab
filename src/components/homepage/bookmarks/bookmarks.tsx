@@ -14,7 +14,7 @@ import {
   FolderPlusIcon,
   PlusIcon,
 } from "lucide-react"
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
 import BookmarkFolder from "./folder"
 import BookmarkUrl from "./url"
@@ -24,10 +24,11 @@ import { DndContext, type DragEndEvent } from "@dnd-kit/core"
 import RootFolderButton from "./root-folder-button"
 
 const Bookmarks = () => {
-  const [activeRootFolder, setActiveRootFolder] = React.useState("home")
-  const [rootChildren, setRootChildren] = React.useState<BookmarkUrlNode[]>([])
-  const [rootFolders, setRootFolders] = React.useState<BookmarkFolderNode[]>([])
-  const [folderStack, setFolderStack] = React.useState<Bookmark[]>([])
+  const [activeRootFolder, setActiveRootFolder] = useState("home")
+
+  const [rootChildren, setRootChildren] = useState<BookmarkUrlNode[]>([])
+  const [rootFolders, setRootFolders] = useState<BookmarkFolderNode[]>([])
+  const [folderStack, setFolderStack] = useState<Bookmark[]>([])
   const history = useHistory()
 
   const {
@@ -54,12 +55,6 @@ const Bookmarks = () => {
       )
     }
   }, [bookmarks])
-
-  useEffect(() => {
-    if (rootChildren.length === 0 && rootFolders.length > 0) {
-      setActiveRootFolder(rootFolders[0].id)
-    }
-  }, [rootChildren, rootFolders])
 
   useEffect(() => {
     if (activeRootFolder !== "history") {
@@ -95,8 +90,19 @@ const Bookmarks = () => {
 
   const sortBookmarks = <T extends { index: number }>(bookmarks: T[]) => {
     // sort by index
-    return bookmarks.sort((a, b) => a.index - b.index)
+    return bookmarks?.sort((a, b) => a.index - b.index) || []
   }
+
+  useEffect(() => {
+    chrome.storage.sync.get("activeRootFolder", (data) => {
+
+      if (data.activeRootFolder) {
+        setActiveRootFolder(data.activeRootFolder)
+      } else if (rootChildren.length === 0 && rootFolders.length > 0) {
+        setActiveRootFolder(rootFolders[0].id)
+      }
+    })
+  }, [rootChildren.length, rootFolders])
 
   return (
     <DndContext onDragEnd={onDragEnd}>
@@ -139,6 +145,7 @@ const Bookmarks = () => {
                   onClick={() => {
                     setActiveRootFolder(item.id)
                     setFolderStack([])
+                    chrome.storage.sync.set({ activeRootFolder: item.id })
                   }}
                   activeRootFolder={activeRootFolder}
                   key={item.id}
