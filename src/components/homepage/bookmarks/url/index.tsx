@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { fetchFavicon } from "@/lib/fetch-favicon"
 import { useSettings } from "@/providers/settings-provider"
 import type { BookmarkUrlNode } from "@/types/bookmark-types"
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 
 import {
   ContextMenu,
@@ -95,6 +95,13 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
     }
   }, [props.url])
 
+  useEffect(() => {
+    setData((prevState) => ({
+      ...prevState,
+      title: props.title,
+    }))
+  }, [props.title])
+  
   const openInNewTab = useCallback((url: string) => {
     window.open(url, "_blank")
   }, [])
