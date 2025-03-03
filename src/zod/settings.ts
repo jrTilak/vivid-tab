@@ -59,6 +59,9 @@ export const SettingsSchema = z
       .object({
         rootFolder: z.string().default(DEFAULT_SETTINGS.general.rootFolder),
         showHistory: z.boolean().default(DEFAULT_SETTINGS.general.showHistory),
+        showTopSites: z
+          .boolean()
+          .default(DEFAULT_SETTINGS.general.showTopSites),
         layout: z
           .enum(["grid", "list"])
           .default(DEFAULT_SETTINGS.general.layout),

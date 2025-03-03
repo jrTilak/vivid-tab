@@ -121,8 +121,12 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
     }
     : undefined
 
-  const handleClick = (url: string) => {
-    window.open(url, general.openUrlIn === "current-tab" ? "_self" : "_blank")
+  const handleClick = (url: string, aux: boolean = false) => {
+    if (aux) {
+      window.open(url, "_blank")
+    } else {
+      window.open(url, general.openUrlIn === "current-tab" ? "_self" : "_blank")
+    }
   }
 
   return (
@@ -153,12 +157,16 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
         <ContextMenuTrigger disabled={disableContextMenu}>
           {props.layout === "grid" ? (
             <div ref={disableContextMenu ? null : setNodeRef}
-              className={isDragging ? "scale-110" : ""}
             >
               <button
                 ref={disableContextMenu ? null : draggableRef}
                 style={style}
                 onClick={() => handleClick(props.url)}
+                onAuxClick={(event) => {
+                  if (event.button === 1) { // Middle mouse button
+                    handleClick(props.url, true)
+                  }
+                }}
                 className={cn("flex items-center flex-col space-y-1 p-2 rounded-lg hover:scale-105 text-center text-xs w-24", isOver && "bg-accent/10",)}
                 {...(disableContextMenu ? {} : attributes)}
                 {...(disableContextMenu ? {} : listeners)}
@@ -193,6 +201,11 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
               ref={disableContextMenu ? null : setNodeRef}
               style={style}
               onClick={() => handleClick(props.url)}
+              onAuxClick={(event) => {
+                if (event.button === 1) { // Middle mouse button
+                  handleClick(props.url, true)
+                }
+              }}
               className={cn("flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-accent/10", isOver && "bg-accent/10")}
               rel="noreferrer"
             >
