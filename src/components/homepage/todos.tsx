@@ -130,7 +130,7 @@ const Todos = () => {
                   />
                   <Label
                     htmlFor={`todo-${todo.id}`}
-                    className={`text-sm ${todo.completed ? "line-through text-muted-foreground" : ""}`}
+                    className={`text-sm ${todo.completed ? "line-through" : ""}`}
                   >
                     {todo.text}
                   </Label>
@@ -153,7 +153,7 @@ const Todos = () => {
           value={newTodo}
           onChange={(e) => setNewTodo(e.target.value)}
           placeholder="Add new todo"
-          className="mr-2 "
+          className="mr-2 bg-background/10 border-none"
         />
         <Button
           tabIndex={-1}

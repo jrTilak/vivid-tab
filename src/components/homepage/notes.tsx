@@ -67,7 +67,7 @@ const Notes = () => {
         value={note}
         onChange={(e) => setNote(e.target.value)}
         placeholder="Add a note..."
-        className="mb-2 bg-white/10"
+        className="mb-2 bg-background/10 border-none"
       />
       <Button
         tabIndex={-1}

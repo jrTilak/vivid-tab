@@ -20,7 +20,6 @@ const RootFolderButton = ({
   activeRootFolder,
   disableDragging,
 }: Props) => {
-
   const { isOver, setNodeRef } = useDroppable({
     id: item.id,
     data: { index: item.index },
@@ -58,9 +57,9 @@ const RootFolderButton = ({
         className={cn(
           "text-xs px-2.5 py-1 h-fit rounded-sm",
           activeRootFolder !== item.id &&
-          "bg-muted/20 hover:bg-muted/30",
+          "bg-muted/20 hover:bg-muted/30 text-accent-foreground",
           isOver && "bg-destructive",
-          isDragging && "scale-110"
+          isDragging && "scale-110",
         )}
         {...(disableDragging ? {} : { ref: draggableRef, ...listeners, ...attributes })}
       >

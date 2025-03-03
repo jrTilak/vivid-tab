@@ -23,9 +23,11 @@ import CreateABookmark from "./create-a-bookmark"
 import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core"
 import RootFolderButton from "./root-folder-button"
 import useTopSites from "@/hooks/use-top-sites"
+import { useTheme } from "@/providers/theme-provider"
 
 const Bookmarks = () => {
   const [activeRootFolder, setActiveRootFolder] = useState("home")
+  const { theme } = useTheme()
 
   const [rootChildren, setRootChildren] = useState<BookmarkUrlNode[]>([])
   const [rootFolders, setRootFolders] = useState<BookmarkFolderNode[]>([])
@@ -136,7 +138,10 @@ const Bookmarks = () => {
         setOpen={setIsCreateAFolderDialogOpen}
       />
 
-      <div className="mb-6 col-span-6 h-[70vh] overflow-scroll __vivid_hide-scrollbar">
+      <div
+        className={cn("mb-6 col-span-6 h-[70vh] overflow-scroll __vivid_hide-scrollbar", theme === "light" ? "dark" : "light")}
+
+      >
         <div className="flex justify-between gap-6 mb-4">
           <div className="flex gap-2.5 flex-wrap ">
             {sortBookmarks([
@@ -179,7 +184,7 @@ const Bookmarks = () => {
             <Button
               tabIndex={-1}
               size="sm"
-              className="text-xs px-2.5 py-1 h-fit rounded-sm bg-muted/20 hover:bg-muted/30"
+              className="text-xs px-2.5 py-1 h-fit rounded-sm bg-muted/20 hover:bg-muted/30 text-accent-foreground"
               variant="ghost"
               onClick={() => {
                 setIsCreateAFolderDialogOpen(true)
