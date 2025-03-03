@@ -24,6 +24,7 @@ const GeneralSettings = () => {
         openUrlIn,
         rootFolder,
         bookmarksCanTakeExtraSpaceIfAvailable,
+        showTopSites,
       },
     },
     setSettings,
@@ -123,6 +124,17 @@ const GeneralSettings = () => {
           checked={showHistory}
           onCheckedChange={(checked) =>
             handleSettingsChange("showHistory", checked)
+          }
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="space-y-0.5">
+          <Label className="text-sm font-medium">Show Top Sites</Label>
+        </div>
+        <Switch
+          checked={showTopSites}
+          onCheckedChange={(checked) =>
+            handleSettingsChange("showTopSites", checked)
           }
         />
       </div>

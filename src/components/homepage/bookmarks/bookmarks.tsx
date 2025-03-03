@@ -22,14 +22,18 @@ import CreateAFolder from "./create-a-folder"
 import CreateABookmark from "./create-a-bookmark"
 import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core"
 import RootFolderButton from "./root-folder-button"
+import useTopSites from "@/hooks/use-top-sites"
+import { useTheme } from "@/providers/theme-provider"
 
 const Bookmarks = () => {
   const [activeRootFolder, setActiveRootFolder] = useState("home")
+  const { theme } = useTheme()
 
   const [rootChildren, setRootChildren] = useState<BookmarkUrlNode[]>([])
   const [rootFolders, setRootFolders] = useState<BookmarkFolderNode[]>([])
   const [folderStack, setFolderStack] = useState<Bookmark[]>([])
   const history = useHistory()
+  const topSites = useTopSites()
 
   const {
     settings: { general },
@@ -134,7 +138,10 @@ const Bookmarks = () => {
         setOpen={setIsCreateAFolderDialogOpen}
       />
 
-      <div className="mb-6 col-span-6 h-[70vh] overflow-scroll __vivid_hide-scrollbar">
+      <div
+        className={cn("mb-6 col-span-6 h-[70vh] overflow-scroll __vivid_hide-scrollbar", theme === "light" ? "dark" : "light")}
+
+      >
         <div className="flex justify-between gap-6 mb-4">
           <div className="flex gap-2.5 flex-wrap ">
             {sortBookmarks([
@@ -148,6 +155,11 @@ const Bookmarks = () => {
                 label: folder.title,
                 ...folder,
               })),
+              general.showTopSites && {
+                id: "top-sites",
+                label: "Top Sites",
+                index: 9999998
+              },
               general.showHistory && {
                 id: "history",
                 label: "History",
@@ -157,7 +169,7 @@ const Bookmarks = () => {
               .filter(Boolean))
               .map((item) => (
                 <RootFolderButton
-                  disableDragging={item.id === "home" || item.id === "history"}
+                  disableDragging={item.id === "home" || item.id === "history" || item.id === "top-sites"}
                   item={item}
                   onClick={() => {
                     setActiveRootFolder(item.id)
@@ -172,7 +184,7 @@ const Bookmarks = () => {
             <Button
               tabIndex={-1}
               size="sm"
-              className="text-xs px-2.5 py-1 h-fit rounded-sm bg-muted/20 hover:bg-muted/30"
+              className="text-xs px-2.5 py-1 h-fit rounded-sm bg-muted/20 hover:bg-muted/30 text-accent-foreground"
               variant="ghost"
               onClick={() => {
                 setIsCreateAFolderDialogOpen(true)
@@ -246,37 +258,53 @@ const Bookmarks = () => {
                     index={i}
                   />
                 ))
-                : sortBookmarks((folderStack?.length > 0
-                  ? (folderStack[
-                    folderStack.length - 1
-                  ] as BookmarkFolderNode)
-                  : rootFolders?.find(
-                    (folder) => folder.id === activeRootFolder,
-                  )
-                )?.children)?.map((item) => {
-                  if ("children" in item) {
-                    return (
-                      <BookmarkFolder
-                        {...item}
-                        key={item.id}
-                        layout={general.layout}
-                        onOpenFolder={() => {
-                          setFolderStack((prev) => [...prev, item])
-                        }}
-                        index={item.index}
-                      />
+                :
+
+                activeRootFolder === "top-sites"
+                  ? topSites.map((item, i) => (
+                    <BookmarkUrl
+                      key={i}
+                      id={item.url}
+                      title={item.title}
+                      url={item.url}
+                      layout={general.layout}
+                      index={i}
+                      dateAdded={0}
+                      disableContextMenu={true}
+                    />
+                  )) :
+
+                  sortBookmarks((folderStack?.length > 0
+                    ? (folderStack[
+                      folderStack.length - 1
+                    ] as BookmarkFolderNode)
+                    : rootFolders?.find(
+                      (folder) => folder.id === activeRootFolder,
                     )
-                  } else {
-                    return (
-                      <BookmarkUrl
-                        {...(item as BookmarkUrlNode)}
-                        key={item.id}
-                        layout={general.layout}
-                        index={item.index}
-                      />
-                    )
-                  }
-                })}
+                  )?.children)?.map((item) => {
+                    if ("children" in item) {
+                      return (
+                        <BookmarkFolder
+                          {...item}
+                          key={item.id}
+                          layout={general.layout}
+                          onOpenFolder={() => {
+                            setFolderStack((prev) => [...prev, item])
+                          }}
+                          index={item.index}
+                        />
+                      )
+                    } else {
+                      return (
+                        <BookmarkUrl
+                          {...(item as BookmarkUrlNode)}
+                          key={item.id}
+                          layout={general.layout}
+                          index={item.index}
+                        />
+                      )
+                    }
+                  })}
           </div>
         </div>
       </div>

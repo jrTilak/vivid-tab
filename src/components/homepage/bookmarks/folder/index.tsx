@@ -79,7 +79,6 @@ const BookmarkFolder = (props: Props) => {
               style={style}
               onClick={props.onOpenFolder}
               className={cn("flex flex-col  space-y-1 p-2 rounded-lg hover:scale-105 w-24 disabled:opacity-50", isOver && "bg-accent/10",
-                isDragging && "scale-110"
               )}
             >
               <img
