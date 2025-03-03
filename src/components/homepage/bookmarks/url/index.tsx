@@ -157,7 +157,6 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
         <ContextMenuTrigger disabled={disableContextMenu}>
           {props.layout === "grid" ? (
             <div ref={disableContextMenu ? null : setNodeRef}
-              className={isDragging ? "scale-110" : ""}
             >
               <button
                 ref={disableContextMenu ? null : draggableRef}

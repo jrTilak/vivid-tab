@@ -34,6 +34,7 @@ export const DEFAULT_SETTINGS = {
     layout: "grid",
     openUrlIn: "current-tab",
     bookmarksCanTakeExtraSpaceIfAvailable: true,
+    showTopSites: true,
   },
   searchbar: {
     dialogBackground: "default",
