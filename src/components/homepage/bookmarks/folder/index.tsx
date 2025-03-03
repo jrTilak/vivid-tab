@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/context-menu"
 
 import type { BookmarkFolderNode } from "@/types/bookmark-types"
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import folderIcon from "data-base64:@/assets/folder-svgrepo-com.svg"
 import DeleteDialog from "../delete-dialog"
 import { DeleteIcon, EditIcon, MoveIcon } from "lucide-react"
@@ -25,7 +25,7 @@ type Props = BookmarkFolderNode & {
 const BookmarkFolder = (props: Props) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false)
-  const { icon, setIcon } = useIcon({ id: props.id, defaultIcon: folderIcon })
+  const { icon, setIcon, fetchIcon } = useIcon({ id: props.id, defaultIcon: folderIcon })
 
   const { isOver, setNodeRef } = useDroppable({
     id: props.id,
@@ -42,6 +42,12 @@ const BookmarkFolder = (props: Props) => {
     id: props.id,
     data: { index: props.index },
   })
+
+  useEffect(() => {
+    if (!isUpdateDialogOpen) {
+      fetchIcon()
+    }
+  }, [isUpdateDialogOpen, fetchIcon])
 
   const style = transform
     ? {

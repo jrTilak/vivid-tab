@@ -31,7 +31,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
-  const { icon } = useIcon({ id: props.id, defaultIcon: "" })
+  const { icon, fetchIcon } = useIcon({ id: props.id, defaultIcon: "" })
 
   const {
     settings: { general },
@@ -101,6 +101,12 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
       title: props.title,
     }))
   }, [props.title])
+  
+  useEffect(() => {
+    if (!editDialogOpen) {
+      fetchIcon()
+    }
+  }, [editDialogOpen, fetchIcon])
   
   const openInNewTab = useCallback((url: string) => {
     window.open(url, "_blank")
