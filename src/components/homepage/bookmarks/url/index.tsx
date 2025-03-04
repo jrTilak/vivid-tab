@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { fetchFavicon } from "@/lib/fetch-favicon"
 import { useSettings } from "@/providers/settings-provider"
 import type { BookmarkUrlNode } from "@/types/bookmark-types"
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 
 import {
   ContextMenu,
@@ -31,7 +31,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
-  const { icon } = useIcon({ id: props.id, defaultIcon: "" })
+  const { icon, fetchIcon } = useIcon({ id: props.id, defaultIcon: "" })
 
   const {
     settings: { general },
@@ -95,6 +95,19 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
     }
   }, [props.url])
 
+  useEffect(() => {
+    setData((prevState) => ({
+      ...prevState,
+      title: props.title,
+    }))
+  }, [props.title])
+  
+  useEffect(() => {
+    if (!editDialogOpen) {
+      fetchIcon()
+    }
+  }, [editDialogOpen, fetchIcon])
+  
   const openInNewTab = useCallback((url: string) => {
     window.open(url, "_blank")
   }, [])
