@@ -7,8 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { useSettings } from "@/providers/settings-provider"
-import { ANIMATIONS, type Tab } from "@/tabs/welcome"
-import type { Animation } from "@/tabs/welcome"
+import { ANIMATIONS } from "@/tabs/welcome"
 
 import { ChevronLeftIcon, ChevronRight } from "lucide-react"
 import { motion } from "motion/react"
@@ -23,12 +22,7 @@ import {
 } from "../ui/select"
 import useActiveTab from "@/hooks/use-active-tab"
 import useFlattenBookmarkFolders from "@/hooks/use-flatten-bookmark-folders"
-
-type Props = {
-  scrollToTab: (tab: Tab) => void
-  animation: Animation
-  setAnimation: (animation: Animation) => void
-}
+import type { Props } from "."
 
 const ImportFromBrowserBookmarks = ({
   scrollToTab,
@@ -42,7 +36,7 @@ const ImportFromBrowserBookmarks = ({
 
   return (
     <motion.div {...ANIMATIONS[animation]}>
-      <Card className="w-full max-w-lg bg-background text-center min-w-[512px]">
+      <Card className="w-full max-w-lg bg-background text-center min-w-[512px] text-foreground">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">
             Import from browser bookmarks
