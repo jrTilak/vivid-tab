@@ -101,13 +101,13 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
       title: props.title,
     }))
   }, [props.title])
-  
+
   useEffect(() => {
     if (!editDialogOpen) {
       fetchIcon()
     }
   }, [editDialogOpen, fetchIcon])
-  
+
   const openInNewTab = useCallback((url: string) => {
     window.open(url, "_blank")
   }, [])
@@ -167,7 +167,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
         label={props.title + " bookmark"}
       />
       <ContextMenu>
-        <ContextMenuTrigger disabled={disableContextMenu}>
+        <ContextMenuTrigger disabled={disableContextMenu} className="overflow-hidden">
           {props.layout === "grid" ? (
             <div ref={disableContextMenu ? null : setNodeRef}
             >
@@ -219,7 +219,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
                   handleClick(props.url, true)
                 }
               }}
-              className={cn("flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-accent/10", isOver && "bg-accent/10")}
+              className={cn("flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-accent/10 overflow-hidden w-full", isOver && "bg-accent/10")}
               rel="noreferrer"
             >
               <Avatar
@@ -244,9 +244,10 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
                     .substring(0, 2)}
                 </AvatarFallback>
               </Avatar>
-              <p className="truncate flex flex-col gap-1">
-                <span> {data.title}</span>
-                <span className="text-xs truncate">{props.url}</span>
+              <p className="text-xs w-full text-left line-clamp-2">
+                {data.title}
+                <br />
+                {props.url}
               </p>
             </button>
           )}

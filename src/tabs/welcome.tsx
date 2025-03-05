@@ -1,16 +1,10 @@
 import WelcomeTab from "@/components/welcome"
+import CreateNewBookmarkFolder from "@/components/welcome/create-new-bookmark-folder"
 import ImportFromBrowserBookmarks from "@/components/welcome/import-from-browser-bookmarks"
-import ImportFromPreviousInstall from "@/components/welcome/import-from-previous-install"
 import ImportTab from "@/components/welcome/import-tab"
 import RootProvider from "@/providers/root-provider"
 import background from "data-base64:@/assets/scene.jpg"
-import React, { useMemo, useState } from "react"
-
-export type Tab =
-  | "WELCOME"
-  | "IMPORT"
-  | "IMPORT_FROM_PREVIOUS_INSTALL"
-  | "IMPORT_FROM_BROWSER_BOOKMARKS"
+import React, { useState } from "react"
 
 export const ANIMATIONS = {
   leftToRight: {
@@ -29,23 +23,22 @@ export const ANIMATIONS = {
 
 export type Animation = keyof typeof ANIMATIONS
 
+const TABS = {
+  WELCOME: WelcomeTab,
+  IMPORT: ImportTab,
+  CREATE_NEW_BOOKMARK_FOLDER: CreateNewBookmarkFolder,
+  IMPORT_FROM_BROWSER_BOOKMARKS: ImportFromBrowserBookmarks,
+} as const
+
+export type TabName = keyof typeof TABS
+
 const Welcome = () => {
-  const [currentTab, setCurrentTab] = useState<Tab>("WELCOME")
+  const [currentTab, setCurrentTab] = useState<TabName>("WELCOME")
   const [animation, setAnimation] = useState<Animation>("leftToRight")
 
-  const scrollToTab = (tab: Tab) => {
+  const scrollToTab = (tab: TabName) => {
     setCurrentTab(tab)
   }
-
-  const TABS = useMemo(
-    () => ({
-      WELCOME: WelcomeTab,
-      IMPORT: ImportTab,
-      IMPORT_FROM_PREVIOUS_INSTALL: ImportFromPreviousInstall,
-      IMPORT_FROM_BROWSER_BOOKMARKS: ImportFromBrowserBookmarks,
-    }),
-    [scrollToTab, animation],
-  )
 
   return (
     <RootProvider theme="light">

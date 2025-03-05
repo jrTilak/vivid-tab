@@ -7,23 +7,17 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import useActiveTab from "@/hooks/use-active-tab"
-import { ANIMATIONS, type Tab } from "@/tabs/welcome"
-import type { Animation } from "@/tabs/welcome"
+import { ANIMATIONS } from "@/tabs/welcome"
 import {
   ChevronLeftIcon,
   ChevronRight,
   ChevronRightIcon,
-  HistoryIcon,
+  PlusCircleIcon,
   StarIcon,
 } from "lucide-react"
 import { motion } from "motion/react"
 import React from "react"
-
-type Props = {
-  scrollToTab: (tab: Tab) => void
-  animation: Animation
-  setAnimation: (animation: Animation) => void
-}
+import type { Props } from "."
 
 const ImportTab = ({ scrollToTab, animation, setAnimation }: Props) => {
   const activeTabId = useActiveTab()
@@ -40,14 +34,14 @@ const ImportTab = ({ scrollToTab, animation, setAnimation }: Props) => {
         <CardContent className="space-y-2">
           <Button
             onClick={() => {
-              scrollToTab("IMPORT_FROM_PREVIOUS_INSTALL")
+              scrollToTab("CREATE_NEW_BOOKMARK_FOLDER")
               setAnimation("rightToLeft")
             }}
             variant="ghost"
             className="w-full justify-start h-14 bg-muted/50 hover:bg-muted"
           >
-            <HistoryIcon className="mr-2 h-4 w-4" />
-            Restore bookmarks from the previous install
+            <PlusCircleIcon className="mr-2 h-4 w-4" />
+            Create a new bookmark folder
             <ChevronRightIcon className="ml-auto h-4 w-4 text-muted-foreground" />
           </Button>
           <Button

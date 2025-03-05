@@ -1,13 +1,13 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { ANIMATIONS, type Animation, type Tab } from "@/tabs/welcome"
+import { ANIMATIONS, type Animation, type TabName } from "@/tabs/welcome"
 import icon from "data-base64:@/assets/icon.png"
 import { ArrowRightIcon } from "lucide-react"
 import { motion } from "motion/react"
 import React from "react"
 
-type Props = {
-  scrollToTab: (tab: Tab) => void
+export type Props = {
+  scrollToTab: (tab: TabName) => void
   animation: Animation
   setAnimation: (animation: Animation) => void
 }
