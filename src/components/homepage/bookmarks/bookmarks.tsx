@@ -13,6 +13,9 @@ import {
   BookmarkPlusIcon,
   FolderPlusIcon,
   PlusIcon,
+  DeleteIcon,
+  EditIcon, 
+  MoveIcon
 } from "lucide-react"
 import { useEffect, useState } from "react"
 
@@ -24,6 +27,14 @@ import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors, type DragE
 import RootFolderButton from "./root-folder-button"
 import useTopSites from "@/hooks/use-top-sites"
 import { useTheme } from "@/providers/theme-provider"
+
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuShortcut,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu"
 
 const Bookmarks = () => {
   const [activeRootFolder, setActiveRootFolder] = useState("home")
@@ -167,19 +178,49 @@ const Bookmarks = () => {
               },
             ]
               .filter(Boolean))
-              .map((item) => (
-                <RootFolderButton
-                  disableDragging={item.id === "home" || item.id === "history" || item.id === "top-sites"}
-                  item={item}
-                  onClick={() => {
-                    setActiveRootFolder(item.id)
-                    setFolderStack([])
-                    chrome.storage.sync.set({ activeRootFolder: item.id })
-                  }}
-                  activeRootFolder={activeRootFolder}
-                  key={item.id}
-                />
-
+              .map((item) => (                
+                <ContextMenu key={item.id}>
+                  <ContextMenuTrigger>
+                    <RootFolderButton
+                      disableDragging={item.id === "home" || item.id === "history" || item.id === "top-sites"}
+                      item={item}
+                      onClick={() => {
+                        setActiveRootFolder(item.id)
+                        setFolderStack([])
+                        chrome.storage.sync.set({ activeRootFolder: item.id })
+                      }}
+                      activeRootFolder={activeRootFolder}
+                    />
+                  </ContextMenuTrigger>
+                  <ContextMenuContent className="w-fit min-w-40">
+                    <ContextMenuItem
+                      onClick={() => {
+                        setEditFolder(item)
+                        setIsEditDialogOpen(true)
+                      }}
+                    >
+                      Edit
+                      <ContextMenuShortcut>
+                        <EditIcon className="size-4" />
+                      </ContextMenuShortcut>
+                    </ContextMenuItem>
+                    <ContextMenuItem>
+                      Move
+                      <ContextMenuShortcut>
+                        <MoveIcon className="size-4" />
+                      </ContextMenuShortcut>
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                      onClick={() => setIsDeleteDialogOpen(true)}
+                      className="text-destructive"
+                    >
+                      Delete
+                      <ContextMenuShortcut>
+                        <DeleteIcon className="size-4" />
+                      </ContextMenuShortcut>
+                    </ContextMenuItem>
+                  </ContextMenuContent>
+                </ContextMenu>
               ))}
             <Button
               tabIndex={-1}
