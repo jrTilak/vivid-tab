@@ -15,7 +15,7 @@ export type Props = {
 const WelcomeTab = ({ scrollToTab, animation, setAnimation }: Props) => {
   return (
     <motion.div {...ANIMATIONS[animation]} className="__vivid-container">
-      <Card className="bg-background text-center px-9 py-5 w-fit min-w-[512px]">
+      <Card className="bg-background text-center px-9 py-5 w-fit min-w-[512px] text-foreground">
         <CardContent className="space-y-6 pt-4">
           <img src={icon} alt="icon" className="size-20 mx-auto" />
           <div className="space-y-2">
