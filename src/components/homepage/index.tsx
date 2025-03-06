@@ -2,7 +2,7 @@ import useImage from "@/hooks/use-image"
 import { useSettings } from "@/providers/settings-provider"
 import background from "data-base64:@/assets/scene.jpg"
 import { useEffect, useMemo, useState } from "react"
-
+import { motion } from "motion/react"
 import Clock from "./clock"
 import Notes from "./notes"
 import Quote from "./quote"
@@ -87,11 +87,16 @@ export default function Homepage() {
         defaultOpen={isSearchDialogOpen}
         onOpenChange={setIsSearchDialogOpen}
       />
-      <div className="min-h-screen w-full bg-cover bg-center p-6 relative select-none">
+      <motion.div
+        initial={{ opacity: 0, }}
+        animate={{ opacity: 1, }}
+        exit={{ opacity: 0, }}
+        transition={{ duration: 0.2, }}
+        className="min-h-screen w-full bg-cover bg-center p-6 relative select-none transition-all">
         <img
           src={wallpapers.selectedImageId === null ? background : image}
           alt="scene"
-          className="h-full w-full object-cover object-center absolute inset-0"
+          className={cn("h-full w-full object-cover object-center absolute inset-0", (wallpapers.selectedImageId === null ? background : image) ? "opacity-100" : "opacity-0")}
         />
         <div
           style={{
@@ -149,7 +154,7 @@ export default function Homepage() {
             )}
           </div>
         </div>
-      </div>
+      </motion.div>
     </>
   )
 }
