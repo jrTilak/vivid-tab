@@ -87,13 +87,14 @@ export default function Homepage() {
         defaultOpen={isSearchDialogOpen}
         onOpenChange={setIsSearchDialogOpen}
       />
-      <motion.div
-        initial={{ opacity: 0, }}
-        animate={{ opacity: 1, }}
-        exit={{ opacity: 0, }}
-        transition={{ duration: 0.2, }}
+      <div
+
         className="min-h-screen w-full bg-cover bg-center p-6 relative select-none transition-all">
-        <img
+        <motion.img
+          initial={{ opacity: 0, }}
+          animate={{ opacity: 1, }}
+          exit={{ opacity: 0, }}
+          transition={{ duration: 1, }}
           src={wallpapers.selectedImageId === null ? background : image}
           alt="scene"
           className={cn("h-full w-full object-cover object-center absolute inset-0", (wallpapers.selectedImageId === null ? background : image) ? "opacity-100" : "opacity-0")}
@@ -154,7 +155,7 @@ export default function Homepage() {
             )}
           </div>
         </div>
-      </motion.div>
+      </div>
     </>
   )
 }
