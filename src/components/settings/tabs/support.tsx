@@ -10,7 +10,7 @@ const Support = () => {
         [
           {
             title: "Support",
-            url: "https://buymeacoffee.com/jrtilak",
+            url: "https://buymeacoffee.com/jrtilak/e/382064",
             icon: bmc,
             desc: "Buy me a coffee",
           },
