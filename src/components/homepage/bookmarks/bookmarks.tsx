@@ -35,6 +35,8 @@ import {
   ContextMenuShortcut,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
+import DeleteDialog from "./delete-dialog"
+import EditBookmarkTab from "./edit-bookmark-tab"
 
 const Bookmarks = () => {
   const [activeRootFolder, setActiveRootFolder] = useState("home")
@@ -59,6 +61,9 @@ const Bookmarks = () => {
   const [isCreateAFolderDialogOpen, setIsCreateAFolderDialogOpen] =
     useState(false)
   const [createFolderParentId, setCreateFolderParentId] = useState("")
+  const [editFolder, setEditFolder] = useState<BookmarkFolderNode | undefined>(undefined)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
   useEffect(() => {
     if (bookmarks.length) {
@@ -148,7 +153,18 @@ const Bookmarks = () => {
         open={isCreateAFolderDialogOpen}
         setOpen={setIsCreateAFolderDialogOpen}
       />
-
+      <EditBookmarkTab
+        open={isEditDialogOpen}
+        setOpen={setIsEditDialogOpen}
+        id={editFolder?.id}
+        title={editFolder?.title}
+      />
+      <DeleteDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        id={editFolder?.id}
+        label={editFolder?.title + " tab and it's contents"}
+      />     
       <div
         className={cn("mb-6 col-span-6 h-[70vh] overflow-scroll __vivid_hide-scrollbar", theme === "light" ? "dark" : "light")}
 
@@ -195,8 +211,8 @@ const Bookmarks = () => {
                   <ContextMenuContent className="w-fit min-w-40">
                     <ContextMenuItem
                       onClick={() => {
-                        setEditFolder(item)
-                        setIsEditDialogOpen(true)
+                        setEditFolder(item as BookmarkFolderNode)
+                        setTimeout(() => setIsEditDialogOpen(true), 100)
                       }}
                     >
                       Edit
@@ -211,7 +227,10 @@ const Bookmarks = () => {
                       </ContextMenuShortcut>
                     </ContextMenuItem>
                     <ContextMenuItem
-                      onClick={() => setIsDeleteDialogOpen(true)}
+                      onClick={() => {
+                        setEditFolder(item as BookmarkFolderNode)
+                        setIsDeleteDialogOpen(true)
+                      }}
                       className="text-destructive"
                     >
                       Delete
