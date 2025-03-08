@@ -79,6 +79,8 @@ const BookmarkFolder = (props: Props) => {
               style={style}
               onClick={props.onOpenFolder}
               className={cn("flex flex-col  space-y-1 p-2 rounded-lg hover:scale-105 w-24 disabled:opacity-50", isOver && "bg-accent/10",
+                isDragging && "bg-destructive/20",
+                isDragging && "relative z-50"
               )}
             >
               <img
@@ -99,7 +101,9 @@ const BookmarkFolder = (props: Props) => {
               onClick={props.onOpenFolder}
               style={style}
               ref={setNodeRef}
-              className={cn("flex space-x-1 p-2 items-center rounded-lg transition-colors disabled:opacity-50", isOver && "bg-accent/10", isDragging && "scale-110")}
+              className={cn("flex space-x-1 p-2 items-center rounded-lg transition-colors disabled:opacity-50", isOver && "bg-accent/10", isDragging && "scale-110 bg-destructive/20",
+                isDragging && "relative z-50"
+              )}
             >
               <img
                 src={icon}

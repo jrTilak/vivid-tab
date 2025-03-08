@@ -167,7 +167,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
         label={props.title + " bookmark"}
       />
       <ContextMenu>
-        <ContextMenuTrigger disabled={disableContextMenu} className="overflow-hidden">
+        <ContextMenuTrigger disabled={disableContextMenu} >
           {props.layout === "grid" ? (
             <div ref={disableContextMenu ? null : setNodeRef}
             >
@@ -180,7 +180,10 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
                     handleClick(props.url, true)
                   }
                 }}
-                className={cn("flex items-center flex-col space-y-1 p-2 rounded-lg hover:scale-105 text-center text-xs w-24", isOver && "bg-accent/10",)}
+                className={cn("flex items-center flex-col space-y-1 p-2 rounded-lg hover:scale-105 text-center text-xs w-24", isOver && "bg-accent/10",
+                  isDragging && "bg-destructive/20",
+                  isDragging && "relative z-50"
+                )}
                 {...(disableContextMenu ? {} : attributes)}
                 {...(disableContextMenu ? {} : listeners)}
               >
@@ -219,7 +222,11 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
                   handleClick(props.url, true)
                 }
               }}
-              className={cn("flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-accent/10 overflow-hidden w-full", isOver && "bg-accent/10")}
+              className={cn("flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-accent/10 overflow-hidden w-full", isOver && "bg-accent/10",
+                isDragging && "bg-destructive/20",
+                isDragging && "relative z-50"
+
+              )}
               rel="noreferrer"
             >
               <Avatar
