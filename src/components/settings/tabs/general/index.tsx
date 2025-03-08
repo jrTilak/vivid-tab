@@ -203,7 +203,7 @@ const GeneralSettings = () => {
       <div className="flex items-center justify-between">
         <div className="space-y-0.5">
           <Label className="text-sm font-medium">
-            Bookmarks can take extra space if available
+            Contents can take extra space if available
           </Label>
         </div>
         <Switch

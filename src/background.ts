@@ -1,4 +1,3 @@
-/* eslint-disable indent */
 import { z } from "zod"
 import { BACKGROUND_ACTIONS } from "./constants/background-actions"
 
@@ -75,4 +74,8 @@ chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
 
       return true
   }
+})
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.tabs.create({ url: chrome.runtime.getURL("tabs/welcome.html") })
 })

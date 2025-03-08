@@ -76,10 +76,6 @@ export default function Homepage() {
     }
   }, [bookmarksCanTakeExtraSpaceIfAvailable, layout])
 
-  useEffect(() => {
-    console.log(layoutType)
-  }, [layoutType])
-
   return (
     <>
       <SearchDialog
@@ -116,7 +112,7 @@ export default function Homepage() {
             )}
 
             {/* to align to center */}
-            {layoutType === "large" && <div className="col-span-1" />}
+            {layoutType === "small" && <div className="col-span-3" />}
 
             <div
               className={cn(
