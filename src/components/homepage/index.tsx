@@ -26,7 +26,7 @@ export default function Homepage() {
     },
   } = useSettings()
 
-  const { imageSrc, isLoading } = useImage(wallpapers.selectedImageId)
+  const imageSrc = useImage(wallpapers.selectedImageId)
 
   const COMPONENTS = useMemo(() => {
     return {
@@ -86,12 +86,6 @@ export default function Homepage() {
         defaultOpen={isSearchDialogOpen}
         onOpenChange={setIsSearchDialogOpen}
       />
-      {
-        //show a black screen while loading
-        isLoading && (
-          <div className="h-full w-full absolute inset-0 bg-black z-[99]" />
-        )
-      }
 
       <div
         className="min-h-screen w-full bg-cover bg-center p-6 relative select-none transition-all">
