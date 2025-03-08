@@ -222,7 +222,7 @@ const Bookmarks = () => {
               onClick={() => setFolderStack((prev) => prev.slice(0, -1))}
               variant="ghost"
               size="sm"
-              className="text-xs hover:bg-transparent"
+              className="text-xs hover:bg-transparent text-foreground"
             >
               <ArrowLeftIcon className="h-4 w-4" />
               Back

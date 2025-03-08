@@ -65,7 +65,7 @@ const LayoutsSettings = () => {
       return
     }
 
-    if (from === "searchbar" && !(current.index === 0 || current.index === 8)) {
+    if (from === "searchbar" && !(current.index === "0" || current.index === "8")) {
       console.log("Searchbar can only be moved to the top or bottom, returning")
 
       return
@@ -136,10 +136,10 @@ const LayoutsSettings = () => {
                 }
               }}
               checked={Object.values(layout).includes(key)}
-              id="terms"
+              id={key}
             />
             <Label
-              htmlFor="terms"
+              htmlFor={key}
               className="text-sm capitalize text-muted-foreground"
             >
               {key}

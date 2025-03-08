@@ -25,7 +25,18 @@ const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     DEFAULT_SETTINGS as unknown as Settings,
   )
 
-  const resetSettings = useCallback(() => {
+  const resetSettings = useCallback(async () => {
+    // clear local storage synced and other storage
+    chrome.storage.sync.clear()
+    chrome.storage.local.clear()
+
+    // clear the index db
+    await indexedDB.databases().then((databases) => {
+      databases.forEach((db) => {
+        indexedDB.deleteDatabase(db.name)
+      })
+    })
+
     setSettings(DEFAULT_SETTINGS as unknown as Settings)
   }, [])
 
