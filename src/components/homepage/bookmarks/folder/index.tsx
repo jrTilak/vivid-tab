@@ -15,6 +15,7 @@ import CreateAFolder from "../create-a-folder"
 import useIcon from "@/hooks/use-icon"
 import { useDraggable, useDroppable } from "@dnd-kit/core"
 import { cn } from "@/lib/cn"
+import MoveBookmarkDialog from "../move-bookmark-dialog"
 
 type Props = BookmarkFolderNode & {
   onOpenFolder: () => void
@@ -25,6 +26,7 @@ type Props = BookmarkFolderNode & {
 const BookmarkFolder = (props: Props) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false)
+  const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
   const { icon, setIcon, fetchIcon } = useIcon({ id: props.id, defaultIcon: folderIcon })
 
   const { isOver, setNodeRef } = useDroppable({
@@ -70,6 +72,12 @@ const BookmarkFolder = (props: Props) => {
         onOpenChange={setIsDeleteDialogOpen}
         id={props.id}
         label={props.title + " folder and it's contents"}
+      />
+      <MoveBookmarkDialog
+        open={isMoveDialogOpen}
+        onOpenChange={setIsMoveDialogOpen}
+        id={props.id}
+        label={props.title + " bookmark"}
       />
       <ContextMenu>
         <ContextMenuTrigger>
@@ -133,7 +141,9 @@ const BookmarkFolder = (props: Props) => {
               <EditIcon className="size-4" />
             </ContextMenuShortcut>
           </ContextMenuItem>
-          <ContextMenuItem>
+          <ContextMenuItem
+            onClick={() => setTimeout(() => setIsMoveDialogOpen(true), 100)}
+          >
             Move
             <ContextMenuShortcut>
               <MoveIcon className="size-4" />
