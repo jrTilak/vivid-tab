@@ -194,7 +194,20 @@ const Bookmarks = () => {
               },
             ]
               .filter(Boolean))
-              .map((item) => (                
+              .map((item) => (      
+                (item.id === "home" || item.id === "history" || item.id === "top-sites") ? (
+                  <RootFolderButton
+                    key={item.id}
+                    disableDragging
+                    item={item}
+                    onClick={() => {
+                      setActiveRootFolder(item.id)
+                      setFolderStack([])
+                      chrome.storage.sync.set({ activeRootFolder: item.id })
+                    }}
+                    activeRootFolder={activeRootFolder}
+                  />
+                ) : (          
                 <ContextMenu key={item.id}>
                   <ContextMenuTrigger>
                     <RootFolderButton
@@ -240,7 +253,7 @@ const Bookmarks = () => {
                     </ContextMenuItem>
                   </ContextMenuContent>
                 </ContextMenu>
-              ))}
+              )))}
             <Button
               tabIndex={-1}
               size="sm"
