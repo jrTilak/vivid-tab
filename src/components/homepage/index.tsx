@@ -112,7 +112,11 @@ export default function Homepage() {
             )}
 
             {/* to align to center */}
-            {layoutType === "small" && <div className="col-span-3" />}
+            {layoutType === "small" &&
+              !(layout[1] || layout[2] || layout[3]) &&
+              !(layout[5] || layout[6] || layout[7]) &&
+              <div className="col-span-3" />}
+            {layoutType === "large" && <div className="col-span-1" />}
 
             <div
               className={cn(
