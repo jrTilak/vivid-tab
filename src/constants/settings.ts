@@ -43,7 +43,7 @@ export const DEFAULT_SETTINGS = {
     searchSuggestions: false,
   },
   background: {
-    blurIntensity: 1,
+    blurIntensity: 5,
     brightness: 9,
   },
 } as const
