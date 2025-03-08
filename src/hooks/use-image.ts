@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 
 const useImage = (imageId: string | null) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     if (!imageId) return
@@ -20,19 +21,23 @@ const useImage = (imageId: string | null) => {
         } else {
           console.warn("No image found with ID:", imageId)
         }
+
+        setIsLoading(false)
       }
 
       getRequest.onerror = () => {
         console.error("Error retrieving image from IndexedDB")
+        setIsLoading(false)
       }
     }
 
     request.onerror = () => {
       console.error("Failed to open IndexedDB")
+      setIsLoading(false)
     }
   }, [imageId]) // Runs when imageId changes
 
-  return imageSrc
+  return { imageSrc, isLoading }
 }
 
 export default useImage

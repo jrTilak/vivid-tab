@@ -2,7 +2,6 @@ import useImage from "@/hooks/use-image"
 import { useSettings } from "@/providers/settings-provider"
 import background from "data-base64:@/assets/scene.jpg"
 import { useEffect, useMemo, useState } from "react"
-import { motion } from "motion/react"
 import Clock from "./clock"
 import Notes from "./notes"
 import Quote from "./quote"
@@ -27,7 +26,7 @@ export default function Homepage() {
     },
   } = useSettings()
 
-  const image = useImage(wallpapers.selectedImageId)
+  const { imageSrc, isLoading } = useImage(wallpapers.selectedImageId)
 
   const COMPONENTS = useMemo(() => {
     return {
@@ -87,17 +86,20 @@ export default function Homepage() {
         defaultOpen={isSearchDialogOpen}
         onOpenChange={setIsSearchDialogOpen}
       />
-      <div
+      {
+        //show a black screen while loading
+        isLoading && (
+          <div className="h-full w-full absolute inset-0 bg-black z-[99]" />
+        )
+      }
 
+      <div
         className="min-h-screen w-full bg-cover bg-center p-6 relative select-none transition-all">
-        <motion.img
-          initial={{ opacity: 0, }}
-          animate={{ opacity: 1, }}
-          exit={{ opacity: 0, }}
-          transition={{ duration: 1, }}
-          src={wallpapers.selectedImageId === null ? background : image}
-          alt="scene"
-          className={cn("h-full w-full object-cover object-center absolute inset-0", (wallpapers.selectedImageId === null ? background : image) ? "opacity-100" : "opacity-0")}
+        <div
+          style={{
+            backgroundImage: `url(${wallpapers.selectedImageId === null ? background : imageSrc})`
+          }}
+          className={cn("h-full w-full bg-cover bg-center bg-no-repeat absolute inset-0")}
         />
         <div
           style={{
