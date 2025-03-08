@@ -1,29 +1,31 @@
-# Vivid Tab - A Custom New Tab Extension
+# Vivid Tab - A New Tab, A New Vibe
 
-Vivid Tab is an open-source Chrome extension that replaces the default new tab with a fully customizable and feature-rich new tab page. Inspired by the **Homey** extension, Vivid Tab enhances your browsing experience by providing quick access to essential features and frequently visited sites.
+Vivid Tab is an open-source Chrome extension that transforms your new tab into a fully customizable, productivity-enhancing dashboard. Whether you need quick access to bookmarks, smart search, or real-time weather updates, Vivid Tab ensures a vibrant and seamless browsing experience.
+
+🔗 [Get it on Chrome Web Store](https://chrome.google.com/webstore/detail/vivid-tab/hchlkclbagoklpnijoadpghhcjpeoeim)
 
 ---
 
-## 🚀 Features
+## 🚀 Highlights
 
-- 📝 **Quotes & Notes** - Get daily inspiration with quotes and jot down quick notes.
-- ☁️ **Weather Updates** - Stay informed with real-time weather information.
-- ⏰ **Time & Date** - Always stay on track with a built-in clock.
-- ✅ **To-Do List** - Manage your daily tasks efficiently.
-- 🔖 **Bookmark Integration** - Select a bookmark folder and display frequently visited pages for easy navigation.
-- 🎨 **Customizable UI** - Personalize the layout and design to fit your style.
+- 🔖 **Unlimited Bookmarks** - Display unlimited bookmarks as shortcuts for quick access to your favorite sites.
+- 🔎 **Smart Search** - Instantly search with AI, search engines, or YouTube directly from your new tab.
+- 🎨 **Fully Customizable** - Drag and drop components, change backgrounds, and personalize your layout.
+- ✅ **To-Dos & Notes** - Stay organized with built-in task lists and quick notes.
+- ☁️ **Weather & Location-based Insights** - Get real-time weather updates and relevant local information.
+- 🌍 **Forever Free & Open Source** - Vivid Tab is completely free and welcomes community contributions.
 
 ---
 
 ## 📌 Preview
 
-![Screenshot 1](./src/assets/preview.png)
+![Screenshot 1](https://github.com/jrTilak/vivid-tab-website/raw/master/public/preview.png)
 
 ---
 
 ## 🛠 Built With
 
-Vivid Tab is developed using **Plasmo**, an amazing framework for building Chrome extensions effortlessly.
+Vivid Tab is developed using **Plasmo**, a powerful framework for building Chrome extensions effortlessly.
 
 🔗 [Plasmo Documentation](https://docs.plasmo.com/)
 
@@ -41,15 +43,27 @@ Vivid Tab is developed using **Plasmo**, an amazing framework for building Chrom
    ```sh
    git clone https://github.com/jrtilak/vivid-tab.git
    ```
-2. Navigate to `chrome://extensions/` in your browser.
-3. Enable **Developer Mode** (toggle in the top right corner).
-4. Click **Load Unpacked** and select the `vivid-tab` folder.
+2. Install dependencies:
+   ```sh
+   pnpm install
+   ```
+3. Start development mode:
+   ```sh
+   pnpm dev
+   ```
+   or build the project:
+   ```sh
+   pnpm build
+   ```
+4. Navigate to `chrome://extensions/` in your browser.
+5. Enable **Developer Mode** (toggle in the top right corner).
+6. Click **Load Unpacked** and select the `build` folder.
 
 ---
 
 ## 🤝 Contributing
 
-Vivid Tab is an exploratory project, and there may be many missing features. If you have ideas or improvements, feel free to contribute!
+Vivid Tab is an evolving project with room for enhancements. If you have ideas or improvements, feel free to contribute!
 
 1. Fork the repository.
 2. Create a new branch (`git checkout -b feature-branch`).
@@ -75,3 +89,4 @@ For questions or suggestions, reach out to me at:
 ---
 
 Thank you for checking out **Vivid Tab**! 🚀
+
