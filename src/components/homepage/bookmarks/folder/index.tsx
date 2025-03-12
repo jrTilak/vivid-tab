@@ -8,7 +8,7 @@ import {
 
 import type { BookmarkFolderNode } from "@/types/bookmark-types"
 import React, { useState, useEffect } from "react"
-import folderIcon from "data-base64:@/assets/folder-svgrepo-com.svg"
+import folderIcon from "data-base64:@/assets/folder-svgrepo-com.png"
 import DeleteDialog from "../delete-dialog"
 import { DeleteIcon, EditIcon, MoveIcon } from "lucide-react"
 import CreateAFolder from "../create-a-folder"

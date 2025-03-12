@@ -1,13 +1,57 @@
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap");
-@import url("./vars.css");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --vivid-background: 0 0% 100%;
+    --vivid-foreground: 222.2 47.4% 11.2%;
+    --vivid-muted: 210 40% 96.1%;
+    --vivid-muted-foreground: 215.4 16.3% 46.9%;
+    --vivid-popover: 0 0% 100%;
+    --vivid-popover-foreground: 222.2 47.4% 11.2%;
+    --vivid-border: 214.3 31.8% 91.4%;
+    --vivid-input: 214.3 31.8% 91.4%;
+    --vivid-card: 0 0% 100%;
+    --vivid-card-foreground: 213 31% 91%;
+    --vivid-primary: 222.2 47.4% 11.2%;
+    --vivid-primary-foreground: 210 40% 98%;
+    --vivid-secondary: 210 40% 96.1%;
+    --vivid-secondary-foreground: 222.2 47.4% 11.2%;
+    --vivid-accent: 210 40% 96.1%;
+    --vivid-accent-foreground: 222.2 47.4% 11.2%;
+    --vivid-destructive: 0 100% 50%;
+    --vivid-destructive-foreground: 210 40% 98%;
+    --vivid-ring: 215 20.2% 65.1%;
+    --vivid-radius: 0.5rem;
+  }
+
+  .dark {
+    --vivid-background: 224 71% 4%;
+    --vivid-foreground: 213 31% 91%;
+    --vivid-muted: 223 47% 11%;
+    --vivid-muted-foreground: 215.4 16.3% 56.9%;
+    --vivid-accent: 216 34% 17%;
+    --vivid-accent-foreground: 210 40% 98%;
+    --vivid-popover: 224 71% 4%;
+    --vivid-popover-foreground: 215 20.2% 65.1%;
+    --vivid-border: 216 34% 17%;
+    --vivid-input: 216 34% 17%;
+    --vivid-card: 224 71% 4%;
+    --vivid-card-foreground: 213 31% 91%;
+    --vivid-primary: 210 40% 98%;
+    --vivid-primary-foreground: 222.2 47.4% 1.2%;
+    --vivid-secondary: 222.2 47.4% 11.2%;
+    --vivid-secondary-foreground: 210 40% 98%;
+    --vivid-destructive: 0 63% 31%;
+    --vivid-destructive-foreground: 210 40% 98%;
+    --vivid-ring: 216 34% 17%;
+  }
+
   * {
-    @apply border-border;
+    @apply border-border outline-ring/50;
   }
 
   body {
@@ -27,16 +71,5 @@
   /* hide scrollbar for IE, Edge and Safari */
   * {
     -ms-overflow-style: none;
-  }
-}
-
-
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
 }

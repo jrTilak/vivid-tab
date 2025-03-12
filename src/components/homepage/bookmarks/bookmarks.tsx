@@ -192,13 +192,13 @@ const Bookmarks = () => {
               <PlusIcon className="h-4 w-4" />
             </Button>
           </div>
-          <div className="flex gap-2.5 bg-muted/20 rounded-sm px-2.5 py-1">
+          <div className="flex gap-2.5 bg-muted/20 rounded-sm px-2.5 py-1 h-fit">
             <button
               onClick={() => {
                 setIsCreateAFolderDialogOpen(true)
                 setCreateFolderParentId(createAFolderId)
               }}
-              disabled={activeRootFolder === "history"}
+              disabled={activeRootFolder === "history" || activeRootFolder === "top-sites"}
               tabIndex={-1}
               className="disabled:opacity-50"
             >
@@ -208,7 +208,7 @@ const Bookmarks = () => {
               onClick={() => {
                 setIsCreateABookmarkDialogOpen(true)
               }}
-              disabled={activeRootFolder === "history"}
+              disabled={activeRootFolder === "history" || activeRootFolder === "top-sites"}
               tabIndex={-1}
               className="disabled:opacity-50"
             >

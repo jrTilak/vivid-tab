@@ -1,5 +1,5 @@
-import { BACKGROUND_ACTIONS } from "@/constants/background-actions"
-import { useEffect, useState } from "react"
+import { useState } from "react"
+import useAsyncEffect from "./use-async-effect"
 
 type Props = {
   query: string
@@ -12,15 +12,13 @@ type Props = {
 const useSearchSuggestions = ({ query, enabled = true }: Props) => {
   const [suggestions, setSuggestions] = useState<string[]>([])
 
-  useEffect(() => {
-    if (!enabled) return
-
-    chrome.runtime.sendMessage(
-      { action: BACKGROUND_ACTIONS.GET_SEARCH_SUGGESTIONS, query },
-      (response: string[]) => {
-        setSuggestions(response)
-      },
+  useAsyncEffect(async () => {
+    const results = await fetch(
+      `https://suggestqueries.google.com/complete/search?client=firefox&q=${query}`,
     )
+    const data = await results.json()
+
+    setSuggestions(data[1])
   }, [query, enabled])
 
   return suggestions
