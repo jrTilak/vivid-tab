@@ -4,10 +4,10 @@ import { AnimatePresence } from "motion/react"
 import { cn } from "@/lib/cn"
 import { SearchIcon } from "lucide-react"
 import { useSettings } from "@/providers/settings-provider"
-import chatgpt from "data-base64:@/assets/openai.svg"
-import claude from "data-base64:@/assets/claude.svg"
-import gemini from "data-base64:@/assets/gemini.svg"
-import deepseek from "data-base64:@/assets/deepseek.svg"
+import chatgpt from "data-base64:@/assets/openai.png"
+import claude from "data-base64:@/assets/claude.png"
+import gemini from "data-base64:@/assets/gemini.png"
+import deepseek from "data-base64:@/assets/deepseek.png"
 import { Badge } from "@/components/ui/badge"
 import useShortcutKey from "@/hooks/use-shortcut-key"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
@@ -54,7 +54,7 @@ const SearchDialog = ({ defaultOpen, onOpenChange, portalRef }: Props) => {
     setSearchQuery("")
   }, [open])
 
-  useEffect(() => {}, [debouncedSearchQuery])
+  useEffect(() => { }, [debouncedSearchQuery])
 
   const handleSearchQuery = useCallback(
     (query: string) => {

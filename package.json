@@ -1,15 +1,16 @@
 {
   "name": "vivid-tab",
-  "displayName": "Vivid tab",
+  "displayName": "Vivid Tab",
   "version": "0.0.1",
   "description": "\"VividTab: Your dynamic new tab for a brighter, more productive browsing experience.\"",
   "author": "jrTilak <contact@jrtilak.dev>",
   "scripts": {
     "dev": "plasmo dev",
-    "build": "plasmo build",
+    "build": "NODE_ENV=production plasmo build && tailwindcss -i ./src/styles/index.css -o ./build/chrome-mv3-prod/minified.css --minify",
     "package": "plasmo package",
     "format": "prettier --write .",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "build:css": "tailwindcss -i ./src/styles/index.css -o ./build/chrome-mv3-prod/minified.css --minify"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -33,7 +34,7 @@
     "cmdk": "1.0.0",
     "lucide-react": "^0.471.1",
     "motion": "^11.18.0",
-    "plasmo": "0.89.4",
+    "plasmo": "0.90.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "tailwind-merge": "^2.6.0",

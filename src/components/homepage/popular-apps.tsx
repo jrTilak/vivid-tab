@@ -5,12 +5,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { LayoutGridIcon } from "lucide-react"
-import buyMeACoffee from "data-base64:@/assets/Buy Me a Coffee Icon.svg"
+import buyMeACoffee from "data-base64:@/assets/Buy Me a Coffee Icon.png"
 import buyMeACoffeeDark from "data-base64:@/assets/bmc-logo-yellow.png"
-import x from "data-base64:@/assets/x.svg"
+import x from "data-base64:@/assets/x.png"
 import xLight from "data-base64:@/assets/x-twitter-light.png"
-import chatgpt from "data-base64:@/assets/openai.svg"
-import notionLight from "data-base64:@/assets/notion-light.svg"
+import chatgpt from "data-base64:@/assets/openai.png"
+import notionLight from "data-base64:@/assets/notion-light.png"
 import { useSettings } from "@/providers/settings-provider"
 
 const POPULAR_APPS = [
