@@ -1,12 +1,12 @@
 {
   "name": "vivid-tab",
   "displayName": "Vivid Tab",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "description": "\"VividTab: Your dynamic new tab for a brighter, more productive browsing experience.\"",
   "author": "jrTilak <contact@jrtilak.dev>",
   "scripts": {
     "dev": "plasmo dev",
-    "build": "NODE_ENV=production plasmo build && tailwindcss -i ./src/styles/index.css -o ./build/chrome-mv3-prod/minified.css --minify",
+    "build": "plasmo build",
     "package": "plasmo package",
     "format": "prettier --write .",
     "lint": "eslint .",
