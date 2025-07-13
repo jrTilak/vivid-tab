@@ -64,6 +64,8 @@ chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
   }
 })
 
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.tabs.create({ url: chrome.runtime.getURL("tabs/welcome.html") })
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === "install") {
+    chrome.tabs.create({ url: chrome.runtime.getURL("tabs/welcome.html") })
+  }
 })
