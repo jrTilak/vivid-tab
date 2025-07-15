@@ -1,6 +1,6 @@
 import type { Animation } from "@/constants/animations";
-import type { TabName } from "@/tabs/welcome";
 import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
+import type { TabName } from ".";
 
 type WelcomeContextType = {
   currentTab: TabName

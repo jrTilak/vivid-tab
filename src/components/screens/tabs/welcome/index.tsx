@@ -12,6 +12,8 @@ const TABS = {
   IMPORT_FROM_BROWSER_BOOKMARKS: ImportFromBrowserBookmarks,
 } as const
 
+export type TabName = keyof typeof TABS
+
 const Welcome = () => {
   const { currentTab } = useWelcomeContext()
 
