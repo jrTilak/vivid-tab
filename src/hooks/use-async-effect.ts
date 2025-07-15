@@ -18,4 +18,4 @@ const useAsyncEffect = (effect: () => Promise<void>, deps?: unknown[]) => {
   }, deps)
 }
 
-export default useAsyncEffect
+export { useAsyncEffect }

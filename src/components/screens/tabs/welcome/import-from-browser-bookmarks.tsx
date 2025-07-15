@@ -7,7 +7,6 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { useSettings } from "@/providers/settings-provider"
-import { ANIMATIONS } from "@/tabs/welcome"
 
 import { ChevronLeftIcon, ChevronRight } from "lucide-react"
 import { motion } from "motion/react"
@@ -19,41 +18,40 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select"
-import useActiveTab from "@/hooks/use-active-tab"
-import useFlattenBookmarkFolders from "@/hooks/use-flatten-bookmark-folders"
-import type { Props } from "."
+} from "@/components/ui/select"
+import { useFlattenBookmarkFolders } from "@/hooks/use-flatten-bookmark-folders"
+import { useBrowserActiveTab } from "@/hooks/use-browser-active-tab"
+import { ANIMATION_PROPS } from "@/constants/animations"
+import { useWelcomeContext } from "./_context"
 
-const ImportFromBrowserBookmarks = ({
-  scrollToTab,
-  animation,
-  setAnimation,
-}: Props) => {
+const ImportFromBrowserBookmarks = () => {
   const folders = useFlattenBookmarkFolders()
   const [selectedFolder, setSelectedFolder] = useState<string>("")
   const { setSettings } = useSettings()
-  const activeTabId = useActiveTab()
+  const activeTabId = useBrowserActiveTab()
+  const { animationName, setAnimationName, scrollToTab } = useWelcomeContext()
 
   return (
-    <motion.div {...ANIMATIONS[animation]}>
-      <Card className="w-full max-w-lg bg-background text-center min-w-[512px] text-foreground">
+    <motion.div {...ANIMATION_PROPS[animationName]}>
+      <Card className="w-full max-w-lg bg-background text-center min-w-[512px] text-foreground pt-12">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">
             Import from browser bookmarks
           </CardTitle>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm">
             Select the folder to save as vivid bookmarks
           </p>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pb-6">
           <div className="flex items-center justify-between gap-2">
             <Select
               value={selectedFolder}
               disabled={folders.length === 0}
               onValueChange={(value) => setSelectedFolder(value)}
             >
-              <SelectTrigger value={null}>
+              <SelectTrigger value={null} className="bg-background/20">
                 <SelectValue
+                  className="select-none"
                   placeholder={
                     folders.length === 0
                       ? "No browser bookmarks found"
@@ -81,7 +79,7 @@ const ImportFromBrowserBookmarks = ({
           <Button
             onClick={() => {
               scrollToTab("IMPORT")
-              setAnimation("leftToRight")
+              setAnimationName("leftToRight")
             }}
             variant="ghost"
             size="sm"
@@ -114,4 +112,4 @@ const ImportFromBrowserBookmarks = ({
   )
 }
 
-export default ImportFromBrowserBookmarks
+export { ImportFromBrowserBookmarks }

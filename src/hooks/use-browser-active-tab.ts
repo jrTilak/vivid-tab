@@ -1,8 +1,12 @@
 import { useState } from "react"
 
-import useAsyncEffect from "./use-async-effect"
+import { useAsyncEffect } from "./use-async-effect"
 
-const useActiveTab = () => {
+/**
+ * Gets the active tab ID from the current browser window
+ * Useful for tracking which tab the user is currently viewing
+ */
+const useBrowserActiveTab = () => {
   const [activeTabId, setActiveTabId] = useState<number>()
 
   useAsyncEffect(async () => {
@@ -23,4 +27,4 @@ const useActiveTab = () => {
   return activeTabId
 }
 
-export default useActiveTab
+export { useBrowserActiveTab }

@@ -1,7 +1,7 @@
-import type { Bookmark, BookmarkFolderNode } from "@/types/bookmark-types"
+import type { Bookmark, BookmarkFolderNode } from "@/types/bookmark"
 import { useEffect, useState } from "react"
 
-import useBookmarks from "./use-bookmarks"
+import { useBookmarks } from "./use-bookmarks"
 
 type Folder = {
   id: string
@@ -9,6 +9,10 @@ type Folder = {
   depth: number
 }
 
+/**
+ * Flattens nested bookmark folders into a flat array with depth indicators
+ * Useful for displaying bookmark folders in dropdowns or lists with proper indentation
+ */
 const useFlattenBookmarkFolders = () => {
   const bookmarks = useBookmarks()
 
@@ -47,4 +51,4 @@ const useFlattenBookmarkFolders = () => {
   return folders
 }
 
-export default useFlattenBookmarkFolders
+export { useFlattenBookmarkFolders }

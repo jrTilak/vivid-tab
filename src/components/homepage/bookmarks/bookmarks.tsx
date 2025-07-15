@@ -7,7 +7,7 @@ import type {
   Bookmark,
   BookmarkFolderNode,
   BookmarkUrlNode,
-} from "@/types/bookmark-types"
+} from "@/types/bookmark"
 import {
   ArrowLeftIcon,
   BookmarkPlusIcon,

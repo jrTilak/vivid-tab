@@ -1,5 +1,10 @@
-import type { BookmarkFolderNode, Bookmarks } from "@/types/bookmark-types"
+import type { BookmarkFolderNode, Bookmarks } from "@/types/bookmark"
 
+/**
+ * Finds a specific bookmark folder by ID within nested bookmark structure
+ * Params: bookmarks (Bookmarks) - the bookmark tree, id (string) - folder ID to find
+ * Returns: BookmarkFolderNode or null if not found
+ */
 const getBookmarkFolder = (
   bookmarks: Bookmarks,
   id: string,
@@ -28,4 +33,4 @@ const getBookmarkFolder = (
   return findNode(bookmarks, id)
 }
 
-export default getBookmarkFolder
+export { getBookmarkFolder }

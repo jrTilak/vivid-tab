@@ -7,31 +7,26 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { useSettings } from "@/providers/settings-provider"
-import { ANIMATIONS } from "@/tabs/welcome"
 import { ChevronLeftIcon, ChevronRight } from "lucide-react"
 import { motion } from "motion/react"
 import React, { useState } from "react"
 
-import useActiveTab from "@/hooks/use-active-tab"
-import type { Props } from "."
-import { Input } from "../ui/input"
 import { NAMES } from "@/constants/common"
+import { Input } from "@/components/ui/input"
+import { useBrowserActiveTab } from "@/hooks/use-browser-active-tab"
+import { ANIMATION_PROPS } from "@/constants/animations"
+import { useWelcomeContext } from "./_context"
 
-const CreateNewBookmarkFolder = ({
-  scrollToTab,
-  animation,
-  setAnimation,
-}: Props) => {
+const CreateNewBookmarkFolder = () => {
   const [bookmarkFolderName, setBookmarkFolderName] = useState(NAMES.DEFAULT_BOOKMARK_FOLDER_NAME)
   const { setSettings } = useSettings()
-  const activeTabId = useActiveTab()
+  const activeTabId = useBrowserActiveTab()
+  const { animationName, scrollToTab, setAnimationName } = useWelcomeContext()
 
   const onCreate = async () => {
     const bookmark = await chrome.bookmarks.create({
       title: bookmarkFolderName
     })
-
-    console.log(bookmark)
 
     setSettings((prev) => ({
       ...prev,
@@ -45,17 +40,18 @@ const CreateNewBookmarkFolder = ({
   }
 
   return (
-    <motion.div {...ANIMATIONS[animation]}>
+    <motion.div {...ANIMATION_PROPS[animationName]}>
       <Card className="w-full max-w-lg bg-background text-center min-w-[512px] text-foreground">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Create Bookmark Folder</CardTitle>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm">
             After creating a folder, you can add bookmarks to {bookmarkFolderName} folder and it will automatically appear in the vivid-tab page
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between gap-2">
             <Input
+              className="bg-background/30"
               value={bookmarkFolderName}
               onChange={(e) => setBookmarkFolderName(e.target.value)}
             />
@@ -65,7 +61,7 @@ const CreateNewBookmarkFolder = ({
           <Button
             onClick={() => {
               scrollToTab("IMPORT")
-              setAnimation("leftToRight")
+              setAnimationName("leftToRight")
             }}
             variant="ghost"
             size="sm"
@@ -88,4 +84,4 @@ const CreateNewBookmarkFolder = ({
   )
 }
 
-export default CreateNewBookmarkFolder
+export { CreateNewBookmarkFolder }

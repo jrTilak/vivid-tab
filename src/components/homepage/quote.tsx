@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import tryCatchAsync from "@/lib/try-catch-async"
-import useAsyncEffect from "@/hooks/use-async-effect"
+import { useAsyncEffect } from "@/hooks/use-async-effect"
 import { useSettings } from "@/providers/settings-provider"
 import React, { useState } from "react"
 
@@ -51,7 +51,7 @@ const Quote = () => {
   }, [])
 
   if (!isLoaded) {
-    ;<Skeleton className="h-24" />
+    ; <Skeleton className="h-24" />
   }
 
   return (

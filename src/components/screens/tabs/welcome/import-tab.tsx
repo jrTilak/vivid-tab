@@ -6,8 +6,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import useActiveTab from "@/hooks/use-active-tab"
-import { ANIMATIONS } from "@/tabs/welcome"
+import { ANIMATION_PROPS } from "@/constants/animations"
+import { useBrowserActiveTab } from "@/hooks/use-browser-active-tab"
 import {
   ChevronLeftIcon,
   ChevronRight,
@@ -16,18 +16,18 @@ import {
   StarIcon,
 } from "lucide-react"
 import { motion } from "motion/react"
-import React from "react"
-import type { Props } from "."
+import { useWelcomeContext } from "./_context"
 
-const ImportTab = ({ scrollToTab, animation, setAnimation }: Props) => {
-  const activeTabId = useActiveTab()
+const ImportTab = () => {
+  const activeTabId = useBrowserActiveTab()
+  const { animationName, scrollToTab, setAnimationName } = useWelcomeContext()
 
   return (
-    <motion.div {...ANIMATIONS[animation]}>
-      <Card className="w-full max-w-lg bg-background text-center min-w-[512px] text-foreground">
+    <motion.div {...ANIMATION_PROPS[animationName]}>
+      <Card className="w-full max-w-lg text-center min-w-[512px] text-foreground">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Import Bookmarks</CardTitle>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm">
             Select the import source for your bookmarks
           </p>
         </CardHeader>
@@ -35,10 +35,10 @@ const ImportTab = ({ scrollToTab, animation, setAnimation }: Props) => {
           <Button
             onClick={() => {
               scrollToTab("CREATE_NEW_BOOKMARK_FOLDER")
-              setAnimation("rightToLeft")
+              setAnimationName("rightToLeft")
             }}
-            variant="ghost"
-            className="w-full justify-start h-14 bg-muted/50 hover:bg-muted"
+            variant="outline"
+            className="w-full justify-start h-14 border-transparent dark:border-input "
           >
             <PlusCircleIcon className="mr-2 h-4 w-4" />
             Create a new bookmark folder
@@ -47,21 +47,21 @@ const ImportTab = ({ scrollToTab, animation, setAnimation }: Props) => {
           <Button
             onClick={() => {
               scrollToTab("IMPORT_FROM_BROWSER_BOOKMARKS")
-              setAnimation("rightToLeft")
+              setAnimationName("rightToLeft")
             }}
-            variant="ghost"
-            className="w-full justify-start h-14 bg-muted/50 hover:bg-muted"
+            variant="outline"
+            className="w-full justify-start h-14 border-transparent dark:border-input"
           >
             <StarIcon className="mr-2 h-4 w-4" />
             Import from browser bookmarks
-            <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
+            <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground " />
           </Button>
         </CardContent>
         <CardFooter className="justify-between pt-6">
           <Button
             onClick={() => {
               scrollToTab("WELCOME")
-              setAnimation("leftToRight")
+              setAnimationName("leftToRight")
             }}
             variant="ghost"
             size="sm"
@@ -86,4 +86,4 @@ const ImportTab = ({ scrollToTab, animation, setAnimation }: Props) => {
   )
 }
 
-export default ImportTab
+export { ImportTab }

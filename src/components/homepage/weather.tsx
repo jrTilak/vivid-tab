@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import tryCatchAsync from "@/lib/try-catch-async"
-import useAsyncEffect from "@/hooks/use-async-effect"
+import { useAsyncEffect } from "@/hooks/use-async-effect"
 import useUserLocation from "@/hooks/use-user-location"
 import { useSettings } from "@/providers/settings-provider"
 import { CloudIcon } from "lucide-react"

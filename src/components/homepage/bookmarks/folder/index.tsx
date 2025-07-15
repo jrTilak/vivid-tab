@@ -6,7 +6,7 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
 
-import type { BookmarkFolderNode } from "@/types/bookmark-types"
+import type { BookmarkFolderNode } from "@/types/bookmark"
 import React, { useState, useEffect } from "react"
 import folderIcon from "data-base64:@/assets/folder-svgrepo-com.png"
 import DeleteDialog from "../delete-dialog"

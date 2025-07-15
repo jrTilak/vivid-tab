@@ -1,11 +1,11 @@
 import { BACKGROUND_ACTIONS } from "@/constants/background-actions"
-import getBookmarkFolder from "@/lib/get-bookmark-folder"
-import type { BookmarkFolderNode, Bookmarks } from "@/types/bookmark-types"
+import { getBookmarkFolder } from "@/lib/get-bookmark-folder"
+import type { BookmarkFolderNode, Bookmarks } from "@/types/bookmark"
 import { useCallback, useEffect, useState } from "react"
 
 /**
  * Custom hook to fetch bookmarks from the Chrome extension's bookmarks API.
- * If id is provided, it returns the bookmark of the given id,
+ * If id is provided, it returns the bookmarks of the given id,
  */
 const useBookmarks = (id?: string) => {
   const [bookmarks, setBookmarks] = useState<Bookmarks>([])
@@ -50,4 +50,4 @@ const useBookmarks = (id?: string) => {
   return bookmarks
 }
 
-export default useBookmarks
+export { useBookmarks }

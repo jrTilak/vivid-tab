@@ -3,12 +3,6 @@ import React, { useEffect } from "react"
 
 import { SettingsProvider } from "./settings-provider"
 
-// if (process.env.NODE_ENV === "development") {
-//   // eslint-disable-next-line @typescript-eslint/no-require-imports
-//   require("@/styles/index.css")
-// }
-
-// give error in production : Segmentation fault: core dumped but works fine
 import "@/styles/index.css"
 
 type Props = {
@@ -28,4 +22,4 @@ const RootProvider = ({ children, theme }: Props) => {
   )
 }
 
-export default RootProvider
+export { RootProvider }
