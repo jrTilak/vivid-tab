@@ -1,10 +1,9 @@
 import { Card } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import tryCatchAsync from "@/lib/try-catch-async"
+import { tryCatchAsync } from "@/lib/try-catch-async"
 import { useAsyncEffect } from "@/hooks/use-async-effect"
-import useUserLocation from "@/hooks/use-user-location"
+import { useUserLocation } from "@/hooks/use-user-location"
 import { useSettings } from "@/providers/settings-provider"
-import { CloudIcon } from "lucide-react"
 import React, { useState } from "react"
 
 type WeatherData = {
@@ -119,14 +118,11 @@ const Weather = () => {
     return <Skeleton className="h-24" />
   }
 
+  if (isError.err) return null
+
   return (
     <Card className="p-6">
-      {isError.err ? (
-        <div className="flex space-x-2 text-destructive">
-          <CloudIcon className="h-5 w-5" />
-          <div className="text-base">{isError.message}</div>
-        </div>
-      ) : (
+      {
         <div className="flex space-x-3">
           <img
             src={
@@ -149,9 +145,9 @@ const Weather = () => {
             </div>
           </div>
         </div>
-      )}
+      }
     </Card>
   )
 }
 
-export default Weather
+export { Weather }

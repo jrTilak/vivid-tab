@@ -1,5 +1,5 @@
 import { useState } from "react"
-import useAsyncEffect from "./use-async-effect"
+import { useAsyncEffect } from "./use-async-effect"
 import { getIconFromLocalStorage } from "@/lib/icons-to-local"
 
 type Props = {
@@ -24,4 +24,4 @@ const useIcon = (props: Props) => {
   return { icon, setIcon, fetchIcon }
 }
 
-export default useIcon
+export { useIcon }

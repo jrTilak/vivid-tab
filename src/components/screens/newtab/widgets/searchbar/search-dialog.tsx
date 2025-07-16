@@ -6,24 +6,20 @@ import { SearchIcon } from "lucide-react"
 import { useSettings } from "@/providers/settings-provider"
 import chatgpt from "data-base64:@/assets/openai.png"
 import claude from "data-base64:@/assets/claude.png"
-import gemini from "data-base64:@/assets/gemini.png"
-import deepseek from "data-base64:@/assets/deepseek.png"
 import { Badge } from "@/components/ui/badge"
-import useShortcutKey from "@/hooks/use-shortcut-key"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import useDebouncedValue from "@/hooks/use-debounced-value"
-import useSearchSuggestions from "@/hooks/use-search-suggestions"
+import { useDebouncedValue } from "@/hooks/use-debounced-value"
+import { useSearchSuggestions } from "@/hooks/use-search-suggestions"
 import { BACKGROUND_ACTIONS } from "@/constants/background-actions"
+import { useHotkeys } from "react-hotkeys-hook"
 
 type Props = {
-  defaultOpen?: boolean
+  open?: boolean
   onOpenChange?: (open: boolean) => void
-  portalRef?: React.RefObject<HTMLElement>
 }
 
-const SearchDialog = ({ defaultOpen, onOpenChange, portalRef }: Props) => {
-  const [open, setOpen] = useState(defaultOpen)
+const SearchDialog = ({ open, onOpenChange }: Props) => {
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 300)
 
@@ -35,10 +31,6 @@ const SearchDialog = ({ defaultOpen, onOpenChange, portalRef }: Props) => {
     query: debouncedSearchQuery,
     enabled: debouncedSearchQuery && searchbar.searchSuggestions,
   })
-
-  useEffect(() => {
-    setOpen(defaultOpen)
-  }, [defaultOpen])
 
   useEffect(() => {
     if (onOpenChange) {
@@ -91,18 +83,6 @@ const SearchDialog = ({ defaultOpen, onOpenChange, portalRef }: Props) => {
           },
         },
         {
-          name: "Ask Gemini",
-          available: false,
-          icon: gemini,
-          id: "gemini",
-        },
-        {
-          name: "Ask DeepSeek",
-          available: false,
-          icon: deepseek,
-          id: "deepseek",
-        },
-        {
           name: "Open Youtube",
           available: true,
           icon: "https://www.svgrepo.com/show/475700/youtube-color.svg",
@@ -111,31 +91,32 @@ const SearchDialog = ({ defaultOpen, onOpenChange, portalRef }: Props) => {
             handleSearchQuery(`https://youtube.com/search?q=${query}`)
           },
         },
+        {
+          name: "Search Online",
+          available: true,
+          icon: "https://www.svgrepo.com/show/178981/search-search.svg",
+          id: "search-online",
+          onQuery: (query: string) => {
+            handleSearchQuery(query)
+          },
+        },
       ] as const,
     [],
   )
 
-  useShortcutKey({
-    keys: ["Escape"],
-    callback: () => setOpen(false),
-  })
-
-  useShortcutKey({
-    keys: ["Control", ","],
-    callback: () => setOpen((prev) => !prev),
-  })
+  useHotkeys("Escape", () => onOpenChange(false))
+  useHotkeys(["Control", ","], () => onOpenChange(!open))
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className={cn(
-          "shadow-none w-fit !border-none !outline-none",
+          "shadow-none w-fit !border-none !outline-none brightness-105",
           searchbar.dialogBackground === "transparent"
             ? "bg-transparent"
-            : "bg-background",
+            : "bg-background/40",
         )}
-        overlayClassName="bg-black/40 backdrop-blur-[12px]"
-        portalContainer={portalRef?.current}
+        overlayClassName="bg-black/40 backdrop-blur-sm"
       >
         <div className="flex flex-col items-center backdrop-blur-md justify-center gap-4">
           {/* search form */}
@@ -169,6 +150,11 @@ const SearchDialog = ({ defaultOpen, onOpenChange, portalRef }: Props) => {
                       searchQuery,
                     )
                     break
+                  case "search-online":
+                    SHORTCUTS.find((s) => s.id === "search-online")?.onQuery?.(
+                      searchQuery,
+                    )
+                    break
                 }
               }}
               className={cn(
@@ -180,7 +166,7 @@ const SearchDialog = ({ defaultOpen, onOpenChange, portalRef }: Props) => {
                 type="text"
                 id="vivid-search-bar"
                 placeholder="Search the web..."
-                className="w-full h-full !outline-none rounded-l-md bg-background px-3 py-2 placeholder:text-muted-foreground flex-grow border border-input"
+                className="w-full h-full !outline-none rounded-l-md bg-background/80 px-3 py-2 placeholder:text-muted-foreground flex-grow border border-input"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -219,9 +205,9 @@ const SearchDialog = ({ defaultOpen, onOpenChange, portalRef }: Props) => {
                         disabled={!engine.available}
                         variant="none"
                         className={cn(
-                          "w-full h-full flex flex-col gap-1 items-center justify-center p-2 py-5 rounded-md relative hover:border hover:border-input focus-visible:ring-destructive",
+                          "w-full h-full flex flex-col gap-1 items-center border border-transparent justify-center p-2 py-5 rounded-md relative hover:border hover:border-input focus-visible:ring-destructive",
                           searchbar.dialogBackground === "transparent"
-                            ? "bg-background"
+                            ? "bg-background/40 backdrop-blur-xl"
                             : "bg-black/10 dark:bg-white/10",
                         )}
                       >

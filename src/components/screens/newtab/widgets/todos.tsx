@@ -1,5 +1,3 @@
-"use client"
-
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -8,7 +6,7 @@ import { useSettings } from "@/providers/settings-provider"
 import { PlusIcon, TrashIcon } from "lucide-react"
 import type React from "react"
 import { useEffect, useState } from "react"
-import { Label } from "../ui/label"
+import { Label } from "../../../ui/label"
 
 interface Todo {
   id: number
@@ -169,4 +167,4 @@ const Todos = () => {
   )
 }
 
-export default Todos
+export { Todos }

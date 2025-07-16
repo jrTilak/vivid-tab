@@ -82,10 +82,16 @@ export const SettingsSchema = z
           .enum(["default", "transparent"])
           .default(DEFAULT_SETTINGS.searchbar.dialogBackground),
         shortcuts: z
-          .array(z.enum(["chatgpt", "gemini", "deepseek", "claude", "youtube"]))
+          .array(z.enum(["chatgpt", "claude", "youtube", "search-online"]))
           .default(() => [...DEFAULT_SETTINGS.searchbar.shortcuts]),
         submitDefaultAction: z
-          .enum(["default", "ask-chatgpt", "ask-claude", "search-on-youtube"])
+          .enum([
+            "default",
+            "ask-chatgpt",
+            "ask-claude",
+            "search-on-youtube",
+            "search-online",
+          ])
           .default(DEFAULT_SETTINGS.searchbar.submitDefaultAction),
         searchSuggestions: z
           .boolean()

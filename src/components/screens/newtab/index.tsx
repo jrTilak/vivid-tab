@@ -1,22 +1,19 @@
-import useImage from "@/hooks/use-image"
+import { useImage } from "@/hooks/use-image"
 import { useSettings } from "@/providers/settings-provider"
 import background from "data-base64:@/assets/scene.jpg"
 import { useEffect, useMemo, useState } from "react"
-import Clock from "./clock"
-import Notes from "./notes"
-import Quote from "./quote"
-import Todos from "./todos"
-import Weather from "./weather"
-import { Bookmarks } from "./bookmarks"
+import { Clock } from "./widgets/clock"
+import { Notes } from "./widgets/notes"
+import { Quote } from "./widgets/quote"
+import { Todos } from "./widgets/todos"
+import { Weather } from "./widgets/weather"
 import { cn } from "@/lib/cn"
-import Searchbar from "./searchbar"
-import SearchDialog from "../common/search-dialog"
+import { Searchbar } from "./widgets/searchbar"
 
 type Layout = "small" | "mid" | "large"
 
 export default function Homepage() {
   const [layoutType, setLayoutType] = useState<Layout>("small")
-  const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false)
   const {
     settings: {
       layout,
@@ -31,19 +28,16 @@ export default function Homepage() {
   const COMPONENTS = useMemo(() => {
     return {
       searchbar: (
-        <Searchbar
-          isOpen={isSearchDialogOpen}
-          setIsOpen={setIsSearchDialogOpen}
-        />
+        <Searchbar />
       ),
       clock: <Clock />,
       weather: <Weather />,
       todos: <Todos />,
-      bookmarks: <Bookmarks />,
+      // bookmarks: <Bookmarks />,
       quotes: <Quote />,
       notes: <Notes />,
     }
-  }, [isSearchDialogOpen])
+  }, [])
 
   useEffect(() => {
     if (!bookmarksCanTakeExtraSpaceIfAvailable) {
@@ -78,11 +72,6 @@ export default function Homepage() {
 
   return (
     <>
-      <SearchDialog
-        defaultOpen={isSearchDialogOpen}
-        onOpenChange={setIsSearchDialogOpen}
-      />
-
       <div
         className="min-h-screen w-full bg-cover bg-center p-6 relative select-none transition-all">
         <div

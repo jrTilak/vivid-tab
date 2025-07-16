@@ -1,7 +1,7 @@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
-import tryCatchAsync from "@/lib/try-catch-async"
+import { tryCatchAsync } from "@/lib/try-catch-async"
 import { useAsyncEffect } from "@/hooks/use-async-effect"
 import { useSettings } from "@/providers/settings-provider"
 import { Trash2Icon } from "lucide-react"

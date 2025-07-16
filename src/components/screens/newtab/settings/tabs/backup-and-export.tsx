@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import useBookmarks from "@/hooks/use-bookmarks"
+import { useBookmarks } from "@/hooks/use-bookmarks"
 import { useSettings } from "@/providers/settings-provider"
 import { SettingsSchema, SettingsSchemaForImport } from "@/zod/settings"
 import { DownloadIcon, UploadIcon } from "lucide-react"

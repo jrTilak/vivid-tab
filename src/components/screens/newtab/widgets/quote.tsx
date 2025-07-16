@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import tryCatchAsync from "@/lib/try-catch-async"
+import { tryCatchAsync } from "@/lib/try-catch-async"
 import { useAsyncEffect } from "@/hooks/use-async-effect"
 import { useSettings } from "@/providers/settings-provider"
 import React, { useState } from "react"
@@ -54,14 +54,14 @@ const Quote = () => {
     ; <Skeleton className="h-24" />
   }
 
+  if (err.err) return null
+
   return (
     <Card className=" p-6">
       <blockquote className="space-y-2">
         <p className="text-sm italic">
           &apos;
-          {err.err
-            ? "An error occurred while fetching the quote"
-            : quote?.content}
+          {quote?.content}
           &apos;
         </p>
         <footer className="text-xs">
@@ -72,4 +72,4 @@ const Quote = () => {
   )
 }
 
-export default Quote
+export { Quote }

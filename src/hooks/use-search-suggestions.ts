@@ -1,5 +1,5 @@
 import { useState } from "react"
-import useAsyncEffect from "./use-async-effect"
+import { useAsyncEffect } from "./use-async-effect"
 
 type Props = {
   query: string
@@ -24,4 +24,4 @@ const useSearchSuggestions = ({ query, enabled = true }: Props) => {
   return suggestions
 }
 
-export default useSearchSuggestions
+export { useSearchSuggestions }

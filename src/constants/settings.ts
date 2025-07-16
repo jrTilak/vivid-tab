@@ -38,7 +38,7 @@ export const DEFAULT_SETTINGS = {
   },
   searchbar: {
     dialogBackground: "default",
-    shortcuts: ["chatgpt", "deepseek", "claude", "youtube"],
+    shortcuts: ["chatgpt", "claude", "youtube", "search-online"],
     submitDefaultAction: "default",
     searchSuggestions: false,
   },

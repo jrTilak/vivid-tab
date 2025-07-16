@@ -1,18 +1,23 @@
-import React from "react"
+import { useState } from "react"
 
-import useAsyncEffect from "./use-async-effect"
+import { useAsyncEffect } from "./use-async-effect"
 
+/**
+ * Gets user's location using browser's geolocation API or IP-based fallback
+ * First tries navigator.geolocation, falls back to ipapi.co if not available
+ */
 const useUserLocation = () => {
-  const [isLoading, setIsLoading] = React.useState(true)
-  const [error, setError] = React.useState({
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState({
     message: "",
     err: false,
   })
-  const [position, setPosition] = React.useState({
+  const [position, setPosition] = useState({
     lat: 0,
     lon: 0,
     accurate: false,
   })
+
   useAsyncEffect(async () => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -59,4 +64,4 @@ const useUserLocation = () => {
   return { position, isLoading, error }
 }
 
-export default useUserLocation
+export { useUserLocation }

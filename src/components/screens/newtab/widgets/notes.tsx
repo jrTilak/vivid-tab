@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
-import useShortcutKey from "@/hooks/use-shortcut-key-with-ref"
 import { TrashIcon } from "lucide-react"
 import React from "react"
 
@@ -55,12 +54,8 @@ const Notes = () => {
     updateNotesInStorage(newNotes)
   }
 
-  useShortcutKey(btnRef, {
-    keys: ["Control", "Enter"],
-  })
-
   return (
-    <Card className="bg-black/40 p-6  backdrop-blur">
+    <Card className="p-6  ">
       <h3 className="mb-4 text-lg font-semibold">Notes:</h3>
       <Textarea
         tabIndex={-1}
@@ -105,4 +100,4 @@ const Notes = () => {
   )
 }
 
-export default Notes
+export { Notes }

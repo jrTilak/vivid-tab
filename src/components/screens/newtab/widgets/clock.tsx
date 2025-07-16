@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card"
-import dateFns from "@/lib/date-fns"
 import { useSettings } from "@/providers/settings-provider"
 import React, { useEffect, useState } from "react"
+import { format } from "date-fns"
 
 const Clock = () => {
   const {
@@ -18,14 +18,11 @@ const Clock = () => {
   return (
     <Card className="p-6">
       <div className="text-5xl font-light">
-        {dateFns.formatTime(time, {
-          hour12: timer.timeFormat === "12h",
-          showSeconds: timer.showSeconds,
-        })}
+        {format(time, timer.showSeconds ? (timer.timeFormat === "12h" ? "h:mm:ss aa" : "H:mm:ss") : (timer.timeFormat === "12h" ? "hh:mm aa" : "HH:mm"))}
       </div>
-      <div className="mt-1 text-sm">{dateFns.formatDate(time)}</div>
+      <div className="mt-1 text-sm">{format(time, "EEEE, MMMM d")}</div>
     </Card>
   )
 }
 
-export default Clock
+export { Clock }

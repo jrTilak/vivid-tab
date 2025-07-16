@@ -11,14 +11,14 @@ import { ChevronLeftIcon, ChevronRight } from "lucide-react"
 import { motion } from "motion/react"
 import React, { useState } from "react"
 
-import { NAMES } from "@/constants/common"
 import { Input } from "@/components/ui/input"
 import { useBrowserActiveTab } from "@/hooks/use-browser-active-tab"
 import { ANIMATION_PROPS } from "@/constants/animations"
 import { useWelcomeContext } from "./_context"
+import { DEFAULT_BOOKMARK_FOLDER_NAME } from "@/constants/keys"
 
 const CreateNewBookmarkFolder = () => {
-  const [bookmarkFolderName, setBookmarkFolderName] = useState(NAMES.DEFAULT_BOOKMARK_FOLDER_NAME)
+  const [bookmarkFolderName, setBookmarkFolderName] = useState(DEFAULT_BOOKMARK_FOLDER_NAME)
   const { setSettings } = useSettings()
   const activeTabId = useBrowserActiveTab()
   const { animationName, scrollToTab, setAnimationName } = useWelcomeContext()

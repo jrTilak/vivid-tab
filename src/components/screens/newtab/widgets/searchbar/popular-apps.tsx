@@ -5,8 +5,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { LayoutGridIcon } from "lucide-react"
-import buyMeACoffee from "data-base64:@/assets/Buy Me a Coffee Icon.png"
-import buyMeACoffeeDark from "data-base64:@/assets/bmc-logo-yellow.png"
 import x from "data-base64:@/assets/x.png"
 import xLight from "data-base64:@/assets/x-twitter-light.png"
 import chatgpt from "data-base64:@/assets/openai.png"
@@ -14,14 +12,6 @@ import notionLight from "data-base64:@/assets/notion-light.png"
 import { useSettings } from "@/providers/settings-provider"
 
 const POPULAR_APPS = [
-  {
-    title: "Support",
-    url: "https://buymeacoffee.com/jrtilak",
-    icon: {
-      light: buyMeACoffee,
-      dark: buyMeACoffeeDark,
-    },
-  },
   {
     title: "ChatGPT",
     url: "https://chatgpt.com/",
@@ -95,19 +85,19 @@ export function PopularApps() {
           tabIndex={-1}
           variant="none"
           size="icon"
-          className="w-auto aspect-square hover:scale-105 transition-transform [&_svg]:size-6 text-background dark:text-foreground"
+          className="w-auto aspect-square hover:scale-105 transition-transform [&_svg]:size-6 text-background dark:text-foreground "
         >
           <LayoutGridIcon />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+      <PopoverContent className="w-80 shadow-xl">
         <div className="grid gap-4 grid-cols-3">
           {POPULAR_APPS.map((app, i) => (
             <Button
               key={i}
               asChild
               variant="secondary"
-              className="h-fit focus-visible:ring-destructive"
+              className="h-fit focus-visible:ring-destructive bg-secondary/30 border border-border/10"
             >
               <a
                 href={app.url}
@@ -139,7 +129,7 @@ export function PopularApps() {
                     />
                   </>
                 )}
-                <p className="text-xs text-muted-foreground">{app.title}</p>
+                <p className="text-xs text-foreground">{app.title}</p>
               </a>
             </Button>
           ))}

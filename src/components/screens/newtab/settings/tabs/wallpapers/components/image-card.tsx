@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge"
-import useImage from "@/hooks/use-image"
+import { useImage } from "@/hooks/use-image"
 import { useSettings } from "@/providers/settings-provider"
 import defaultImage from "data-base64:@/assets/scene.jpg"
 import { TrashIcon } from "lucide-react"

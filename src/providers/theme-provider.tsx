@@ -32,10 +32,6 @@ export function ThemeProvider({
     () => t || (localStorage.getItem(storageKey) as Theme) || defaultTheme,
   )
 
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark")
-  }
-
   useEffect(() => {
     const root = window.document.documentElement
 
@@ -66,9 +62,6 @@ export function ThemeProvider({
   return (
     <ThemeProviderContext.Provider {...props} value={value}>
       {children}
-      <button className="fixed top-2 left-2 z-50 bg-red-50" onClick={toggleTheme} >
-        Theme {theme}
-      </button>
     </ThemeProviderContext.Provider>
   )
 }

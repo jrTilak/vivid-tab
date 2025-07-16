@@ -23,4 +23,4 @@ const tryCatchAsync = async <Err extends Error, Return>(
   }
 }
 
-export default tryCatchAsync
+export { tryCatchAsync }

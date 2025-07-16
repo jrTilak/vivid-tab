@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch"
 import { useSettings } from "@/providers/settings-provider"
 import { useTheme, type Theme } from "@/providers/theme-provider"
 import React, { useCallback } from "react"
-import useFlattenBookmarkFolders from "@/hooks/use-flatten-bookmark-folders"
+import { useFlattenBookmarkFolders } from "@/hooks/use-flatten-bookmark-folders"
 import { HistoryIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
