@@ -111,7 +111,7 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className={cn(
-          "shadow-none w-fit !border-none !outline-none brightness-105",
+          "shadow-none w-fit !border-none !outline-none",
           searchbar.dialogBackground === "transparent"
             ? "bg-transparent"
             : "bg-background/40",
@@ -193,9 +193,9 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
                       exit={{ opacity: 0, y: 100 }}
                       transition={{ duration: 0.1, delay: index * 0.1 + 0.1 }}
                       onClick={() => {
-                        if (engine.available && searchQuery) {
+                        if (engine.available) {
                           if (engine.onQuery) {
-                            engine.onQuery(searchQuery)
+                            engine.onQuery(searchQuery || "")
                           }
                         }
                       }}
