@@ -14,10 +14,10 @@ import {
 } from "@/components/ui/context-menu"
 import { useAsyncEffect } from "@/hooks/use-async-effect"
 import { DeleteIcon, EditIcon, ExternalLinkIcon, MoveIcon } from "lucide-react"
-import DeleteDialog from "../delete-dialog"
-import CreateABookmark from "../create-a-bookmark"
-import useIcon from "@/hooks/use-icon"
-import MoveBookmarkDialog from "../move-bookmark-dialog"
+import { DeleteDialog } from "../delete-dialog"
+import { CreateABookmark } from "../create-a-bookmark"
+import { useIcon } from "@/hooks/use-icon"
+import { MoveBookmarkDialog } from "../move-bookmark-dialog"
 import { useDraggable, useDroppable } from "@dnd-kit/core"
 import { cn } from "@/lib/cn"
 
@@ -298,4 +298,4 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
   )
 }
 
-export default BookmarkUrl
+export { BookmarkUrl }

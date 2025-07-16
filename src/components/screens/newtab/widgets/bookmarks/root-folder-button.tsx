@@ -1,8 +1,8 @@
 import { useDraggable, useDroppable } from '@dnd-kit/core'
 import React from 'react'
-import MoveBookmarkDialog from './move-bookmark-dialog'
-import DeleteDialog from './delete-dialog'
-import CreateAFolder from './create-a-folder'
+import { MoveBookmarkDialog } from './move-bookmark-dialog'
+import { DeleteDialog } from './delete-dialog'
+import { CreateAFolder } from './create-a-folder'
 import { Button } from '@/components/ui/button'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuShortcut, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { cn } from '@/lib/cn'
@@ -138,4 +138,4 @@ const RootFolderButton = ({
   )
 }
 
-export default RootFolderButton
+export { RootFolderButton }

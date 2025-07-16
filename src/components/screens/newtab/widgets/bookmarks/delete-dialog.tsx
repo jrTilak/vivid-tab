@@ -64,4 +64,4 @@ const DeleteDialog = ({ open, onOpenChange, id, label, url }: Props) => {
   )
 }
 
-export default DeleteDialog
+export { DeleteDialog }

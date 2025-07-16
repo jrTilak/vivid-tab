@@ -9,13 +9,13 @@ import {
 import type { BookmarkFolderNode } from "@/types/bookmark"
 import React, { useState, useEffect } from "react"
 import folderIcon from "data-base64:@/assets/folder-svgrepo-com.png"
-import DeleteDialog from "../delete-dialog"
+import { DeleteDialog } from "../delete-dialog"
 import { DeleteIcon, EditIcon, MoveIcon } from "lucide-react"
-import CreateAFolder from "../create-a-folder"
-import useIcon from "@/hooks/use-icon"
+import { CreateAFolder } from "../create-a-folder"
+import { useIcon } from "@/hooks/use-icon"
 import { useDraggable, useDroppable } from "@dnd-kit/core"
 import { cn } from "@/lib/cn"
-import MoveBookmarkDialog from "../move-bookmark-dialog"
+import { MoveBookmarkDialog } from "../move-bookmark-dialog"
 
 type Props = BookmarkFolderNode & {
   onOpenFolder: () => void
@@ -164,4 +164,4 @@ const BookmarkFolder = (props: Props) => {
   )
 }
 
-export default BookmarkFolder
+export { BookmarkFolder }

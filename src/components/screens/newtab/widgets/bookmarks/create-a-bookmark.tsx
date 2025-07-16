@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import useIcon from "@/hooks/use-icon"
+import { useIcon } from "@/hooks/use-icon"
 import {
   removeIconFromLocalStorage,
   saveIconsToLocalStorage,
@@ -174,4 +174,4 @@ const CreateABookmark = ({ parentId, defaultValues, open, setOpen }: Props) => {
   )
 }
 
-export default CreateABookmark
+export { CreateABookmark }

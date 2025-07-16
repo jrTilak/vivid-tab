@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import useFlattenBookmarkFolders from '@/hooks/use-flatten-bookmark-folders'
+import { useFlattenBookmarkFolders } from '@/hooks/use-flatten-bookmark-folders'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
@@ -82,4 +82,4 @@ const MoveBookmarkDialog = ({ open, onOpenChange, id, label }: Props) => {
   )
 }
 
-export default MoveBookmarkDialog
+export { MoveBookmarkDialog }

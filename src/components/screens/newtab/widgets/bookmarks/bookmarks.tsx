@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/cn"
-import useBookmarks from "@/hooks/use-bookmarks"
-import useHistory from "@/hooks/use-history"
+import { useBookmarks } from "@/hooks/use-bookmarks"
+import { useHistory } from "@/hooks/use-history"
 import { useSettings } from "@/providers/settings-provider"
 import type {
   Bookmark,
@@ -16,13 +16,13 @@ import {
 } from "lucide-react"
 import { useEffect, useState } from "react"
 
-import BookmarkFolder from "./folder"
-import BookmarkUrl from "./url"
-import CreateAFolder from "./create-a-folder"
-import CreateABookmark from "./create-a-bookmark"
+import { BookmarkFolder } from "./folder"
+import { BookmarkUrl } from "./url"
+import { CreateAFolder } from "./create-a-folder"
+import { CreateABookmark } from "./create-a-bookmark"
 import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core"
-import RootFolderButton from "./root-folder-button"
-import useTopSites from "@/hooks/use-top-sites"
+import { RootFolderButton } from "./root-folder-button"
+import { useTopSites } from "@/hooks/use-top-sites"
 import { useTheme } from "@/providers/theme-provider"
 
 const Bookmarks = () => {
@@ -310,4 +310,4 @@ const Bookmarks = () => {
   )
 }
 
-export default Bookmarks
+export { Bookmarks }

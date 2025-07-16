@@ -16,7 +16,7 @@ import {
   removeIconFromLocalStorage,
   saveIconsToLocalStorage,
 } from "@/lib/icons-to-local"
-import useIcon from "@/hooks/use-icon"
+import { useIcon } from "@/hooks/use-icon"
 
 type Props = {
   parentId?: string
@@ -154,4 +154,4 @@ const CreateAFolder = ({ parentId, defaultValues, open, setOpen }: Props) => {
   )
 }
 
-export default CreateAFolder
+export { CreateAFolder }
