@@ -47,7 +47,6 @@ const Bookmarks = () => {
     useState(false)
   const [isCreateAFolderDialogOpen, setIsCreateAFolderDialogOpen] =
     useState(false)
-  const [createFolderParentId, setCreateFolderParentId] = useState("")
 
   useEffect(() => {
     if (bookmarks.length) {
@@ -128,12 +127,12 @@ const Bookmarks = () => {
   return (
     <DndContext onDragEnd={onDragEnd} sensors={sensors}>
       <CreateABookmark
-        parentId={createAFolderId}
+        parentId={folderStack?.length > 0 ? folderStack[folderStack.length - 1].id : createAFolderId}
         open={isCreateABookmarkDialogOpen}
         setOpen={setIsCreateABookmarkDialogOpen}
       />
       <CreateAFolder
-        parentId={createFolderParentId}
+        parentId={folderStack?.length > 0 ? folderStack[folderStack.length - 1].id : createAFolderId}
         open={isCreateAFolderDialogOpen}
         setOpen={setIsCreateAFolderDialogOpen}
       />
@@ -186,7 +185,6 @@ const Bookmarks = () => {
               variant="ghost"
               onClick={() => {
                 setIsCreateAFolderDialogOpen(true)
-                setCreateFolderParentId(general.rootFolder)
               }}
             >
               <PlusIcon className="h-4 w-4" />
@@ -196,7 +194,6 @@ const Bookmarks = () => {
             <button
               onClick={() => {
                 setIsCreateAFolderDialogOpen(true)
-                setCreateFolderParentId(createAFolderId)
               }}
               disabled={activeRootFolder === "history" || activeRootFolder === "top-sites"}
               tabIndex={-1}
