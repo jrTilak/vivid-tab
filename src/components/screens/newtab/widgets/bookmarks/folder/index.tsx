@@ -27,7 +27,7 @@ const BookmarkFolder = (props: Props) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false)
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
-  const { icon, setIcon, fetchIcon } = useIcon({ id: props.id, defaultIcon: folderIcon })
+  const { icon, fetchIcon } = useIcon({ id: props.id, })
 
   const { isOver, setNodeRef } = useDroppable({
     id: props.id,
@@ -91,15 +91,30 @@ const BookmarkFolder = (props: Props) => {
                 isDragging && "relative z-50"
               )}
             >
-              <img
-                ref={draggableRef}
-                {...attributes}
-                {...listeners}
-                src={icon}
-                alt=""
-                className={cn("size-12 mx-auto rounded-md object-contain object-center", isDragging && "scale-105")}
-                onError={() => setIcon(folderIcon)}
-              />
+              {
+                icon ? (
+                  <div
+                    ref={draggableRef}
+                    {...attributes}
+                    {...listeners}
+                    className={cn("relative size-12 mx-auto rounded-md object-contain object-center", isDragging && "scale-105")}
+                  >
+                    <img
+                      src={folderIcon}
+                    />
+                    <img src={icon} alt="" className="absolute w-10 h-6 object-cover object-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-md shadow-inner brightness-90" />
+                  </div>
+                ) : (
+                  <img
+                    ref={draggableRef}
+                    {...attributes}
+                    {...listeners}
+                    src={folderIcon}
+                    alt=""
+                    className={cn("size-12 mx-auto rounded-md object-contain object-center", isDragging && "scale-105")}
+                  />
+                )
+              }
               <p className="text-center line-clamp-2 text-xs break-all">
                 {props.title} ({props.children.length})
               </p>
@@ -113,15 +128,31 @@ const BookmarkFolder = (props: Props) => {
                 isDragging && "relative z-50"
               )}
             >
-              <img
-                src={icon}
-                ref={draggableRef}
-                {...attributes}
-                {...listeners}
-                alt=""
-                className={cn("size-12 rounded-md object-contain object-center", isDragging && "scale-105")}
-                onError={() => setIcon(folderIcon)}
-              />
+              {
+                icon ? (
+                  <div
+                    ref={draggableRef}
+                    {...attributes}
+                    {...listeners}
+                    className={cn("relative min-w-12 size-12 mx-auto rounded-md object-contain object-center", isDragging && "scale-105")}
+                  >
+                    <img
+                      src={folderIcon}
+                      className="size-12 min-w-12"
+                    />
+                    <img src={icon} alt="" className="absolute w-10 h-8 object-cover object-center top-1/2 left-1/2 -translate-x-1/2 translate-y-[-40%] rounded-md shadow-inner brightness-90" />
+                  </div>
+                ) : (
+                  <img
+                    ref={draggableRef}
+                    {...attributes}
+                    {...listeners}
+                    src={folderIcon}
+                    alt=""
+                    className={cn("size-12 mx-auto rounded-md object-contain object-center", isDragging && "scale-105")}
+                  />
+                )
+              }
               <p className="text-xs w-full text-left line-clamp-2">
                 {props.title}
                 <br />

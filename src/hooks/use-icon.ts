@@ -8,7 +8,7 @@ type Props = {
 }
 
 const useIcon = (props: Props) => {
-  const [icon, setIcon] = useState(props.defaultIcon || "")
+  const [icon, setIcon] = useState(props.defaultIcon || null)
 
   const fetchIcon = async () => {
     const key = `icon-${props.id}`
@@ -16,6 +16,8 @@ const useIcon = (props: Props) => {
 
     if (icon?.[key]?.icon) {
       setIcon(icon[key].icon)
+    } else {
+      setIcon(props.defaultIcon || null)
     }
   }
 
