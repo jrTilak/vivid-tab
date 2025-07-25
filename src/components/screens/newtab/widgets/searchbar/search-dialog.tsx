@@ -118,7 +118,7 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
         )}
         overlayClassName="bg-black/40 backdrop-blur-sm"
       >
-        <div className="flex flex-col items-center backdrop-blur-md justify-center gap-4">
+        <div className="flex flex-col items-center justify-center gap-4">
           {/* search form */}
           <motion.div
             initial={{ opacity: 0, y: 100 }}
