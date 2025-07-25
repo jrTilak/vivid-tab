@@ -61,8 +61,8 @@ const Quote = () => {
     setQuote(data)
   }, [])
 
-  if (!isLoaded) {
-    ; <Skeleton className="h-24" />
+  if (!quote && !isLoaded) {
+    return <Skeleton className="h-24" />
   }
 
   if (err.err) return null
