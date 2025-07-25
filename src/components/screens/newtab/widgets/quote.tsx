@@ -4,6 +4,7 @@ import { tryCatchAsync } from "@/lib/try-catch-async"
 import { useAsyncEffect } from "@/hooks/use-async-effect"
 import { useSettings } from "@/providers/settings-provider"
 import React, { useState } from "react"
+import { LOCAL_STORAGE } from "@/constants/keys"
 
 type QuoteResponse = {
   _id: string
@@ -29,7 +30,7 @@ const Quote = () => {
       const baseUrl = "http://api.quotable.io/quotes/random"
       const urlWithTags =
         categories.length > 0
-          ? `${baseUrl}?tags=${categories.join("|")}&maxLength=100`
+          ? `${baseUrl}?tags=${categories.join("|")}&maxLength=80`
           : baseUrl
       const response = await fetch(urlWithTags)
       const json = (await response.json()) as QuoteResponse[]
@@ -38,15 +39,25 @@ const Quote = () => {
     })
 
     if (err || !data) {
-      setErr({
-        err: true,
-        message: err.message,
+
+      const [err, cachedQuote] = await tryCatchAsync<Error, QuoteResponse>(() => {
+        return JSON.parse(localStorage.getItem(LOCAL_STORAGE.quote))
       })
-      setIsLoaded(true)
+
+      if (err) {
+        setErr({
+          err: true,
+          message: err.message,
+        })
+        setIsLoaded(true)
+      } else {
+        setQuote(cachedQuote)
+      }
 
       return
     }
 
+    localStorage.setItem(LOCAL_STORAGE.quote, JSON.stringify(data))
     setQuote(data)
   }, [])
 
