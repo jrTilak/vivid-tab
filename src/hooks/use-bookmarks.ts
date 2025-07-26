@@ -34,14 +34,11 @@ const useBookmarks = (id?: string) => {
     chrome.bookmarks.onChanged.addListener(fn)
     chrome.bookmarks.onMoved.addListener(fn)
 
-    window.addEventListener("bookmarks:update", fn)
-
     return () => {
       chrome.bookmarks.onCreated.removeListener(fn)
       chrome.bookmarks.onRemoved.removeListener(fn)
       chrome.bookmarks.onChanged.removeListener(fn)
       chrome.bookmarks.onMoved.removeListener(fn)
-      window.removeEventListener("bookmarks:update", fn)
     }
   }, [])
 
