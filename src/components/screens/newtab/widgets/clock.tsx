@@ -18,7 +18,16 @@ const Clock = () => {
   return (
     <Card className="p-6">
       <div className="text-5xl font-light">
-        {format(time, timer.showSeconds ? (timer.timeFormat === "12h" ? "h:mm:ss aa" : "H:mm:ss") : (timer.timeFormat === "12h" ? "hh:mm aa" : "HH:mm"))}
+        {format(
+          time,
+          timer.showSeconds
+            ? timer.timeFormat === "12h"
+              ? "h:mm:ss aa"
+              : "H:mm:ss"
+            : timer.timeFormat === "12h"
+              ? "hh:mm aa"
+              : "HH:mm",
+        )}
       </div>
       <div className="mt-1 text-sm">{format(time, "EEEE, MMMM d")}</div>
     </Card>

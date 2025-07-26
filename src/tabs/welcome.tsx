@@ -3,7 +3,6 @@ import { WelcomeContextProvider } from "@/components/screens/tabs/welcome/_conte
 import { Welcome } from "@/components/screens/tabs/welcome"
 
 const WelcomeTab = () => {
-
   return (
     <RootProvider>
       <WelcomeContextProvider>

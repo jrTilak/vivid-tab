@@ -5,8 +5,10 @@ import { useSettings } from "@/providers/settings-provider"
 import React from "react"
 
 const Weather = () => {
-  const { isLoading, error, weatherData, } = useFetchWeather()
-  const { settings: { temperature } } = useSettings()
+  const { isLoading, error, weatherData } = useFetchWeather()
+  const {
+    settings: { temperature },
+  } = useSettings()
 
   if (error.err) return null
 

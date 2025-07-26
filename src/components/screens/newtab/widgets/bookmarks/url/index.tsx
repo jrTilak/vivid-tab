@@ -130,8 +130,8 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
 
   const style = transform
     ? {
-      transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-    }
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
     : undefined
 
   const handleClick = (url: string, aux: boolean = false) => {
@@ -167,22 +167,24 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
         label={props.title + " bookmark"}
       />
       <ContextMenu>
-        <ContextMenuTrigger disabled={disableContextMenu} >
+        <ContextMenuTrigger disabled={disableContextMenu}>
           {props.layout === "grid" ? (
-            <div ref={disableContextMenu ? null : setNodeRef}
-            >
+            <div ref={disableContextMenu ? null : setNodeRef}>
               <button
                 ref={disableContextMenu ? null : draggableRef}
                 style={style}
                 onClick={() => handleClick(props.url)}
                 onAuxClick={(event) => {
-                  if (event.button === 1) { // Middle mouse button
+                  if (event.button === 1) {
+                    // Middle mouse button
                     handleClick(props.url, true)
                   }
                 }}
-                className={cn("flex items-center flex-col space-y-1 p-2 rounded-lg hover:scale-105 text-center text-xs w-24", isOver && "bg-accent/10",
+                className={cn(
+                  "flex items-center flex-col space-y-1 p-2 rounded-lg hover:scale-105 text-center text-xs w-24",
+                  isOver && "bg-accent/10",
                   isDragging && "bg-destructive/20",
-                  isDragging && "relative z-50"
+                  isDragging && "relative z-50",
                 )}
                 {...(disableContextMenu ? {} : attributes)}
                 {...(disableContextMenu ? {} : listeners)}
@@ -217,20 +219,25 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
               style={style}
               onClick={() => handleClick(props.url)}
               onAuxClick={(event) => {
-                if (event.button === 1) { // Middle mouse button
+                if (event.button === 1) {
+                  // Middle mouse button
                   handleClick(props.url, true)
                 }
               }}
-              className={cn("flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-accent/10 overflow-hidden w-full", isOver && "bg-accent/10",
+              className={cn(
+                "flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-accent/10 overflow-hidden w-full",
+                isOver && "bg-accent/10",
                 isDragging && "bg-destructive/20",
-                isDragging && "relative z-50"
-
+                isDragging && "relative z-50",
               )}
               rel="noreferrer"
             >
               <Avatar
                 ref={disableContextMenu ? null : draggableRef}
-                className={cn("rounded-none mx-auto transition-transform", isDragging && "scale-105")}
+                className={cn(
+                  "rounded-none mx-auto transition-transform",
+                  isDragging && "scale-105",
+                )}
                 {...(disableContextMenu ? {} : attributes)}
                 {...(disableContextMenu ? {} : listeners)}
               >
@@ -292,7 +299,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
             </ContextMenuShortcut>
           </ContextMenuItem>
         </ContextMenuContent>
-      </ContextMenu >
+      </ContextMenu>
     </>
   )
 }

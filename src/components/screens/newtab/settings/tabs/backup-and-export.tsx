@@ -44,7 +44,9 @@ const BackupAndExportSettings = () => {
         if (!e.target?.result) return
         const json = e.target.result as string
 
-        const { success, data } = SettingsSchemaForImport.safeParse(JSON.parse(json).settings)
+        const { success, data } = SettingsSchemaForImport.safeParse(
+          JSON.parse(json).settings,
+        )
 
         if (!success) {
           window.alert("Invalid settings, please check your file")
@@ -63,9 +65,7 @@ const BackupAndExportSettings = () => {
         <div className="space-y-0.5 min-w-fit">
           <Label className="text-sm font-medium">Import Settings</Label>
         </div>
-        <Button
-          onClick={importSettings}
-          variant="outline" className="min-w-32">
+        <Button onClick={importSettings} variant="outline" className="min-w-32">
           Import <DownloadIcon />
         </Button>
       </div>
@@ -75,7 +75,9 @@ const BackupAndExportSettings = () => {
         </div>
         <Button
           onClick={() => exportSettings(false)}
-          variant="outline" className="min-w-32">
+          variant="outline"
+          className="min-w-32"
+        >
           Export <UploadIcon />
         </Button>
       </div>

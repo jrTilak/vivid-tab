@@ -1,5 +1,11 @@
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
 import { useSettings } from "@/providers/settings-provider"
 import React, { useCallback } from "react"
@@ -27,7 +33,9 @@ const BackgroundSetting = () => {
     <div className="flex flex-col gap-4 p-4">
       <div className="flex items-center justify-between gap-4">
         <div className="space-y-0.5 min-w-fit">
-          <Label className="text-sm font-medium">Background Blur Intensity ({background.blurIntensity}px)</Label>
+          <Label className="text-sm font-medium">
+            Background Blur Intensity ({background.blurIntensity}px)
+          </Label>
         </div>
         <Slider
           min={0}
@@ -42,7 +50,9 @@ const BackgroundSetting = () => {
       </div>
       <div className="flex items-center justify-between gap-4">
         <div className="space-y-0.5 min-w-fit">
-          <Label className="text-sm font-medium">Background Brightness ({(((background.brightness) / 10)).toFixed(1)}%)</Label>
+          <Label className="text-sm font-medium">
+            Background Brightness ({(background.brightness / 10).toFixed(1)}%)
+          </Label>
         </div>
         <Slider
           min={0}

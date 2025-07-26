@@ -1,9 +1,9 @@
-import { WelcomeTab } from './welcome-tab'
-import { ImportTab } from './import-tab'
-import { CreateNewBookmarkFolder } from './create-new-bookmark-folder'
-import { ImportFromBrowserBookmarks } from './import-from-browser-bookmarks'
+import { WelcomeTab } from "./welcome-tab"
+import { ImportTab } from "./import-tab"
+import { CreateNewBookmarkFolder } from "./create-new-bookmark-folder"
+import { ImportFromBrowserBookmarks } from "./import-from-browser-bookmarks"
 import background from "data-base64:@/assets/scene.jpg"
-import { useWelcomeContext } from './_context'
+import { useWelcomeContext } from "./_context"
 
 const TABS = {
   WELCOME: WelcomeTab,
@@ -29,9 +29,7 @@ const Welcome = () => {
           {(() => {
             const Comp = TABS[currentTab]
 
-            return (
-              <Comp />
-            )
+            return <Comp />
           })()}
         </div>
       </div>

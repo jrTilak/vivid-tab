@@ -25,9 +25,27 @@ const LayoutsSettings = () => {
           index={findObjValue(layout, "searchbar").objKey}
         />
       ),
-      clock: <PreviewCard id="clock" label="Clock" index={findObjValue(layout, "clock").objKey} />,
-      weather: <PreviewCard id="weather" label="Weather" index={findObjValue(layout, "weather").objKey} />,
-      todos: <PreviewCard id="todos" label="Todos" index={findObjValue(layout, "todos").objKey} />,
+      clock: (
+        <PreviewCard
+          id="clock"
+          label="Clock"
+          index={findObjValue(layout, "clock").objKey}
+        />
+      ),
+      weather: (
+        <PreviewCard
+          id="weather"
+          label="Weather"
+          index={findObjValue(layout, "weather").objKey}
+        />
+      ),
+      todos: (
+        <PreviewCard
+          id="todos"
+          label="Todos"
+          index={findObjValue(layout, "todos").objKey}
+        />
+      ),
       bookmarks: (
         <PreviewCard
           id="bookmarks"
@@ -36,8 +54,20 @@ const LayoutsSettings = () => {
           index={findObjValue(layout, "bookmarks").objKey}
         />
       ),
-      quotes: <PreviewCard id="quotes" label="Quotes" index={findObjValue(layout, "quotes").objKey} />,
-      notes: <PreviewCard id="notes" label="Notes" index={findObjValue(layout, "notes").objKey} />,
+      quotes: (
+        <PreviewCard
+          id="quotes"
+          label="Quotes"
+          index={findObjValue(layout, "quotes").objKey}
+        />
+      ),
+      notes: (
+        <PreviewCard
+          id="notes"
+          label="Notes"
+          index={findObjValue(layout, "notes").objKey}
+        />
+      ),
     }
   }, [layout])
 
@@ -65,14 +95,16 @@ const LayoutsSettings = () => {
       return
     }
 
-    if (from === "searchbar" && !(current.index === "0" || current.index === "8")) {
+    if (
+      from === "searchbar" &&
+      !(current.index === "0" || current.index === "8")
+    ) {
       console.log("Searchbar can only be moved to the top or bottom, returning")
 
       return
     }
 
     setSettings((prevSettings) => {
-
       const obj = {
         ...prevSettings,
         layout: {
@@ -151,7 +183,6 @@ const LayoutsSettings = () => {
       <DndContext onDragEnd={onDragEnd}>
         <div className="space-y-5 w-full ">
           <div className="relative">
-
             <div className="grid grid-cols-12 gap-x-9">
               <div className="col-span-3 space-y-6 opacity-80">
                 {COMPONENTS[layout[1]] || <PreviewCard index={"1"} />}

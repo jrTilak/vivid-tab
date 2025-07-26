@@ -11,7 +11,10 @@ const WelcomeTab = () => {
   const { animationName, scrollToTab, setAnimationName } = useWelcomeContext()
 
   return (
-    <motion.div {...ANIMATION_PROPS[animationName]} className="__vivid-container">
+    <motion.div
+      {...ANIMATION_PROPS[animationName]}
+      className="__vivid-container"
+    >
       <Card className="text-center px-9 py-5 w-fit min-w-[512px] text-foreground">
         <CardContent className="space-y-6 pt-4">
           <img src={icon} alt="icon" className="size-20 mx-auto" />

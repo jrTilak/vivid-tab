@@ -39,25 +39,25 @@ const Quote = () => {
     })
 
     if (err || !data) {
+      const [err, cachedQuote] = await tryCatchAsync<Error, QuoteResponse>(
+        () => {
+          return new Promise((resolve, reject) => {
+            chrome.storage.local.get(LOCAL_STORAGE.quote, (data) => {
+              try {
+                const w = JSON.parse(data[LOCAL_STORAGE.quote])
 
-      const [err, cachedQuote] = await tryCatchAsync<Error, QuoteResponse>(() => {
-        return new Promise((resolve, reject) => {
-          chrome.storage.local.get(LOCAL_STORAGE.quote, (data) => {
-            try {
-              const w = JSON.parse(data[LOCAL_STORAGE.quote])
-
-              if (w) {
-                resolve(w)
-              } else {
-                reject(false)
+                if (w) {
+                  resolve(w)
+                } else {
+                  reject(false)
+                }
+              } catch (e) {
+                reject(e)
               }
-            } catch (e) {
-              reject(e)
-            }
+            })
           })
-        })
-
-      })
+        },
+      )
 
       if (err) {
         setErr({

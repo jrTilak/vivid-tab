@@ -18,14 +18,16 @@ import { useWelcomeContext } from "./_context"
 import { DEFAULT_BOOKMARK_FOLDER_NAME } from "@/constants/keys"
 
 const CreateNewBookmarkFolder = () => {
-  const [bookmarkFolderName, setBookmarkFolderName] = useState(DEFAULT_BOOKMARK_FOLDER_NAME)
+  const [bookmarkFolderName, setBookmarkFolderName] = useState(
+    DEFAULT_BOOKMARK_FOLDER_NAME,
+  )
   const { setSettings } = useSettings()
   const activeTabId = useBrowserActiveTab()
   const { animationName, scrollToTab, setAnimationName } = useWelcomeContext()
 
   const onCreate = async () => {
     const bookmark = await chrome.bookmarks.create({
-      title: bookmarkFolderName
+      title: bookmarkFolderName,
     })
 
     setSettings((prev) => ({
@@ -45,7 +47,9 @@ const CreateNewBookmarkFolder = () => {
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Create Bookmark Folder</CardTitle>
           <p className="text-sm">
-            After creating a folder, you can add bookmarks to {bookmarkFolderName} folder and it will automatically appear in the vivid-tab page
+            After creating a folder, you can add bookmarks to{" "}
+            {bookmarkFolderName} folder and it will automatically appear in the
+            vivid-tab page
           </p>
         </CardHeader>
         <CardContent className="space-y-4">

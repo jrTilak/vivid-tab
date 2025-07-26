@@ -68,32 +68,32 @@ const QuotesSettings = () => {
         <div className="grid grid-cols-2 gap-4">
           {isLoaded
             ? categories.map(({ name, slug }) => (
-              <div
-                key={slug}
-                className="flex items-center space-x-2 text-muted-foreground"
-              >
-                <Checkbox
-                  id={slug}
-                  checked={quotes.categories.includes(slug)}
-                  onCheckedChange={() => {
-                    const newCategories = quotes.categories.includes(slug)
-                      ? quotes.categories.filter(
-                        (category) => category !== slug,
-                      )
-                      : [...quotes.categories, slug]
+                <div
+                  key={slug}
+                  className="flex items-center space-x-2 text-muted-foreground"
+                >
+                  <Checkbox
+                    id={slug}
+                    checked={quotes.categories.includes(slug)}
+                    onCheckedChange={() => {
+                      const newCategories = quotes.categories.includes(slug)
+                        ? quotes.categories.filter(
+                            (category) => category !== slug,
+                          )
+                        : [...quotes.categories, slug]
 
-                    handleSettingsChange("categories", newCategories)
-                  }}
-                />
-                <Label htmlFor={slug}>{name}</Label>
-              </div>
-            ))
+                      handleSettingsChange("categories", newCategories)
+                    }}
+                  />
+                  <Label htmlFor={slug}>{name}</Label>
+                </div>
+              ))
             : Array.from({ length: 8 }).map((_, index) => (
-              <Skeleton
-                key={index}
-                className="h-4 bg-muted-foreground/20 rounded-sm"
-              />
-            ))}
+                <Skeleton
+                  key={index}
+                  className="h-4 bg-muted-foreground/20 rounded-sm"
+                />
+              ))}
         </div>
       </div>
     </div>

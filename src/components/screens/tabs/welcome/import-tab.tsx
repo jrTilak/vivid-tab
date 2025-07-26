@@ -27,9 +27,7 @@ const ImportTab = () => {
       <Card className="w-full max-w-lg text-center min-w-[512px] text-foreground">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Import Bookmarks</CardTitle>
-          <p className="text-sm">
-            Select the import source for your bookmarks
-          </p>
+          <p className="text-sm">Select the import source for your bookmarks</p>
         </CardHeader>
         <CardContent className="space-y-2">
           <Button

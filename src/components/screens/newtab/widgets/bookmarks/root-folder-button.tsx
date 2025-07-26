@@ -1,12 +1,18 @@
-import { useDraggable, useDroppable } from '@dnd-kit/core'
-import React from 'react'
-import { MoveBookmarkDialog } from './move-bookmark-dialog'
-import { DeleteDialog } from './delete-dialog'
-import { CreateAFolder } from './create-a-folder'
-import { Button } from '@/components/ui/button'
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuShortcut, ContextMenuTrigger } from '@/components/ui/context-menu'
-import { cn } from '@/lib/cn'
-import { DeleteIcon, EditIcon, MoveIcon } from 'lucide-react'
+import { useDraggable, useDroppable } from "@dnd-kit/core"
+import React from "react"
+import { MoveBookmarkDialog } from "./move-bookmark-dialog"
+import { DeleteDialog } from "./delete-dialog"
+import { CreateAFolder } from "./create-a-folder"
+import { Button } from "@/components/ui/button"
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuShortcut,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu"
+import { cn } from "@/lib/cn"
+import { DeleteIcon, EditIcon, MoveIcon } from "lucide-react"
 
 type Props = {
   item: {
@@ -38,7 +44,7 @@ const RootFolderButton = ({
     listeners,
     setNodeRef: draggableRef,
     transform,
-    isDragging
+    isDragging,
   } = useDraggable({
     id: item.id,
     data: { index: item.index },
@@ -46,8 +52,8 @@ const RootFolderButton = ({
 
   const style = transform
     ? {
-      transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-    }
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
     : undefined
 
   return (
@@ -72,13 +78,9 @@ const RootFolderButton = ({
           title: item.label,
         }}
       />
-      <ContextMenu key={item.id} >
-        <ContextMenuTrigger disabled={disableDragging} >
-          <div
-            style={style}
-            ref={disableDragging ? null : setNodeRef}
-
-          >
+      <ContextMenu key={item.id}>
+        <ContextMenuTrigger disabled={disableDragging}>
+          <div style={style} ref={disableDragging ? null : setNodeRef}>
             <Button
               key={item.id}
               onClick={onClick}
@@ -88,11 +90,13 @@ const RootFolderButton = ({
               className={cn(
                 "text-xs px-2.5 py-1 h-fit rounded-sm",
                 activeRootFolder !== item.id &&
-                "bg-muted/20 hover:bg-muted/30 text-accent-foreground",
+                  "bg-muted/20 hover:bg-muted/30 text-accent-foreground",
                 isOver && "bg-destructive",
                 isDragging && "scale-110",
               )}
-              {...(disableDragging ? {} : { ref: draggableRef, ...listeners, ...attributes })}
+              {...(disableDragging
+                ? {}
+                : { ref: draggableRef, ...listeners, ...attributes })}
             >
               {item.label}
             </Button>
@@ -112,8 +116,7 @@ const RootFolderButton = ({
           <ContextMenuItem
             onClick={() => {
               setTimeout(() => setIsMoveDialogOpen(true), 100)
-            }
-            }
+            }}
           >
             Move
             <ContextMenuShortcut>
@@ -133,7 +136,6 @@ const RootFolderButton = ({
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
-
     </>
   )
 }

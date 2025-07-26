@@ -20,7 +20,7 @@ export default function Homepage() {
       layout,
       wallpapers,
       general: { bookmarksCanTakeExtraSpaceIfAvailable },
-      background: backgroundSettings
+      background: backgroundSettings,
     },
   } = useSettings()
 
@@ -28,9 +28,7 @@ export default function Homepage() {
 
   const COMPONENTS = useMemo(() => {
     return {
-      searchbar: (
-        <Searchbar />
-      ),
+      searchbar: <Searchbar />,
       clock: <Clock />,
       weather: <Weather />,
       todos: <Todos />,
@@ -73,20 +71,22 @@ export default function Homepage() {
 
   return (
     <>
-      <div
-        className="min-h-screen w-full bg-cover bg-center p-6 relative select-none transition-all">
+      <div className="min-h-screen w-full bg-cover bg-center p-6 relative select-none transition-all">
         <div
           style={{
-            backgroundImage: `url(${!wallpapers.selectedImageId ? background : imageSrc})`
+            backgroundImage: `url(${!wallpapers.selectedImageId ? background : imageSrc})`,
           }}
-          className={cn("h-full w-full bg-cover bg-center bg-no-repeat absolute inset-0")}
+          className={cn(
+            "h-full w-full bg-cover bg-center bg-no-repeat absolute inset-0",
+          )}
         />
         <div
           style={{
             backdropFilter: `blur(${backgroundSettings.blurIntensity}px)`,
-            backgroundColor: `rgba(0, 0, 0, ${(1 - ((backgroundSettings.brightness) / 10))})`,
+            backgroundColor: `rgba(0, 0, 0, ${1 - backgroundSettings.brightness / 10})`,
           }}
-          className={cn(`h-full w-full absolute inset-0`)} />
+          className={cn(`h-full w-full absolute inset-0`)}
+        />
 
         <div className="mx-auto max-w-[1400px] relative mt-20">
           {/* Tabs */}
@@ -104,8 +104,9 @@ export default function Homepage() {
             {/* to align to center */}
             {layoutType === "small" &&
               !(layout[1] || layout[2] || layout[3]) &&
-              !(layout[5] || layout[6] || layout[7]) &&
-              <div className="col-span-3" />}
+              !(layout[5] || layout[6] || layout[7]) && (
+                <div className="col-span-3" />
+              )}
             {layoutType === "large" && <div className="col-span-1" />}
 
             <div

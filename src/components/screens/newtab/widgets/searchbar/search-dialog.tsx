@@ -46,7 +46,7 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
     setSearchQuery("")
   }, [open])
 
-  useEffect(() => { }, [debouncedSearchQuery])
+  useEffect(() => {}, [debouncedSearchQuery])
 
   const handleSearchQuery = useCallback(
     (query: string) => {
@@ -105,7 +105,9 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
   )
 
   useHotkeys("Escape", () => onOpenChange(false))
-  useHotkeys(["ctrl+comma", "cmd+comma", "ctrl+,", "cmd+,"], () => onOpenChange(!open))
+  useHotkeys(["ctrl+comma", "cmd+comma", "ctrl+,", "cmd+,"], () =>
+    onOpenChange(!open),
+  )
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

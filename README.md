@@ -89,4 +89,3 @@ For questions or suggestions, reach out to me at:
 ---
 
 Thank you for checking out **Vivid Tab**! 🚀
-

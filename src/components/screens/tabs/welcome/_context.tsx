@@ -1,6 +1,12 @@
-import type { Animation } from "@/constants/animations";
-import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
-import type { TabName } from ".";
+import type { Animation } from "@/constants/animations"
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+  type ReactNode,
+} from "react"
+import type { TabName } from "."
 
 type WelcomeContextType = {
   currentTab: TabName
@@ -20,12 +26,14 @@ const WelcomeContextProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   return (
-    <WelcomeContext.Provider value={{
-      animationName,
-      currentTab,
-      scrollToTab,
-      setAnimationName
-    }}>
+    <WelcomeContext.Provider
+      value={{
+        animationName,
+        currentTab,
+        scrollToTab,
+        setAnimationName,
+      }}
+    >
       {children}
     </WelcomeContext.Provider>
   )
@@ -35,13 +43,12 @@ const useWelcomeContext = () => {
   const context = useContext(WelcomeContext)
 
   if (!context) {
-    throw new Error("useWelcomeContext must be used within a WelcomeContextProvider")
+    throw new Error(
+      "useWelcomeContext must be used within a WelcomeContextProvider",
+    )
   }
 
   return context
 }
 
-export {
-  useWelcomeContext,
-  WelcomeContextProvider,
-}
+export { useWelcomeContext, WelcomeContextProvider }

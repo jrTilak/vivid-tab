@@ -27,7 +27,7 @@ const BookmarkFolder = (props: Props) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false)
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
-  const { icon, fetchIcon } = useIcon({ id: props.id, })
+  const { icon, fetchIcon } = useIcon({ id: props.id })
 
   const { isOver, setNodeRef } = useDroppable({
     id: props.id,
@@ -53,8 +53,8 @@ const BookmarkFolder = (props: Props) => {
 
   const style = transform
     ? {
-      transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-    }
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
     : undefined
 
   return (
@@ -86,35 +86,43 @@ const BookmarkFolder = (props: Props) => {
               ref={setNodeRef}
               style={style}
               onClick={props.onOpenFolder}
-              className={cn("flex flex-col  space-y-1 p-2 rounded-lg hover:scale-105 w-24 disabled:opacity-50", isOver && "bg-accent/10",
+              className={cn(
+                "flex flex-col  space-y-1 p-2 rounded-lg hover:scale-105 w-24 disabled:opacity-50",
+                isOver && "bg-accent/10",
                 isDragging && "bg-destructive/20",
-                isDragging && "relative z-50"
+                isDragging && "relative z-50",
               )}
             >
-              {
-                icon ? (
-                  <div
-                    ref={draggableRef}
-                    {...attributes}
-                    {...listeners}
-                    className={cn("relative size-12 mx-auto rounded-md object-contain object-center", isDragging && "scale-105")}
-                  >
-                    <img
-                      src={folderIcon}
-                    />
-                    <img src={icon} alt="" className="absolute w-10 h-6 object-cover object-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-md shadow-inner brightness-90" />
-                  </div>
-                ) : (
+              {icon ? (
+                <div
+                  ref={draggableRef}
+                  {...attributes}
+                  {...listeners}
+                  className={cn(
+                    "relative size-12 mx-auto rounded-md object-contain object-center",
+                    isDragging && "scale-105",
+                  )}
+                >
+                  <img src={folderIcon} />
                   <img
-                    ref={draggableRef}
-                    {...attributes}
-                    {...listeners}
-                    src={folderIcon}
+                    src={icon}
                     alt=""
-                    className={cn("size-12 mx-auto rounded-md object-contain object-center", isDragging && "scale-105")}
+                    className="absolute w-10 h-6 object-cover object-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-md shadow-inner brightness-90"
                   />
-                )
-              }
+                </div>
+              ) : (
+                <img
+                  ref={draggableRef}
+                  {...attributes}
+                  {...listeners}
+                  src={folderIcon}
+                  alt=""
+                  className={cn(
+                    "size-12 mx-auto rounded-md object-contain object-center",
+                    isDragging && "scale-105",
+                  )}
+                />
+              )}
               <p className="text-center line-clamp-2 text-xs break-all">
                 {props.title} ({props.children.length})
               </p>
@@ -124,35 +132,43 @@ const BookmarkFolder = (props: Props) => {
               onClick={props.onOpenFolder}
               style={style}
               ref={setNodeRef}
-              className={cn("flex space-x-1 p-2 items-center rounded-lg transition-colors disabled:opacity-50", isOver && "bg-accent/10", isDragging && "scale-110 bg-destructive/20",
-                isDragging && "relative z-50"
+              className={cn(
+                "flex space-x-1 p-2 items-center rounded-lg transition-colors disabled:opacity-50",
+                isOver && "bg-accent/10",
+                isDragging && "scale-110 bg-destructive/20",
+                isDragging && "relative z-50",
               )}
             >
-              {
-                icon ? (
-                  <div
-                    ref={draggableRef}
-                    {...attributes}
-                    {...listeners}
-                    className={cn("relative min-w-12 size-12 mx-auto rounded-md object-contain object-center", isDragging && "scale-105")}
-                  >
-                    <img
-                      src={folderIcon}
-                      className="size-12 min-w-12"
-                    />
-                    <img src={icon} alt="" className="absolute w-10 h-8 object-cover object-center top-1/2 left-1/2 -translate-x-1/2 translate-y-[-40%] rounded-md shadow-inner brightness-90" />
-                  </div>
-                ) : (
+              {icon ? (
+                <div
+                  ref={draggableRef}
+                  {...attributes}
+                  {...listeners}
+                  className={cn(
+                    "relative min-w-12 size-12 mx-auto rounded-md object-contain object-center",
+                    isDragging && "scale-105",
+                  )}
+                >
+                  <img src={folderIcon} className="size-12 min-w-12" />
                   <img
-                    ref={draggableRef}
-                    {...attributes}
-                    {...listeners}
-                    src={folderIcon}
+                    src={icon}
                     alt=""
-                    className={cn("size-12 mx-auto rounded-md object-contain object-center", isDragging && "scale-105")}
+                    className="absolute w-10 h-8 object-cover object-center top-1/2 left-1/2 -translate-x-1/2 translate-y-[-40%] rounded-md shadow-inner brightness-90"
                   />
-                )
-              }
+                </div>
+              ) : (
+                <img
+                  ref={draggableRef}
+                  {...attributes}
+                  {...listeners}
+                  src={folderIcon}
+                  alt=""
+                  className={cn(
+                    "size-12 mx-auto rounded-md object-contain object-center",
+                    isDragging && "scale-105",
+                  )}
+                />
+              )}
               <p className="text-xs w-full text-left line-clamp-2">
                 {props.title}
                 <br />

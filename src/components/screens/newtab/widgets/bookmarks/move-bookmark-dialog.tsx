@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -6,9 +6,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { useFlattenBookmarkFolders } from '@/hooks/use-flatten-bookmark-folders'
-import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useFlattenBookmarkFolders } from "@/hooks/use-flatten-bookmark-folders"
+import { Button } from "@/components/ui/button"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 type Props = {
   open: boolean
@@ -22,21 +28,16 @@ const MoveBookmarkDialog = ({ open, onOpenChange, id, label }: Props) => {
   const [selectedFolder, setSelectedFolder] = useState<string>("")
 
   const moveBookmark = useCallback((from: string, to: string) => {
-    chrome.bookmarks.move(
-      from,
-      {
-        parentId: to,
-      },
-    )
+    chrome.bookmarks.move(from, {
+      parentId: to,
+    })
   }, [])
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-[425px]'>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>
-            Move {label} to?
-          </DialogTitle>
+          <DialogTitle>Move {label} to?</DialogTitle>
         </DialogHeader>
         <div className="flex items-center justify-between gap-2">
           <Select
@@ -72,13 +73,14 @@ const MoveBookmarkDialog = ({ open, onOpenChange, id, label }: Props) => {
           <Button
             disabled={!selectedFolder}
             onClick={() => moveBookmark(id, selectedFolder)}
-            type="button" variant="secondary">
+            type="button"
+            variant="secondary"
+          >
             Move
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-
   )
 }
 

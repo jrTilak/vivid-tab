@@ -26,12 +26,12 @@ const DeleteDialog = ({ open, onOpenChange, id, label, url }: Props) => {
     chrome.bookmarks.getChildren(id, (children) => {
       if (children.length > 0) {
         // It's a folder with items, remove it recursively
-        chrome.bookmarks.removeTree(id, () => onOpenChange(false));
+        chrome.bookmarks.removeTree(id, () => onOpenChange(false))
       } else {
         // It's a single bookmark, remove it normally
-        chrome.bookmarks.remove(id, () => onOpenChange(false));
+        chrome.bookmarks.remove(id, () => onOpenChange(false))
       }
-    });
+    })
 
     removeIconFromLocalStorage(`icon-${id}`)
 
