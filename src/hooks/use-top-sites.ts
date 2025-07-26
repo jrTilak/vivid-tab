@@ -16,4 +16,4 @@ const useTopSites = () => {
 }
 
 export type TopSite = chrome.topSites.MostVisitedURL
-export default useTopSites
+export { useTopSites }

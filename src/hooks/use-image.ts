@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react"
 
+/**
+ * Retrieves an image from IndexedDB using its ID
+ * Params: imageId (string | null) - ID of the image to retrieve
+ * Returns: string | null - URL/data URI of the image or null if not found
+ */
 const useImage = (imageId: string | null) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null)
 
@@ -35,4 +40,4 @@ const useImage = (imageId: string | null) => {
   return imageSrc
 }
 
-export default useImage
+export { useImage }

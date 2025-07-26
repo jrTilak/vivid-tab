@@ -26,7 +26,7 @@ import type {
   Bookmark,
   BookmarkFolderNode,
   BookmarkTreeNode,
-} from "@/types/bookmark-types"
+} from "@/types/bookmark"
 
 class Bookmarks {
   searchBookmarkFoldersByName(

@@ -1,4 +1,7 @@
-export const fetchFavicon = async (url: string) => {
+/**
+ *  Fetches favicon of a specific website
+ */
+const fetchFavicon = async (url: string) => {
   try {
     const response = await fetch(url)
     const html = await response.text()
@@ -31,3 +34,5 @@ export const fetchFavicon = async (url: string) => {
     return { title: null, favicon: null }
   }
 }
+
+export { fetchFavicon }

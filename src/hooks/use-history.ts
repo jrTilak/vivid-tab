@@ -1,4 +1,4 @@
-import type { HistoryItem } from "@/types/history-types"
+import type { HistoryItem } from "@/types/history"
 import { useEffect, useState } from "react"
 
 /**
@@ -27,4 +27,4 @@ const useHistory = () => {
   return history
 }
 
-export default useHistory
+export { useHistory }
