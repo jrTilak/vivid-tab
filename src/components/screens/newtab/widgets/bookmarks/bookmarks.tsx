@@ -327,7 +327,7 @@ const Bookmarks = () => {
           >
             {activeRootFolder === "history"
               ? hasPermission ?
-                history.map((item, i) => (
+                history?.map((item, i) => (
                   <BookmarkUrl
                     {...item}
                     key={item.id}

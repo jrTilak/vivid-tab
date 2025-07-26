@@ -8,8 +8,8 @@ import { Todos } from "./widgets/todos"
 import { Weather } from "./widgets/weather"
 import { cn } from "@/lib/cn"
 import { Searchbar } from "./widgets/searchbar"
-import { Bookmarks } from "./widgets/bookmarks"
 import { useWallpaper } from "@/hooks/use-wallpaper"
+import { Bookmarks } from "./widgets/bookmarks"
 
 type Layout = "small" | "mid" | "large"
 
