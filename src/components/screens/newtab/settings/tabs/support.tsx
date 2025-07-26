@@ -1,6 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card'
 import React from 'react'
-import bmc from "data-base64:@/assets/bmc-logo-yellow.png"
 import { GithubIcon } from 'lucide-react'
 
 const Support = () => {
@@ -9,19 +8,13 @@ const Support = () => {
       {
         [
           {
-            title: "Support",
-            url: "https://buymeacoffee.com/jrtilak/e/382064",
-            icon: bmc,
-            desc: "Buy me a coffee",
-          },
-          {
             title: "Github",
             url: "https://github.com/jrtilak/vivid-tab",
             icon: <GithubIcon />,
             desc: "Contribute on Github",
           }
         ].map((item, i) => (
-          <Card key={i} className="overflow-hidden transition-all bg-muted hover:scale-[1.01]">
+          <Card key={i} className="overflow-hidden transition-all bg-muted hover:scale-[1.01] border-solid border">
             <a href={item.url} className="block" target="_blank" rel="noopener noreferrer">
               <CardContent className="flex items-center justify-between p-6">
                 <div className="space-y-1">

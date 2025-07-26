@@ -44,8 +44,8 @@ const PreviewCard = ({
       onClick={() => console.log(index, id)}
       ref={setNodeRef}
       className={cn(
-        "relative w-full flex items-center justify-center text-center bg-muted text-foreground",
-        isOver && "bg-muted-foreground/40",
+        "relative w-full flex items-center justify-center text-center border-solid border border-muted-foreground/45 text-foreground bg-muted z-[9999]",
+        isOver && "bg-muted-foreground/40 dark:bg-muted-foreground z-0",
         className,
       )}
       style={style}
