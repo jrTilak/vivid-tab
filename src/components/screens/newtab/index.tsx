@@ -1,4 +1,3 @@
-import { useImage } from "@/hooks/use-image"
 import { useSettings } from "@/providers/settings-provider"
 import background from "data-base64:@/assets/scene.jpg"
 import { useEffect, useMemo, useState } from "react"
@@ -10,6 +9,7 @@ import { Weather } from "./widgets/weather"
 import { cn } from "@/lib/cn"
 import { Searchbar } from "./widgets/searchbar"
 import { Bookmarks } from "./widgets/bookmarks"
+import { useWallpaper } from "@/hooks/use-wallpaper"
 
 type Layout = "small" | "mid" | "large"
 
@@ -24,7 +24,7 @@ export default function Homepage() {
     },
   } = useSettings()
 
-  const imageSrc = useImage(wallpapers.selectedImageId)
+  const imageSrc = useWallpaper()
 
   const COMPONENTS = useMemo(() => {
     return {
@@ -77,7 +77,7 @@ export default function Homepage() {
         className="min-h-screen w-full bg-cover bg-center p-6 relative select-none transition-all">
         <div
           style={{
-            backgroundImage: `url(${wallpapers.selectedImageId === null ? background : imageSrc})`
+            backgroundImage: `url(${!wallpapers.selectedImageId ? background : imageSrc})`
           }}
           className={cn("h-full w-full bg-cover bg-center bg-no-repeat absolute inset-0")}
         />

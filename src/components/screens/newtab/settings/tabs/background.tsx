@@ -1,4 +1,5 @@
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
 import { useSettings } from "@/providers/settings-provider"
 import React, { useCallback } from "react"
@@ -53,6 +54,47 @@ const BackgroundSetting = () => {
             handleSettingsChange("brightness", value[0])
           }}
         />
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="space-y-0.5">
+          <label className="text-sm font-medium">Randomize Wallpaper</label>
+        </div>
+        <Select
+          value={background.randomizeWallpaper}
+          onValueChange={(value) =>
+            handleSettingsChange("randomizeWallpaper", value)
+          }
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select randomize wallpaper option" />
+          </SelectTrigger>
+          <SelectContent>
+            {(
+              [
+                {
+                  label: "Off",
+                  value: "off",
+                },
+                {
+                  label: "On Each Tab",
+                  value: "on-each-tab",
+                },
+                {
+                  label: "Hourly",
+                  value: "hourly",
+                },
+                {
+                  label: "Daily",
+                  value: "daily",
+                },
+              ] as const
+            ).map(({ label, value }) => (
+              <SelectItem key={value} value={value}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </div>
   )

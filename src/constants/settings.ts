@@ -45,5 +45,6 @@ export const DEFAULT_SETTINGS = {
   background: {
     blurIntensity: 5,
     brightness: 9,
+    randomizeWallpaper: "off",
   },
 } as const

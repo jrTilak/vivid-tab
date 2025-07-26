@@ -104,6 +104,9 @@ export const SettingsSchema = z
           .number()
           .default(DEFAULT_SETTINGS.background.blurIntensity),
         brightness: z.number().default(DEFAULT_SETTINGS.background.brightness),
+        randomizeWallpaper: z
+          .enum(["off", "on-each-tab", "hourly", "daily"])
+          .default(DEFAULT_SETTINGS.background.randomizeWallpaper),
       })
       .default(DEFAULT_SETTINGS.background),
   })
