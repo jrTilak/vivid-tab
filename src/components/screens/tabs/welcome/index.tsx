@@ -18,7 +18,7 @@ const Welcome = () => {
   const { currentTab } = useWelcomeContext()
 
   return (
-    <main className="h-screen w-screen relative">
+    <main className="h-screen w-screen relative dark">
       <img
         src={background}
         alt="background"

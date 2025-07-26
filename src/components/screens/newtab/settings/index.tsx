@@ -126,7 +126,7 @@ export function Settings() {
                   variant="ghost"
                   className={cn(
                     "justify-start gap-2 rounded-sm border-b border-border/50",
-                    activeTabIndex === index && "bg-primary hover:bg-primary",
+                    activeTabIndex === index && "bg-primary hover:bg-primary text-primary-foreground hover:text-primary-foreground",
                   )}
                   onClick={() => setActiveTabIndex(index)}
                 >

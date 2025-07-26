@@ -14,7 +14,7 @@ const Support = () => {
             desc: "Contribute on Github",
           }
         ].map((item, i) => (
-          <Card key={i} className="overflow-hidden transition-all bg-muted hover:scale-[1.01] border-solid border">
+          <Card key={i} className="overflow-hidden transition-all bg-muted hover:scale-[1.01] border-solid border shadow-none">
             <a href={item.url} className="block" target="_blank" rel="noopener noreferrer">
               <CardContent className="flex items-center justify-between p-6">
                 <div className="space-y-1">

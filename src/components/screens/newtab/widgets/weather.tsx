@@ -34,7 +34,7 @@ const Weather = () => {
                 : `${weatherData.temp.fahrenheit}°F`}
             </div>
             <div className="text-sm">{weatherData.location}</div>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-xs text-foreground/40 dark:text-muted-foreground">
               {weatherData.condition.text}
             </div>
           </div>
