@@ -105,7 +105,7 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
   )
 
   useHotkeys("Escape", () => onOpenChange(false))
-  useHotkeys(["Control", ","], () => onOpenChange(!open))
+  useHotkeys(["ctrl+comma", "cmd+comma", "ctrl+,", "cmd+,"], () => onOpenChange(!open))
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

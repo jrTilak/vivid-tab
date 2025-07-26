@@ -189,7 +189,6 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
               >
                 <Avatar
                   className={cn("rounded-none mx-auto transition-transform")}
-
                 >
                   <AvatarImage
                     src={icon || data.image}
