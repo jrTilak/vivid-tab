@@ -30,11 +30,11 @@ export const DEFAULT_SETTINGS = {
   },
   general: {
     rootFolder: "1",
-    showHistory: true,
+    showHistory: false,
     layout: "grid",
     openUrlIn: "current-tab",
     bookmarksCanTakeExtraSpaceIfAvailable: true,
-    showTopSites: true,
+    showTopSites: false,
   },
   searchbar: {
     dialogBackground: "default",

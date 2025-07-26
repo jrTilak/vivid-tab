@@ -38,7 +38,7 @@ const Bookmarks = () => {
 
   // Only store folder IDs for navigation - derive everything else from live bookmark data
   const [folderIdStack, setFolderIdStack] = useState<string[]>([])
-  const history = useHistory()
+  const { history, hasPermission, requestPermission } = useHistory()
   const topSites = useTopSites()
 
   const {
@@ -326,7 +326,8 @@ const Bookmarks = () => {
             )}
           >
             {activeRootFolder === "history"
-              ? history.map((item, i) => (
+              ? hasPermission ?
+                history.map((item, i) => (
                   <BookmarkUrl
                     {...item}
                     key={item.id}
@@ -335,44 +336,50 @@ const Bookmarks = () => {
                     disableContextMenu={true}
                     index={i}
                   />
-                ))
+                )) : (
+                  <div className="flex items-center justify-center col-span-12">
+                    <Button variant="secondary" onClick={requestPermission}>
+                      Enable History Access
+                    </Button>
+                  </div>
+                )
               : activeRootFolder === "top-sites"
                 ? topSites.map((item, i) => (
-                    <BookmarkUrl
-                      key={i}
-                      id={item.url}
-                      title={item.title}
-                      url={item.url}
-                      layout={general.layout}
-                      index={i}
-                      dateAdded={0}
-                      disableContextMenu={true}
-                    />
-                  ))
+                  <BookmarkUrl
+                    key={i}
+                    id={item.url}
+                    title={item.title}
+                    url={item.url}
+                    layout={general.layout}
+                    index={i}
+                    dateAdded={0}
+                    disableContextMenu={true}
+                  />
+                ))
                 : sortBookmarks(currentFolderChildren)?.map((item) => {
-                    if ("children" in item) {
-                      return (
-                        <BookmarkFolder
-                          {...item}
-                          key={item.id}
-                          layout={general.layout}
-                          onOpenFolder={() => {
-                            setFolderIdStack((prev) => [...prev, item.id])
-                          }}
-                          index={item.index}
-                        />
-                      )
-                    } else {
-                      return (
-                        <BookmarkUrl
-                          {...(item as BookmarkUrlNode)}
-                          key={item.id}
-                          layout={general.layout}
-                          index={item.index}
-                        />
-                      )
-                    }
-                  })}
+                  if ("children" in item) {
+                    return (
+                      <BookmarkFolder
+                        {...item}
+                        key={item.id}
+                        layout={general.layout}
+                        onOpenFolder={() => {
+                          setFolderIdStack((prev) => [...prev, item.id])
+                        }}
+                        index={item.index}
+                      />
+                    )
+                  } else {
+                    return (
+                      <BookmarkUrl
+                        {...(item as BookmarkUrlNode)}
+                        key={item.id}
+                        layout={general.layout}
+                        index={item.index}
+                      />
+                    )
+                  }
+                })}
           </div>
         </div>
       </div>

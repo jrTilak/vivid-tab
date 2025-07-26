@@ -8,6 +8,7 @@
 - Show weather in offline mode.
 - Better UI in dark mode.
 - Better UI in light mode.
+- FEAT: move geolocation and history permission to be optional.
 
 ### Fixed
 - BUG: Editing bookmarks within a folder not updating correctly. (#45)
