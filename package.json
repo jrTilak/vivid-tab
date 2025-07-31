@@ -73,7 +73,8 @@
       "unlimitedStorage",
       "search",
       "topSites",
-      "tabs"
+      "tabs",
+      "alarms"
     ],
     "optional_permissions": [
       "history"

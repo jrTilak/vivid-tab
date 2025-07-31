@@ -18,6 +18,10 @@ export const DEFAULT_SETTINGS = {
   wallpapers: {
     selectedImageId: null,
     images: [] as string[],
+    onlineImages: {
+      enabled: true,
+      keywords: "",
+    },
   },
   layout: {
     0: "searchbar",
