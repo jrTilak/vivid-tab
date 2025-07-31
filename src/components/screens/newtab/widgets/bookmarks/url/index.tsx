@@ -120,7 +120,11 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
     // close the current tab if newTab is false
     if (!newTab) {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        chrome.tabs.remove(tabs[0].id)
+        if (tabs && tabs.length > 0 && tabs[0].id) {
+          chrome.tabs.remove(tabs[0].id)
+        } else {
+          console.error("No active tab found to close.");
+        }
       })
     }
 
