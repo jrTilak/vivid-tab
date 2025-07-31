@@ -15,8 +15,7 @@ import {
   removeIconFromLocalStorage,
   saveIconsToLocalStorage,
 } from "@/lib/icons-to-local"
-import { Label } from "@/components/ui/label"
-import { CloudUploadIcon } from "lucide-react"
+import { CloudUploadIcon, X } from "lucide-react"
 
 type Props = {
   parentId?: string
@@ -45,8 +44,9 @@ const CreateABookmark = ({ parentId, defaultValues, open, setOpen }: Props) => {
       chrome.bookmarks.update(defaultValues.id, value, () => {
         setOpen(false)
 
+        removeIconFromLocalStorage(`icon-${defaultValues.id}`)
+
         if (icon) {
-          removeIconFromLocalStorage(`icon-${defaultValues.id}`)
           saveIconsToLocalStorage({
             key: `icon-${defaultValues.id}`,
             value: {
@@ -109,18 +109,34 @@ const CreateABookmark = ({ parentId, defaultValues, open, setOpen }: Props) => {
               />
 
               {/* icon input */}
-              <Label
-                htmlFor="icon"
+              <div
                 className="rounded-full bg-muted flex items-center justify-center aspect-square h-12 w-12 cursor-pointer"
               >
                 {icon ? (
-                  <img
-                    src={icon}
-                    alt=""
-                    className="h-full w-full rounded-full object-contain object-center"
-                  />
+                  <div className="relative w-full h-full group">
+                    <label htmlFor="icon" className="w-full h-full">
+                      <img
+                        src={icon}
+                        alt=""
+                        className="h-full w-full rounded-full object-contain object-center"
+                      />
+                    </label>
+                    {/* a small cross to remove the icon */}
+                    <Button
+                      variant="secondary"
+                      className="absolute text-destructive -top-4 h-auto w-auto px-1 py-1 -right-4 rounded-full scale-0 group-hover:scale-100 transition-transform"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setIcon("")
+                      }}
+                    >
+                      <X />
+                    </Button>
+                  </div>
                 ) : (
-                  <CloudUploadIcon className="h-6 w-6" />
+                  <label htmlFor="icon" className="w-full h-full  flex items-center justify-center">
+                    <CloudUploadIcon className="h-6 w-6" />
+                  </label>
                 )}
                 <input
                   type="file"
@@ -143,7 +159,7 @@ const CreateABookmark = ({ parentId, defaultValues, open, setOpen }: Props) => {
                     }
                   }}
                 />
-              </Label>
+              </div>
             </div>
             <div className="grid gap-4">
               <Input

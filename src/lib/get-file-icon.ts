@@ -1,4 +1,8 @@
 export const getFileIcon = (fileUrl: string) => {
+  if (!fileUrl.startsWith("file://")) {
+    return null
+  }
+
   const fileExtension = fileUrl.split(".").pop()
 
   switch (fileExtension) {
