@@ -153,7 +153,7 @@ const CreateABookmark = ({ parentId, defaultValues, open, setOpen }: Props) => {
                   setValue((prev) => ({ ...prev, url: e.target.value }))
                 }
                 id="url"
-                placeholder="https://...."
+                placeholder="https://... or file://..."
                 className="col-span-3"
               />
             </div>

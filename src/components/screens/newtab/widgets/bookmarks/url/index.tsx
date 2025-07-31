@@ -42,6 +42,17 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
   })
 
   useAsyncEffect(async () => {
+    // Skip favicon fetching for file:// URLs
+    if (props.url?.startsWith('file://')) {
+      // Provide a default file icon for local files
+      const defaultFileIcon = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xNCAySDZhMiAyIDAgMCAwLTIgMnYxNmEyIDIgMCAwIDAgMiAyaDEyYTIgMiAwIDAgMCAyLTJWOHoiLz48cG9seWxpbmUgcG9pbnRzPSIxNCwyIDE0LDggMjAsOCIvPjwvc3ZnPg=="
+      setData({
+        image: defaultFileIcon,
+        title: props.title,
+      })
+      return
+    }
+
     const cachedData = await new Promise<{
       favicon: string | null
       expiry: number | null
@@ -109,7 +120,13 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
   }, [editDialogOpen, fetchIcon])
 
   const openInNewTab = useCallback((url: string) => {
-    window.open(url, "_blank")
+    // Check if the URL is a local file URL
+    if (url.startsWith('file://')) {
+      // Use Chrome tabs API for local file URLs
+      chrome.tabs.create({ url: url, active: true })
+    } else {
+      window.open(url, "_blank")
+    }
   }, [])
 
   const { isOver, setNodeRef } = useDroppable({
@@ -135,6 +152,14 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
     : undefined
 
   const handleClick = (url: string, aux: boolean = false) => {
+    // Check if the URL is a local file URL
+    if (url.startsWith('file://')) {
+      // Use Chrome tabs API for local file URLs
+      chrome.tabs.create({ url: url, active: !aux })
+      return
+    }
+
+    // Use window.open for regular URLs
     if (aux) {
       window.open(url, "_blank")
     } else {
