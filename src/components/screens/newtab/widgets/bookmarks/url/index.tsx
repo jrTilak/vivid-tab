@@ -20,6 +20,7 @@ import { useIcon } from "@/hooks/use-icon"
 import { MoveBookmarkDialog } from "../move-bookmark-dialog"
 import { useDraggable, useDroppable } from "@dnd-kit/core"
 import { cn } from "@/lib/cn"
+import { getFileIcon } from "@/lib/get-file-icon"
 
 type Props = BookmarkUrlNode & {
   layout: "grid" | "list"
@@ -31,7 +32,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
-  const { icon, fetchIcon } = useIcon({ id: props.id, defaultIcon: "" })
+  const { icon, fetchIcon } = useIcon({ id: props.id, defaultIcon: getFileIcon(props.url) })
 
   const {
     settings: { general },
@@ -41,6 +42,9 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
     image: icon,
   })
 
+  /**
+   * Fetch favicon from cache or fetch it from the internet
+   */
   useAsyncEffect(async () => {
     const cachedData = await new Promise<{
       favicon: string | null
@@ -55,16 +59,20 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
 
     const currentTime = Date.now()
 
+    if (cachedData) {
+      // Use cached favicon
+      setData({
+        image: cachedData.favicon,
+        title: props.title,
+      })
+    }
+
     if (
       cachedData.favicon &&
       cachedData.expiry &&
       cachedData.expiry > currentTime
     ) {
-      // Use cached favicon if it hasn't expired
-      setData({
-        image: cachedData.favicon,
-        title: props.title,
-      })
+      // do nothing
     } else {
       // Fetch new favicon
       const res = await fetchFavicon(props.url || "")
@@ -108,8 +116,20 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
     }
   }, [editDialogOpen, fetchIcon])
 
-  const openInNewTab = useCallback((url: string) => {
-    window.open(url, "_blank")
+  const openLink = useCallback((url: string, newTab?: boolean) => {
+    // close the current tab if newTab is false
+    if (!newTab) {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs && tabs.length > 0 && tabs[0].id) {
+          chrome.tabs.remove(tabs[0].id)
+        } else {
+          console.error("No active tab found to close.");
+        }
+      })
+    }
+
+    // create a new tab with the url
+    chrome.tabs.create({ url: url, })
   }, [])
 
   const { isOver, setNodeRef } = useDroppable({
@@ -130,15 +150,15 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
 
   const style = transform
     ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-      }
+      transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+    }
     : undefined
 
   const handleClick = (url: string, aux: boolean = false) => {
     if (aux) {
-      window.open(url, "_blank")
+      openLink(url, true)
     } else {
-      window.open(url, general.openUrlIn === "current-tab" ? "_self" : "_blank")
+      openLink(url, general.openUrlIn === "current-tab" ? false : true)
     }
   }
 
@@ -266,7 +286,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
           )}
         </ContextMenuTrigger>
         <ContextMenuContent className="w-fit min-w-40">
-          <ContextMenuItem onClick={() => openInNewTab(props.url)}>
+          <ContextMenuItem onClick={() => openLink(props.url, true)}>
             Open in new tab
             <ContextMenuShortcut>
               <ExternalLinkIcon className="size-4" />
