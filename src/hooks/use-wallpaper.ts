@@ -77,7 +77,7 @@ export const useWallpaper = () => {
     }))
   }, [background.randomizeWallpaper])
 
-  const imageSrc = useImage(wallpapers.selectedImageId)
+  const imageData = useImage(wallpapers.selectedImageId)
 
-  return imageSrc
+  return imageData
 }

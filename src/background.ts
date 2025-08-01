@@ -1,5 +1,6 @@
 import { z } from "zod"
-import { BACKGROUND_ACTIONS } from "./constants/background-actions"
+import { ALARMS, BACKGROUND_ACTIONS } from "./constants/background-actions"
+import { fetchOnlineImagesIfNeeded } from "./lib/pixabay"
 
 /**
  * Handles background communication
@@ -68,4 +69,17 @@ chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === "install") {
     chrome.tabs.create({ url: chrome.runtime.getURL("tabs/welcome.html") })
   }
+
+  // Set up alarm for hourly image fetching
+  chrome.alarms.create(ALARMS.FETCH_ONLINE_IMAGES, { periodInMinutes: 60 * 3 })
 })
+
+// Handle alarm for periodic image fetching
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === ALARMS.FETCH_ONLINE_IMAGES) {
+    fetchOnlineImagesIfNeeded()
+  }
+})
+
+// Also fetch images when extension starts
+fetchOnlineImagesIfNeeded()

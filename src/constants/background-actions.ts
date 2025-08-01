@@ -5,3 +5,7 @@ export const BACKGROUND_ACTIONS = {
 }
 
 export type BackgroundAction = keyof typeof BACKGROUND_ACTIONS
+
+export const ALARMS = {
+  FETCH_ONLINE_IMAGES: "FETCH_ONLINE_IMAGES",
+}
