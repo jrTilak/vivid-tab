@@ -34,7 +34,7 @@ export const useWallpaper = () => {
               // First time - set a random wallpaper and timestamp
               const newSelectedImageId =
                 wallpapers.images[randomInt(0, wallpapers.images.length)]
-              
+
               setSettings((prev) => ({
                 ...prev,
                 wallpapers: {
@@ -47,7 +47,9 @@ export const useWallpaper = () => {
                 [LAST_WALLPAPER_CHANGED_AT]: Date.now().toString(),
               })
             } else {
-              const lastWallpaperChangedAtDate = new Date(lastWallpaperChangedAt)
+              const lastWallpaperChangedAtDate = new Date(
+                lastWallpaperChangedAt,
+              )
               const now = new Date()
               const diff = now.getTime() - lastWallpaperChangedAtDate.getTime()
               const diffInHours = diff / (1000 * 60 * 60)
@@ -55,7 +57,7 @@ export const useWallpaper = () => {
               if (diffInHours >= 1) {
                 const newSelectedImageId =
                   wallpapers.images[randomInt(0, wallpapers.images.length)]
-                
+
                 setSettings((prev) => ({
                   ...prev,
                   wallpapers: {
@@ -81,7 +83,7 @@ export const useWallpaper = () => {
               // First time - set a random wallpaper and timestamp
               const newSelectedImageId =
                 wallpapers.images[randomInt(0, wallpapers.images.length)]
-              
+
               setSettings((prev) => ({
                 ...prev,
                 wallpapers: {
@@ -94,7 +96,9 @@ export const useWallpaper = () => {
                 [LAST_WALLPAPER_CHANGED_AT]: Date.now().toString(),
               })
             } else {
-              const lastWallpaperChangedAtDate = new Date(lastWallpaperChangedAt)
+              const lastWallpaperChangedAtDate = new Date(
+                lastWallpaperChangedAt,
+              )
               const now = new Date()
               const diff = now.getTime() - lastWallpaperChangedAtDate.getTime()
               const diffInHours = diff / (1000 * 60 * 60)
@@ -102,7 +106,7 @@ export const useWallpaper = () => {
               if (diffInHours >= 24) {
                 const newSelectedImageId =
                   wallpapers.images[randomInt(0, wallpapers.images.length)]
-                
+
                 setSettings((prev) => ({
                   ...prev,
                   wallpapers: {

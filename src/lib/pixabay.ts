@@ -40,8 +40,8 @@ class Pixabay {
     try {
       if (!this._apiKey) {
         console.warn("Pixabay API key not found")
-        
-return []
+
+        return []
       }
 
       const searchTerm = keywords.split(",").map((k) => k.trim())
@@ -63,17 +63,15 @@ return []
       return images
     } catch (error) {
       console.error("Error fetching Pixabay images:", error)
-      
-return []
+
+      return []
     }
   }
 
   /**
    * Downloads an image and converts it to base64
    */
-  private async _downloadImageAsBase64(
-    url: string,
-  ): Promise<string | null> {
+  private async _downloadImageAsBase64(url: string): Promise<string | null> {
     try {
       const response = await fetch(url)
 
@@ -92,8 +90,8 @@ return []
       })
     } catch (error) {
       console.error("Error downloading image:", error)
-      
-return null
+
+      return null
     }
   }
 
@@ -158,8 +156,8 @@ return null
       })
     } catch (error) {
       console.error("Error storing Pixabay image:", error)
-      
-return null
+
+      return null
     }
   }
 
@@ -178,25 +176,29 @@ return null
 
         getAllRequest.onsuccess = () => {
           const allImages = getAllRequest.result as StoredImage[]
-          const onlineImages = allImages.filter(img => img.source === "pixabay")
+          const onlineImages = allImages.filter(
+            (img) => img.source === "pixabay",
+          )
 
           let deletedCount = 0
           const totalToDelete = onlineImages.length
 
           if (totalToDelete === 0) {
             resolve()
-            
-return
+
+            return
           }
 
-          onlineImages.forEach(image => {
+          onlineImages.forEach((image) => {
             const deleteRequest = store.delete(image.id)
 
             deleteRequest.onsuccess = () => {
               deletedCount++
 
               if (deletedCount === totalToDelete) {
-                console.log(`Deleted ${deletedCount} online images from IndexedDB`)
+                console.log(
+                  `Deleted ${deletedCount} online images from IndexedDB`,
+                )
                 resolve()
               }
             }
@@ -222,9 +224,7 @@ return
    * Stores multiple Pixabay images, replacing all existing online images
    * while preserving manually uploaded local images
    */
-  async storePixabayImages(
-    images: PixabayImage[],
-  ): Promise<string[]> {
+  async storePixabayImages(images: PixabayImage[]): Promise<string[]> {
     try {
       // First, delete all existing online images
       await this._deleteOnlineImages()
@@ -256,8 +256,8 @@ return
       return imageIds
     } catch (error) {
       console.error("Error in storePixabayImages:", error)
-      
-return []
+
+      return []
     }
   }
 
@@ -298,8 +298,8 @@ return []
 
         if (timeDiff < hourInMs) {
           console.log("Not time yet")
-          
-return // Not time yet
+
+          return // Not time yet
         }
       }
 
@@ -308,8 +308,8 @@ return // Not time yet
 
       if (tabs.length === 0) {
         console.log("Chrome not active")
-        
-return // Chrome not active
+
+        return // Chrome not active
       }
 
       console.log("Fetching new images from Pixabay...")
@@ -322,8 +322,8 @@ return // Chrome not active
 
       if (images.length === 0) {
         console.log("No images fetched from Pixabay")
-        
-return
+
+        return
       }
 
       // Store images using the new method that replaces old ones
@@ -333,12 +333,12 @@ return
         // Get current settings to preserve local images
         const currentResult = await chrome.storage.sync.get("settings")
         const currentSettings = JSON.parse(currentResult.settings)
-        
+
         // Get all images from IndexedDB to filter local ones
         const allStoredImages = await this.getAllStoredImages()
         const localImageIds = allStoredImages
-          .filter(img => img.source === "local")
-          .map(img => img.id)
+          .filter((img) => img.source === "local")
+          .map((img) => img.id)
 
         // Update settings with new online image IDs plus existing local ones
         const updatedSettings = {

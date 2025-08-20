@@ -20,8 +20,8 @@ const useImage = (imageId: string | null) => {
   useEffect(() => {
     if (!imageId) {
       setImageData(null)
-      
-return
+
+      return
     }
 
     const request = indexedDB.open("ImageDB", 1)

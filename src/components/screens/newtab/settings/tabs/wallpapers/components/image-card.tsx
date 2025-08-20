@@ -72,10 +72,7 @@ const ImageCard = ({
         </Badge>
       )}
       {imageData?.source === "pixabay" && (
-        <Badge
-          className="absolute top-2 left-2 text-xs"
-          variant="outline"
-        >
+        <Badge className="absolute top-2 left-2 text-xs" variant="outline">
           Pixabay
         </Badge>
       )}

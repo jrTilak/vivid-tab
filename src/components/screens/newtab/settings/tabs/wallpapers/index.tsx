@@ -101,20 +101,17 @@ export default function WallpaperSettings() {
     }
 
     setIsRefreshing(true)
-    
+
     try {
       console.log("Force fetching new images from Pixabay...")
-      
+
       // Fetch images from Pixabay
-      const images = await pixabay.fetchImages(
-        onlineImages.keywords || "",
-        10,
-      )
+      const images = await pixabay.fetchImages(onlineImages.keywords || "", 10)
 
       if (images.length === 0) {
         console.log("No images fetched from Pixabay")
-        
-return
+
+        return
       }
 
       // Store images using the new method that replaces old online images
@@ -125,8 +122,8 @@ return
         // Get all stored images to filter local ones
         const allStoredImages = await pixabay.getAllStoredImages()
         const localImageIds = allStoredImages
-          .filter(img => img.source === "local")
-          .map(img => img.id)
+          .filter((img) => img.source === "local")
+          .map((img) => img.id)
 
         // Update settings with new online image IDs plus existing local ones
         setSettings((prev) => ({
@@ -159,7 +156,10 @@ return
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label htmlFor="online-images-toggle" className="text-sm font-medium">
+            <Label
+              htmlFor="online-images-toggle"
+              className="text-sm font-medium"
+            >
               Get images from online
             </Label>
             <p className="text-xs text-muted-foreground">
@@ -198,19 +198,21 @@ return
 
       {/* Image Gallery */}
       <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium">Wallpaper Gallery</h3>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={forceRefreshImages}
-              disabled={!onlineImages.enabled || isRefreshing}
-              className="flex items-center gap-2"
-            >
-              <RefreshCwIcon className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-              {isRefreshing ? 'Refreshing...' : 'Reload'}
-            </Button>
-          </div>
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-medium">Wallpaper Gallery</h3>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={forceRefreshImages}
+            disabled={!onlineImages.enabled || isRefreshing}
+            className="flex items-center gap-2"
+          >
+            <RefreshCwIcon
+              className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
+            />
+            {isRefreshing ? "Refreshing..." : "Reload"}
+          </Button>
+        </div>
         <div className="grid grid-cols-2 gap-4">
           <UploadButton onUpload={handleImageUpload} />
 
