@@ -44,23 +44,38 @@ class Pixabay {
         return []
       }
 
-      const searchTerm = keywords.split(",").map((k) => k.trim())
-      const images: PixabayImage[] = []
+      const searchTerm = keywords.split(",").filter(Boolean).map((k) => k.trim().toLowerCase())
+      const allImages: PixabayImage[] = []
 
       for (const term of searchTerm) {
-        const url = `https://pixabay.com/api/?key=${this._apiKey}&q=${encodeURIComponent(term)}&image_type=photo&per_page=${count}&safesearch=true&orientation=horizontal`
+        const url = `https://pixabay.com/api/?key=${this._apiKey}&q=${encodeURIComponent(term)}&image_type=photo&orientation=horizontal`
 
-        const response = await fetch(url)
+        const response = await fetch(url, {
+          cache: 'no-cache',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        })
 
         if (!response.ok) {
           continue
         }
 
         const data: PixabayResponse = await response.json()
-        images.push(...data.hits)
+        
+        // Randomize the fetched images for this term
+        const shuffledImages = data.hits.sort(() => Math.random() - 0.5)
+        allImages.push(...shuffledImages)
       }
 
-      return images
+      // Randomize all collected images again
+      const finalShuffledImages = allImages.sort(() => Math.random() - 0.5)
+      
+      // Return count * number of search terms, but not more than available
+      const totalToReturn = Math.min(count * searchTerm.length, finalShuffledImages.length)
+      return finalShuffledImages.slice(0, totalToReturn)
     } catch (error) {
       console.error("Error fetching Pixabay images:", error)
 
