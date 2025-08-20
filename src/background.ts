@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { ALARMS, BACKGROUND_ACTIONS } from "./constants/background-actions"
-import { fetchOnlineImagesIfNeeded } from "./lib/pixabay"
+import { pixabay } from "./lib/pixabay"
 
 /**
  * Handles background communication
@@ -77,9 +77,9 @@ chrome.runtime.onInstalled.addListener((details) => {
 // Handle alarm for periodic image fetching
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === ALARMS.FETCH_ONLINE_IMAGES) {
-    fetchOnlineImagesIfNeeded()
+    pixabay.fetchOnlineImagesIfNeeded()
   }
 })
 
 // Also fetch images when extension starts
-fetchOnlineImagesIfNeeded()
+pixabay.fetchOnlineImagesIfNeeded()

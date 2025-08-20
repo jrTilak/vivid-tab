@@ -23,6 +23,7 @@ export const useWallpaper = () => {
             wallpapers.images[randomInt(0, wallpapers.images.length)]
           shouldUpdateSettings = true
         }
+
         break
       case "hourly":
         chrome.storage.local.get([LAST_WALLPAPER_CHANGED_AT], (result) => {

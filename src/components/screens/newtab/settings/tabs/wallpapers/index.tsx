@@ -1,9 +1,13 @@
 import { useSettings } from "@/providers/settings-provider"
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
+import { Button } from "@/components/ui/button"
+import { RefreshCwIcon } from "lucide-react"
+import { pixabay } from "@/lib/pixabay"
+import { LAST_ONLINE_IMAGES_FETCHED_AT } from "@/constants/keys"
 
 import ImageCard from "./components/image-card"
 import UploadButton from "./components/upload-button"
@@ -19,6 +23,7 @@ export default function WallpaperSettings() {
     },
     setSettings,
   } = useSettings()
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   const handleImageSelect = useCallback((id: string | null) => {
     setSettings((prev) => ({
@@ -90,6 +95,64 @@ export default function WallpaperSettings() {
     [setSettings],
   )
 
+  const forceRefreshImages = useCallback(async () => {
+    if (!onlineImages.enabled || isRefreshing) {
+      return
+    }
+
+    setIsRefreshing(true)
+    
+    try {
+      console.log("Force fetching new images from Pixabay...")
+      
+      // Fetch images from Pixabay
+      const images = await pixabay.fetchImages(
+        onlineImages.keywords || "",
+        10,
+      )
+
+      if (images.length === 0) {
+        console.log("No images fetched from Pixabay")
+        
+return
+      }
+
+      // Store images using the new method that replaces old online images
+      // while preserving local uploads
+      const imageIds = await pixabay.storePixabayImages(images)
+
+      if (imageIds.length > 0) {
+        // Get all stored images to filter local ones
+        const allStoredImages = await pixabay.getAllStoredImages()
+        const localImageIds = allStoredImages
+          .filter(img => img.source === "local")
+          .map(img => img.id)
+
+        // Update settings with new online image IDs plus existing local ones
+        setSettings((prev) => ({
+          ...prev,
+          wallpapers: {
+            ...prev.wallpapers,
+            images: [...localImageIds, ...imageIds],
+          },
+        }))
+
+        // Update last fetch time
+        await chrome.storage.local.set({
+          [LAST_ONLINE_IMAGES_FETCHED_AT]: Date.now().toString(),
+        })
+
+        console.log(
+          `Successfully fetched and stored ${imageIds.length} images from Pixabay`,
+        )
+      }
+    } catch (error) {
+      console.error("Error in forceRefreshImages:", error)
+    } finally {
+      setIsRefreshing(false)
+    }
+  }, [onlineImages.enabled, onlineImages.keywords, isRefreshing, setSettings])
+
   return (
     <div className="container mx-auto p-4 space-y-6">
       {/* Online Images Settings */}
@@ -135,7 +198,19 @@ export default function WallpaperSettings() {
 
       {/* Image Gallery */}
       <div className="space-y-4">
-        <h3 className="text-sm font-medium">Wallpaper Gallery</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium">Wallpaper Gallery</h3>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={forceRefreshImages}
+              disabled={!onlineImages.enabled || isRefreshing}
+              className="flex items-center gap-2"
+            >
+              <RefreshCwIcon className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              {isRefreshing ? 'Refreshing...' : 'Reload'}
+            </Button>
+          </div>
         <div className="grid grid-cols-2 gap-4">
           <UploadButton onUpload={handleImageUpload} />
 
