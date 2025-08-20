@@ -162,10 +162,15 @@ export async function fetchOnlineImagesIfNeeded(): Promise<void> {
     }
 
     const settings = JSON.parse(result.settings)
-    const { wallpapers } = settings
+    const { wallpapers, background } = settings
 
     // Check if online images are enabled
     if (!wallpapers?.onlineImages?.enabled) {
+      return
+    }
+
+    // Don't fetch online images if wallpaper randomization is turned off
+    if (background?.randomizeWallpaper === "off") {
       return
     }
 

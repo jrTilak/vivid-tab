@@ -11,32 +11,62 @@ export const useWallpaper = () => {
   } = useSettings()
   useEffect(() => {
     let selectedImageId = wallpapers.selectedImageId
+    let shouldUpdateSettings = false
 
     switch (background.randomizeWallpaper) {
       case "off":
-        // do nothing
+        // do nothing - keep current selectedImageId
         break
       case "on-each-tab":
-        selectedImageId =
-          wallpapers.images[randomInt(0, wallpapers.images.length)]
+        if (wallpapers.images.length > 0) {
+          selectedImageId =
+            wallpapers.images[randomInt(0, wallpapers.images.length)]
+          shouldUpdateSettings = true
+        }
         break
       case "hourly":
         chrome.storage.local.get([LAST_WALLPAPER_CHANGED_AT], (result) => {
           const lastWallpaperChangedAt = result[LAST_WALLPAPER_CHANGED_AT]
 
-          if (lastWallpaperChangedAt) {
-            const lastWallpaperChangedAtDate = new Date(lastWallpaperChangedAt)
-            const now = new Date()
-            const diff = now.getTime() - lastWallpaperChangedAtDate.getTime()
-            const diffInHours = diff / (1000 * 60 * 60)
-
-            if (diffInHours >= 1) {
-              selectedImageId =
+          if (wallpapers.images.length > 0) {
+            if (!lastWallpaperChangedAt) {
+              // First time - set a random wallpaper and timestamp
+              const newSelectedImageId =
                 wallpapers.images[randomInt(0, wallpapers.images.length)]
+              
+              setSettings((prev) => ({
+                ...prev,
+                wallpapers: {
+                  ...prev.wallpapers,
+                  selectedImageId: newSelectedImageId,
+                },
+              }))
 
               chrome.storage.local.set({
                 [LAST_WALLPAPER_CHANGED_AT]: Date.now().toString(),
               })
+            } else {
+              const lastWallpaperChangedAtDate = new Date(lastWallpaperChangedAt)
+              const now = new Date()
+              const diff = now.getTime() - lastWallpaperChangedAtDate.getTime()
+              const diffInHours = diff / (1000 * 60 * 60)
+
+              if (diffInHours >= 1) {
+                const newSelectedImageId =
+                  wallpapers.images[randomInt(0, wallpapers.images.length)]
+                
+                setSettings((prev) => ({
+                  ...prev,
+                  wallpapers: {
+                    ...prev.wallpapers,
+                    selectedImageId: newSelectedImageId,
+                  },
+                }))
+
+                chrome.storage.local.set({
+                  [LAST_WALLPAPER_CHANGED_AT]: Date.now().toString(),
+                })
+              }
             }
           }
         })
@@ -45,19 +75,45 @@ export const useWallpaper = () => {
         chrome.storage.local.get([LAST_WALLPAPER_CHANGED_AT], (result) => {
           const lastWallpaperChangedAt = result[LAST_WALLPAPER_CHANGED_AT]
 
-          if (lastWallpaperChangedAt) {
-            const lastWallpaperChangedAtDate = new Date(lastWallpaperChangedAt)
-            const now = new Date()
-            const diff = now.getTime() - lastWallpaperChangedAtDate.getTime()
-            const diffInHours = diff / (1000 * 60 * 60)
-
-            if (diffInHours >= 24) {
-              selectedImageId =
+          if (wallpapers.images.length > 0) {
+            if (!lastWallpaperChangedAt) {
+              // First time - set a random wallpaper and timestamp
+              const newSelectedImageId =
                 wallpapers.images[randomInt(0, wallpapers.images.length)]
+              
+              setSettings((prev) => ({
+                ...prev,
+                wallpapers: {
+                  ...prev.wallpapers,
+                  selectedImageId: newSelectedImageId,
+                },
+              }))
 
               chrome.storage.local.set({
                 [LAST_WALLPAPER_CHANGED_AT]: Date.now().toString(),
               })
+            } else {
+              const lastWallpaperChangedAtDate = new Date(lastWallpaperChangedAt)
+              const now = new Date()
+              const diff = now.getTime() - lastWallpaperChangedAtDate.getTime()
+              const diffInHours = diff / (1000 * 60 * 60)
+
+              if (diffInHours >= 24) {
+                const newSelectedImageId =
+                  wallpapers.images[randomInt(0, wallpapers.images.length)]
+                
+                setSettings((prev) => ({
+                  ...prev,
+                  wallpapers: {
+                    ...prev.wallpapers,
+                    selectedImageId: newSelectedImageId,
+                  },
+                }))
+
+                chrome.storage.local.set({
+                  [LAST_WALLPAPER_CHANGED_AT]: Date.now().toString(),
+                })
+              }
             }
           }
         })
@@ -66,16 +122,17 @@ export const useWallpaper = () => {
         break
     }
 
-    console.log(selectedImageId)
-    setSettings((prev) => ({
-      ...prev,
-      wallpapers: {
-        ...prev.wallpapers,
-        selectedImageId:
-          wallpapers.images[randomInt(0, wallpapers.images.length)],
-      },
-    }))
-  }, [background.randomizeWallpaper])
+    // Only update settings for "on-each-tab" case synchronously
+    if (shouldUpdateSettings) {
+      setSettings((prev) => ({
+        ...prev,
+        wallpapers: {
+          ...prev.wallpapers,
+          selectedImageId: selectedImageId,
+        },
+      }))
+    }
+  }, [background.randomizeWallpaper, wallpapers.images.length])
 
   const imageData = useImage(wallpapers.selectedImageId)
 
