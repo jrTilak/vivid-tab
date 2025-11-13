@@ -196,7 +196,7 @@ const LayoutsSettings = () => {
                     <PreviewCard index={"0"} className="h-9 mx-auto " />
                   )}
                 </div>
-                <div className="flex-grow">{COMPONENTS[layout[4]]}</div>
+                <div className="grow">{COMPONENTS[layout[4]]}</div>
                 <div className="mt-6 flex items-center justify-center">
                   {COMPONENTS[layout[8]] || (
                     <PreviewCard index={"8"} className="h-9 mx-auto" />

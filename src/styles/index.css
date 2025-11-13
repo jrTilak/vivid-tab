@@ -1,8 +1,45 @@
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap");
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@plugin 'tailwindcss-animate';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-border: hsl(var(--vivid-border));
+  --color-input: hsl(var(--vivid-input));
+  --color-ring: hsl(var(--vivid-ring));
+  --color-background: hsl(var(--vivid-background));
+  --color-foreground: hsl(var(--vivid-foreground));
+
+  --color-primary: hsl(var(--vivid-primary));
+  --color-primary-foreground: hsl(var(--vivid-primary-foreground));
+
+  --color-secondary: hsl(var(--vivid-secondary));
+  --color-secondary-foreground: hsl(var(--vivid-secondary-foreground));
+
+  --color-destructive: hsl(var(--vivid-destructive));
+  --color-destructive-foreground: hsl(var(--vivid-destructive-foreground));
+
+  --color-muted: hsl(var(--vivid-muted));
+  --color-muted-foreground: hsl(var(--vivid-muted-foreground));
+
+  --color-accent: hsl(var(--vivid-accent));
+  --color-accent-foreground: hsl(var(--vivid-accent-foreground));
+
+  --color-popover: hsl(var(--vivid-popover));
+  --color-popover-foreground: hsl(var(--vivid-popover-foreground));
+
+  --color-card: hsl(var(--vivid-card));
+  --color-card-foreground: hsl(var(--vivid-card-foreground));
+
+  --radius-lg: var(--vivid-radius);
+  --radius-md: calc(var(--vivid-radius) - 2px);
+  --radius-sm: calc(var(--vivid-radius) - 4px);
+
+  --font-bricolage-grotesque: Bricolage Grotesque, sans-serif;
+}
 
 @layer base {
   :root {
@@ -65,7 +102,7 @@
   }
 
   body {
-    @apply antialiased bg-background text-foreground font-bricolage-grotesque;
+    @apply antialiased bg-background text-foreground !font-bricolage-grotesque;
   }
 
   /* hide scrollbar */

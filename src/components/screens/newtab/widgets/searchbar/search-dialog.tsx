@@ -113,12 +113,12 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className={cn(
-          "shadow-none w-fit !border-none !outline-none",
+          "shadow-none w-fit border-none! outline-hidden!",
           searchbar.dialogBackground === "transparent"
             ? "bg-transparent"
             : "bg-background/40",
         )}
-        overlayClassName="bg-black/40 backdrop-blur-sm"
+        overlayClassName="bg-black/40 backdrop-blur-xs"
       >
         <div className="flex flex-col items-center justify-center gap-4">
           {/* search form */}
@@ -160,7 +160,7 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
                 }
               }}
               className={cn(
-                "flex-grow flex h-10 w-full text-base bg-transparent gap-1",
+                "grow flex h-10 w-full text-base bg-transparent gap-1",
               )}
             >
               <input
@@ -168,14 +168,14 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
                 type="text"
                 id="vivid-search-bar"
                 placeholder="Search the web..."
-                className="w-full h-full !outline-none rounded-l-md bg-background/80 px-3 py-2 placeholder:text-muted-foreground flex-grow border border-input"
+                className="w-full h-full outline-hidden! rounded-l-md bg-background/80 px-3 py-2 placeholder:text-muted-foreground grow border border-input"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               <button
                 disabled={!searchQuery}
                 type="submit"
-                className="h-full !outline-none rounded-r-md bg-accent px-3 py-2 disabled:opacity-50 border border-input"
+                className="h-full outline-hidden! rounded-r-md bg-accent px-3 py-2 disabled:opacity-50 border border-input"
               >
                 <SearchIcon className="text-muted-foreground size-4" />
               </button>
@@ -253,7 +253,7 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
                   <Button
                     variant="none"
                     key={i}
-                    className="h-fit w-auto focus-visible:ring-destructive !px-0 !py-0"
+                    className="h-fit w-auto focus-visible:ring-destructive px-0! py-0!"
                     onClick={() => handleSearchQuery(result)}
                   >
                     <Badge
