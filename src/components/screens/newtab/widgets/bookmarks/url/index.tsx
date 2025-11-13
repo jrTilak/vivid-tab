@@ -32,7 +32,10 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
-  const { icon, fetchIcon } = useIcon({ id: props.id, defaultIcon: getFileIcon(props.url) })
+  const { icon, fetchIcon } = useIcon({
+    id: props.id,
+    defaultIcon: getFileIcon(props.url),
+  })
 
   const {
     settings: { general },
@@ -123,13 +126,13 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
         if (tabs && tabs.length > 0 && tabs[0].id) {
           chrome.tabs.remove(tabs[0].id)
         } else {
-          console.error("No active tab found to close.");
+          console.error("No active tab found to close.")
         }
       })
     }
 
     // create a new tab with the url
-    chrome.tabs.create({ url: url, })
+    chrome.tabs.create({ url: url })
   }, [])
 
   const { isOver, setNodeRef } = useDroppable({
@@ -150,8 +153,8 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
 
   const style = transform
     ? {
-      transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-    }
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
     : undefined
 
   const handleClick = (url: string, aux: boolean = false) => {

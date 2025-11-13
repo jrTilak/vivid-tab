@@ -109,9 +109,7 @@ const CreateABookmark = ({ parentId, defaultValues, open, setOpen }: Props) => {
               />
 
               {/* icon input */}
-              <div
-                className="rounded-full bg-muted flex items-center justify-center aspect-square h-12 w-12 cursor-pointer"
-              >
+              <div className="rounded-full bg-muted flex items-center justify-center aspect-square h-12 w-12 cursor-pointer">
                 {icon ? (
                   <div className="relative w-full h-full group">
                     <label htmlFor="icon" className="w-full h-full">
@@ -134,7 +132,10 @@ const CreateABookmark = ({ parentId, defaultValues, open, setOpen }: Props) => {
                     </Button>
                   </div>
                 ) : (
-                  <label htmlFor="icon" className="w-full h-full  flex items-center justify-center">
+                  <label
+                    htmlFor="icon"
+                    className="w-full h-full  flex items-center justify-center"
+                  >
                     <CloudUploadIcon className="h-6 w-6" />
                   </label>
                 )}

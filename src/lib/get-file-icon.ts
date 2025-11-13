@@ -3,7 +3,10 @@ export const getFileIcon = (fileUrl: string) => {
     return null
   }
 
-  const fileExtension = new URL(fileUrl).pathname.split('.').pop()?.toLowerCase()
+  const fileExtension = new URL(fileUrl).pathname
+    .split(".")
+    .pop()
+    ?.toLowerCase()
 
   switch (fileExtension) {
     case "pdf":
