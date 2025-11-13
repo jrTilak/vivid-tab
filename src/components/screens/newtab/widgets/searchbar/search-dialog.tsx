@@ -4,8 +4,6 @@ import { AnimatePresence } from "motion/react"
 import { cn } from "@/lib/cn"
 import { SearchIcon } from "lucide-react"
 import { useSettings } from "@/providers/settings-provider"
-import chatgpt from "data-base64:@/assets/openai.png"
-import claude from "data-base64:@/assets/claude.png"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -13,6 +11,11 @@ import { useDebouncedValue } from "@/hooks/use-debounced-value"
 import { useSearchSuggestions } from "@/hooks/use-search-suggestions"
 import { BACKGROUND_ACTIONS } from "@/constants/background-actions"
 import { useHotkeys } from "react-hotkeys-hook"
+
+import chatgpt from "data-base64:@/assets/openai.png"
+import claude from "data-base64:@/assets/claude.png"
+import youtube from "data-base64:@/assets/svg/youtube-color.svg"
+import search from "data-base64:@/assets/svg/search-search.svg"
 
 type Props = {
   open?: boolean
@@ -85,7 +88,7 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
         {
           name: "Open Youtube",
           available: true,
-          icon: "https://www.svgrepo.com/show/475700/youtube-color.svg",
+          icon: youtube,
           id: "youtube",
           onQuery: (query: string) => {
             handleSearchQuery(`https://youtube.com/search?q=${query}`)
@@ -94,7 +97,7 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
         {
           name: "Search Online",
           available: true,
-          icon: "https://www.svgrepo.com/show/178981/search-search.svg",
+          icon: search,
           id: "search-online",
           onQuery: (query: string) => {
             handleSearchQuery(query)
