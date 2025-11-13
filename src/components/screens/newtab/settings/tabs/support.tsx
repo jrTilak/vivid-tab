@@ -30,7 +30,7 @@ const Support = () => {
                 </h3>
                 <p className="text-sm text-muted-foreground">{item.desc}</p>
               </div>
-              <div className="ml-4 flex-shrink-0 text-foreground/60">
+              <div className="ml-4 shrink-0 text-foreground/60">
                 {typeof item.icon === "string" ? (
                   <img
                     src={item.icon}

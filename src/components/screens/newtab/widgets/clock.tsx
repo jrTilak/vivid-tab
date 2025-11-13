@@ -14,7 +14,10 @@ const Clock = () => {
   const [time, setTime] = useState<Date>(new Date())
 
   useEffect(() => {
-    const intervalId: NodeJS.Timeout = setInterval(() => setTime(new Date()), 1000)
+    const intervalId: NodeJS.Timeout = setInterval(
+      () => setTime(new Date()),
+      1000,
+    )
 
     return () => clearInterval(intervalId)
   }, [])
@@ -23,8 +26,8 @@ const Clock = () => {
     if (!timer) return "00:00"
 
     let hours: number = date.getHours()
-    const minutes: string = date.getMinutes().toString().padStart(2, '0')
-    const seconds: string = date.getSeconds().toString().padStart(2, '0')
+    const minutes: string = date.getMinutes().toString().padStart(2, "0")
+    const seconds: string = date.getSeconds().toString().padStart(2, "0")
 
     let timeString: string = ""
     let ampm: string = ""
@@ -35,11 +38,15 @@ const Clock = () => {
       hours = hours ? hours : 12 // 0 should be 12
 
       // For 12h format: h:mm (no leading zero) vs hh:mm (with leading zero)
-      const formattedHours: string = timer.showSeconds ? hours.toString() : hours.toString().padStart(2, '0')
+      const formattedHours: string = timer.showSeconds
+        ? hours.toString()
+        : hours.toString().padStart(2, "0")
       timeString = `${formattedHours}:${minutes}`
     } else {
-      // 24h format: H:mm (no leading zero) vs HH:mm (with leading zero)  
-      const formattedHours: string = timer.showSeconds ? hours.toString() : hours.toString().padStart(2, '0')
+      // 24h format: H:mm (no leading zero) vs HH:mm (with leading zero)
+      const formattedHours: string = timer.showSeconds
+        ? hours.toString()
+        : hours.toString().padStart(2, "0")
       timeString = `${formattedHours}:${minutes}`
     }
 
@@ -52,12 +59,28 @@ const Clock = () => {
 
   const formatDate = (date: Date): string => {
     const days: readonly string[] = [
-      'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
     ] as const
 
     const months: readonly string[] = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ] as const
 
     const dayName: string = days[date.getDay()]
@@ -69,12 +92,8 @@ const Clock = () => {
 
   return (
     <Card className="p-6">
-      <div className="text-5xl font-light">
-        {formatTime(time, timer)}
-      </div>
-      <div className="mt-1 text-sm">
-        {formatDate(time)}
-      </div>
+      <div className="text-5xl font-light">{formatTime(time, timer)}</div>
+      <div className="mt-1 text-sm">{formatDate(time)}</div>
     </Card>
   )
 }

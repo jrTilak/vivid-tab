@@ -121,6 +121,7 @@ const config = [
       "node_modules/**",
       "postcss.config.js",
       ".plasmo/**",
+      "scripts/patch.js",
     ],
   },
 ]

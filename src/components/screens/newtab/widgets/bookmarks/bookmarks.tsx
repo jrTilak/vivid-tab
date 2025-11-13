@@ -325,8 +325,8 @@ const Bookmarks = () => {
               "bg-black/20 backdrop-blur-[1px] rounded-lg p-2 px-5 min-h-[100px] text-background dark:text-foreground",
             )}
           >
-            {activeRootFolder === "history"
-              ? hasPermission ?
+            {activeRootFolder === "history" ? (
+              hasPermission ? (
                 history?.map((item, i) => (
                   <BookmarkUrl
                     {...item}
@@ -336,50 +336,53 @@ const Bookmarks = () => {
                     disableContextMenu={true}
                     index={i}
                   />
-                )) : (
-                  <div className="flex items-center justify-center col-span-12">
-                    <Button variant="secondary" onClick={requestPermission}>
-                      Enable History Access
-                    </Button>
-                  </div>
-                )
-              : activeRootFolder === "top-sites"
-                ? topSites.map((item, i) => (
-                  <BookmarkUrl
-                    key={i}
-                    id={item.url}
-                    title={item.title}
-                    url={item.url}
-                    layout={general.layout}
-                    index={i}
-                    dateAdded={0}
-                    disableContextMenu={true}
-                  />
                 ))
-                : sortBookmarks(currentFolderChildren)?.map((item) => {
-                  if ("children" in item) {
-                    return (
-                      <BookmarkFolder
-                        {...item}
-                        key={item.id}
-                        layout={general.layout}
-                        onOpenFolder={() => {
-                          setFolderIdStack((prev) => [...prev, item.id])
-                        }}
-                        index={item.index}
-                      />
-                    )
-                  } else {
-                    return (
-                      <BookmarkUrl
-                        {...(item as BookmarkUrlNode)}
-                        key={item.id}
-                        layout={general.layout}
-                        index={item.index}
-                      />
-                    )
-                  }
-                })}
+              ) : (
+                <div className="flex items-center justify-center col-span-12">
+                  <Button variant="secondary" onClick={requestPermission}>
+                    Enable History Access
+                  </Button>
+                </div>
+              )
+            ) : activeRootFolder === "top-sites" ? (
+              topSites.map((item, i) => (
+                <BookmarkUrl
+                  key={i}
+                  id={item.url}
+                  title={item.title}
+                  url={item.url}
+                  layout={general.layout}
+                  index={i}
+                  dateAdded={0}
+                  disableContextMenu={true}
+                />
+              ))
+            ) : (
+              sortBookmarks(currentFolderChildren)?.map((item) => {
+                if ("children" in item) {
+                  return (
+                    <BookmarkFolder
+                      {...item}
+                      key={item.id}
+                      layout={general.layout}
+                      onOpenFolder={() => {
+                        setFolderIdStack((prev) => [...prev, item.id])
+                      }}
+                      index={item.index}
+                    />
+                  )
+                } else {
+                  return (
+                    <BookmarkUrl
+                      {...(item as BookmarkUrlNode)}
+                      key={item.id}
+                      layout={general.layout}
+                      index={item.index}
+                    />
+                  )
+                }
+              })
+            )}
           </div>
         </div>
       </div>
