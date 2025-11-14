@@ -84,7 +84,11 @@ const Notes = () => {
                 key={index}
                 className="text-sm bg-white/10 p-2 rounded relative group"
               >
-                {note.text}
+                <div className="flex flex-col">
+                  {note.text.split("\n").map((line, index) => (
+                    <p key={index}>{line}</p>
+                  ))}
+                </div>
                 <button
                   tabIndex={-1}
                   onClick={() => deleteNote(note.id)}
