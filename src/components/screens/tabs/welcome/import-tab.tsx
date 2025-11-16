@@ -24,7 +24,7 @@ const ImportTab = () => {
 
   return (
     <motion.div {...ANIMATION_PROPS[animationName]}>
-      <Card className="w-full max-w-lg text-center min-w-[512px] text-foreground">
+      <Card className="w-full max-w-lg text-center min-w-[512px] text-foreground gap-4">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Import Bookmarks</CardTitle>
           <p className="text-sm">Select the import source for your bookmarks</p>

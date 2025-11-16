@@ -33,7 +33,7 @@ const ImportFromBrowserBookmarks = () => {
 
   return (
     <motion.div {...ANIMATION_PROPS[animationName]}>
-      <Card className="w-full max-w-lg text-center min-w-lg text-foreground pt-12">
+      <Card className="w-full max-w-lg text-center min-w-lg text-foreground pt-12 gap-4">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">
             Import from browser bookmarks
@@ -97,8 +97,10 @@ const ImportFromBrowserBookmarks = () => {
                   rootFolder: selectedFolder,
                 },
               }))
-              chrome.tabs.create({})
-              chrome.tabs.remove(activeTabId)
+              setTimeout(() => {
+                chrome.tabs.create({})
+                chrome.tabs.remove(activeTabId)
+              }, 100)
             }}
             variant="ghost"
             size="sm"
