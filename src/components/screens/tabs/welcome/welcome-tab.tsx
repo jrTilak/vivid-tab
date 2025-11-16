@@ -15,7 +15,7 @@ const WelcomeTab = () => {
       {...ANIMATION_PROPS[animationName]}
       className="__vivid-container"
     >
-      <Card className="text-center px-9 py-5 w-fit min-w-lg text-foreground">
+      <Card className="text-center px-9 py-5 w-fit min-w-lg ">
         <CardContent className="space-y-6 pt-4">
           <img src={icon} alt="icon" className="size-20 mx-auto" />
           <div className="space-y-2">

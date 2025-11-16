@@ -15,7 +15,7 @@ const Support = () => {
       ].map((item, i) => (
         <Card
           key={i}
-          className="overflow-hidden transition-all bg-muted hover:scale-[1.01] border-solid border shadow-none"
+          className="overflow-hidden transition-all bg-muted border-solid border shadow-none"
         >
           <a
             href={item.url}

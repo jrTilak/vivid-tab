@@ -91,14 +91,12 @@ export function PopularApps() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button
+        <button
           tabIndex={-1}
-          variant="none"
-          size="icon"
-          className="w-auto aspect-square hover:scale-105 transition-transform [&_svg]:size-6 text-background dark:text-foreground "
+          className="w-auto aspect-square hover:scale-105 transition-transform [&_svg]:size-6 text-background dark:text-foreground cursor-pointer"
         >
           <LayoutGridIcon />
-        </Button>
+        </button>
       </PopoverTrigger>
       <PopoverContent className="w-80 shadow-xl">
         <div className="grid gap-4 grid-cols-3">

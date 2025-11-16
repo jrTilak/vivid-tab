@@ -1,4 +1,4 @@
-import { Card, CardHeader } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/cn"
 import { useDraggable, useDroppable } from "@dnd-kit/core"
 import { GripIcon } from "lucide-react"
@@ -50,7 +50,7 @@ const PreviewCard = ({
       )}
       style={style}
     >
-      <CardHeader>{label}</CardHeader>
+      <p>{label}</p>
 
       {/* Drag button */}
       <button
