@@ -33,7 +33,7 @@ const ImportFromBrowserBookmarks = () => {
 
   return (
     <motion.div {...ANIMATION_PROPS[animationName]}>
-      <Card className="w-full max-w-lg bg-background text-center min-w-[512px] text-foreground pt-12">
+      <Card className="w-full max-w-lg text-center min-w-lg text-foreground pt-12">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">
             Import from browser bookmarks

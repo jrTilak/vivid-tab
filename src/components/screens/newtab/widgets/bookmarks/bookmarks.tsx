@@ -284,7 +284,7 @@ const Bookmarks = () => {
                 activeRootFolder === "top-sites"
               }
               tabIndex={-1}
-              className="disabled:opacity-50"
+              className="disabled:opacity-50 cursor-pointer disabled:cursor-default"
             >
               <FolderPlusIcon className="size-5 text-foreground" />
             </button>
@@ -297,7 +297,7 @@ const Bookmarks = () => {
                 activeRootFolder === "top-sites"
               }
               tabIndex={-1}
-              className="disabled:opacity-50"
+              className="disabled:opacity-50  cursor-pointer disabled:cursor-default"
             >
               <BookmarkPlusIcon className="size-5 text-foreground" />
             </button>
@@ -311,7 +311,7 @@ const Bookmarks = () => {
               }}
               variant="ghost"
               size="sm"
-              className="text-xs hover:bg-transparent text-foreground"
+              className="text-xs hover:bg-transparent! text-foreground mb-2 "
             >
               <ArrowLeftIcon className="h-4 w-4" />
               Back
@@ -320,8 +320,8 @@ const Bookmarks = () => {
           <div
             className={cn(
               general.layout === "grid"
-                ? "grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-x-4 gap-y-2"
-                : "grid grid-cols-2 xl:grid-cols-3 gap-4",
+                ? "grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-x-2 gap-y-2"
+                : "grid grid-cols-2 xl:grid-cols-3 gap-3",
               "bg-black/20 backdrop-blur-[1px] rounded-lg p-2 px-5 min-h-[100px] text-background dark:text-foreground",
             )}
           >
