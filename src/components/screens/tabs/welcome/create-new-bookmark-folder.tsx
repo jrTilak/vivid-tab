@@ -29,16 +29,19 @@ const CreateNewBookmarkFolder = () => {
     const bookmark = await chrome.bookmarks.create({
       title: bookmarkFolderName,
     })
-
-    setSettings((prev) => ({
-      ...prev,
-      general: {
-        ...prev.general,
-        rootFolder: bookmark.id,
-      },
-    }))
-    chrome.tabs.create({})
-    chrome.tabs.remove(activeTabId)
+    setSettings((prev) => {
+      return {
+        ...prev,
+        general: {
+          ...prev.general,
+          rootFolder: bookmark.id,
+        },
+      }
+    })
+    setTimeout(() => {
+      chrome.tabs.create({})
+      chrome.tabs.remove(activeTabId)
+    }, 100)
   }
 
   return (

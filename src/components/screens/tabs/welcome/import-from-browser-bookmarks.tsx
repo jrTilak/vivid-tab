@@ -97,8 +97,10 @@ const ImportFromBrowserBookmarks = () => {
                   rootFolder: selectedFolder,
                 },
               }))
-              chrome.tabs.create({})
-              chrome.tabs.remove(activeTabId)
+              setTimeout(() => {
+                chrome.tabs.create({})
+                chrome.tabs.remove(activeTabId)
+              }, 100)
             }}
             variant="ghost"
             size="sm"
