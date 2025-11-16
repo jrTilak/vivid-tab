@@ -43,7 +43,7 @@ const CreateNewBookmarkFolder = () => {
 
   return (
     <motion.div {...ANIMATION_PROPS[animationName]}>
-      <Card className="w-full max-w-lg text-center min-w-lg text-foreground">
+      <Card className="w-full max-w-lg text-center min-w-lg text-foreground gap-4">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Create Bookmark Folder</CardTitle>
           <p className="text-sm">
