@@ -83,3 +83,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
     wallpaper.fetchOnlineImages()
   }
 })
+
+if (process.env.PLASMO_PUBLIC_UNINSTALL_URL) {
+  chrome.runtime.setUninstallURL(process.env.PLASMO_PUBLIC_UNINSTALL_URL)
+}
