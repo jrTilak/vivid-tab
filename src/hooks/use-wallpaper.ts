@@ -143,7 +143,7 @@ export const useWallpaper = () => {
         },
       }))
     }
-  }, [background.randomizeWallpaper, setSettings, wallpapers.images, wallpapers.images.length, wallpapers.selectedImageId])
+  }, [background.randomizeWallpaper])
 
   const imageData = useImage(wallpapers.selectedImageId)
 
