@@ -8,6 +8,7 @@
     "dev": "plasmo dev",
     "dev:f": "plasmo dev --target=firefox-mv3",
     "build": "plasmo build",
+    "build:f": "plasmo build --target=firefox-mv3",
     "package": "plasmo package",
     "format": "prettier --write .",
     "lint": "eslint .",
