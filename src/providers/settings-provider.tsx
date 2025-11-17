@@ -21,53 +21,55 @@ const SettingsContext = createContext<SettingsContextState | undefined>(
 
 const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isLoaded, setIsLoaded] = useState(false)
+
   const [settings, setSettings] = useState<Settings>(
     DEFAULT_SETTINGS as unknown as Settings,
   )
 
   const resetSettings = useCallback(async () => {
-    // clear local storage synced and other storage
+    // clear synced + local storage
     chrome.storage.sync.clear()
     chrome.storage.local.clear()
 
-    // clear the index db
-    await indexedDB.databases().then((databases) => {
-      databases.forEach((db) => {
-        indexedDB.deleteDatabase(db.name)
-      })
-    })
+    // clear indexdb
+    const databases = await indexedDB.databases()
+
+    for (const db of databases) {
+      if (db.name) indexedDB.deleteDatabase(db.name)
+    }
 
     setSettings(DEFAULT_SETTINGS as unknown as Settings)
   }, [])
 
-  //  Load settings from storage
   useEffect(() => {
-    chrome.storage.sync.get("settings", ({ settings }) => {
-      let s: Settings = DEFAULT_SETTINGS as unknown as Settings
+    chrome.storage.sync.get("settings", (result) => {
+      const raw = result?.settings
+      let parsed: Settings = DEFAULT_SETTINGS as unknown as Settings
 
-      if (settings) {
+      if (raw) {
         try {
-          s = SettingsSchema.parse(JSON.parse(settings))
-        } catch (error) {
-          console.error(error)
+          parsed = SettingsSchema.parse(JSON.parse(raw))
+        } catch (err) {
+          console.error("Failed to parse settings:", err)
         }
       }
 
-      setSettings(s)
+      setSettings(parsed)
       setIsLoaded(true)
     })
   }, [])
 
-  // Save settings to storage on change
   useEffect(() => {
     if (isLoaded) {
-      chrome.storage.sync.set({ settings: JSON.stringify(settings) })
+      chrome.storage.sync.set({
+        settings: JSON.stringify(settings),
+      })
     }
   }, [settings, isLoaded])
 
   const value: SettingsContextState = {
-    setSettings,
     settings,
+    setSettings,
     resetSettings,
   }
 
@@ -81,7 +83,7 @@ const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 const useSettings = () => {
   const context = useContext(SettingsContext)
 
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useSettings must be used within a SettingsProvider")
   }
 
