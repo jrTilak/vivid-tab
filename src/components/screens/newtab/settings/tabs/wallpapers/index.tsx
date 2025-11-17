@@ -6,11 +6,10 @@ import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { RefreshCwIcon } from "lucide-react"
-import { pixabay } from "@/lib/pixabay"
-import { LAST_ONLINE_IMAGES_FETCHED_AT } from "@/constants/keys"
 
 import ImageCard from "./components/image-card"
 import UploadButton from "./components/upload-button"
+import { wallpaper } from "@/lib/wallpapers"
 
 export interface ImageData {
   src: string
@@ -105,50 +104,13 @@ export default function WallpaperSettings() {
     try {
       console.log("Force fetching new images from Pixabay...")
 
-      // Fetch images from Pixabay
-      const images = await pixabay.fetchImages(onlineImages.keywords || "", 10)
-
-      if (images.length === 0) {
-        console.log("No images fetched from Pixabay")
-
-        return
-      }
-
-      // Store images using the new method that replaces old online images
-      // while preserving local uploads
-      const imageIds = await pixabay.storePixabayImages(images)
-
-      if (imageIds.length > 0) {
-        // Get all stored images to filter local ones
-        const allStoredImages = await pixabay.getAllStoredImages()
-        const localImageIds = allStoredImages
-          .filter((img) => img.source === "local")
-          .map((img) => img.id)
-
-        // Update settings with new online image IDs plus existing local ones
-        setSettings((prev) => ({
-          ...prev,
-          wallpapers: {
-            ...prev.wallpapers,
-            images: [...localImageIds, ...imageIds],
-          },
-        }))
-
-        // Update last fetch time
-        await chrome.storage.local.set({
-          [LAST_ONLINE_IMAGES_FETCHED_AT]: Date.now().toString(),
-        })
-
-        console.log(
-          `Successfully fetched and stored ${imageIds.length} images from Pixabay`,
-        )
-      }
+      wallpaper.fetchOnlineImages(true)
     } catch (error) {
       console.error("Error in forceRefreshImages:", error)
     } finally {
       setIsRefreshing(false)
     }
-  }, [onlineImages.enabled, onlineImages.keywords, isRefreshing, setSettings])
+  }, [onlineImages.enabled, isRefreshing])
 
   return (
     <div className="container mx-auto p-4 space-y-6">

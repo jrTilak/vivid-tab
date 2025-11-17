@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { ALARMS, BACKGROUND_ACTIONS } from "./constants/background-actions"
-import { pixabay } from "./lib/pixabay"
+import { wallpaper } from "./lib/wallpapers"
 
 /**
  * Handles background communication
@@ -68,6 +68,9 @@ chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === "install") {
     chrome.tabs.create({ url: chrome.runtime.getURL("tabs/welcome.html") })
+
+    // Also fetch images when extension starts
+    wallpaper.fetchOnlineImages(true)
   }
 
   // Set up alarm for hourly image fetching
@@ -77,9 +80,6 @@ chrome.runtime.onInstalled.addListener((details) => {
 // Handle alarm for periodic image fetching
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === ALARMS.FETCH_ONLINE_IMAGES) {
-    pixabay.fetchOnlineImagesIfNeeded()
+    wallpaper.fetchOnlineImages()
   }
 })
-
-// Also fetch images when extension starts
-pixabay.fetchOnlineImagesIfNeeded()
