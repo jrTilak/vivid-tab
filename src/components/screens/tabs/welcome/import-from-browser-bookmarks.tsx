@@ -89,18 +89,34 @@ const ImportFromBrowserBookmarks = () => {
           </Button>
           <Button
             disabled={!selectedFolder}
-            onClick={() => {
-              setSettings((prev) => ({
-                ...prev,
+            onClick={async () => {
+              // Get current settings from storage
+              const result = await chrome.storage.sync.get("settings")
+              const currentSettings = result.settings
+                ? JSON.parse(result.settings)
+                : {}
+
+              // Update settings with selected rootFolder
+              const updatedSettings = {
+                ...currentSettings,
                 general: {
-                  ...prev.general,
+                  ...currentSettings.general,
                   rootFolder: selectedFolder,
                 },
-              }))
-              setTimeout(() => {
-                chrome.tabs.create({})
-                chrome.tabs.remove(activeTabId)
-              }, 100)
+              }
+
+              // Save to Chrome storage and wait for completion
+              // This is especially important in Firefox where storage operations may take longer
+              await chrome.storage.sync.set({
+                settings: JSON.stringify(updatedSettings),
+              })
+
+              // Update local state to keep UI in sync
+              setSettings(updatedSettings)
+
+              // Close the welcome tab and open a new tab
+              chrome.tabs.create({})
+              chrome.tabs.remove(activeTabId)
             }}
             variant="ghost"
             size="sm"
