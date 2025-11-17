@@ -69,8 +69,9 @@ const ImportTab = () => {
           </Button>
           <Button
             onClick={() => {
-              chrome.tabs.create({})
-              chrome.tabs.remove(activeTabId)
+              chrome.tabs.create({}, () => {
+                chrome.tabs.remove(activeTabId)
+              })
             }}
             variant="ghost"
             size="sm"
