@@ -56,7 +56,13 @@ export default function WallpaperSettings() {
         const transaction = db.transaction("images", "readwrite")
         const store = transaction.objectStore("images")
 
-        const imageObject = { id: imageId, src: imageSrc }
+        const imageObject = {
+          id: imageId,
+          src: imageSrc,
+          source: "local",
+          downloaded: true,
+          fetchedAt: Date.now(),
+        }
 
         store.put(imageObject)
         console.log("Image stored with ID:", imageId)

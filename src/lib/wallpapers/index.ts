@@ -12,6 +12,8 @@ export interface StoredImage {
   fetchedAt: number
   downloaded?: boolean // true if src is base64, false/undefined if src is still a URL
   originalUrl?: string // the original URL before download
+  downloadAttempts?: number // number of download attempts
+  downloadFailed?: boolean // true if download has permanently failed
 }
 
 /**
@@ -147,18 +149,20 @@ class Wallpaper {
    * Download and update an image that was stored as URL only
    */
   private async _downloadAndUpdateImage(imageId: string): Promise<boolean> {
+    const MAX_DOWNLOAD_ATTEMPTS = 5
+
     try {
       // Get the image from IndexedDB
       const image = await this._getImageById(imageId)
 
-      if (!image || image.downloaded) {
-        return true // Already downloaded or doesn't exist
+      if (!image || image.downloaded || image.downloadFailed) {
+        return true // Already downloaded, doesn't exist, or permanently failed
       }
+
+      const attempts = (image.downloadAttempts || 0) + 1
 
       // Download the image
       const base64 = await this._downloadAsBase64(image.originalUrl || image.src)
-
-      if (!base64) return false
 
       // Update in IndexedDB
       return new Promise((resolve, reject) => {
@@ -169,15 +173,24 @@ class Wallpaper {
           const tx = db.transaction("images", "readwrite")
           const store = tx.objectStore("images")
 
-          const updatedImage: StoredImage = {
-            ...image,
-            src: base64,
-            downloaded: true,
-          }
+          const updatedImage: StoredImage = base64
+            ? {
+                // Successfully downloaded
+                ...image,
+                src: base64,
+                downloaded: true,
+                downloadAttempts: attempts,
+              }
+            : {
+                // Download failed
+                ...image,
+                downloadAttempts: attempts,
+                downloadFailed: attempts >= MAX_DOWNLOAD_ATTEMPTS,
+              }
 
           store.put(updatedImage)
 
-          tx.oncomplete = () => resolve(true)
+          tx.oncomplete = () => resolve(!!base64)
           tx.onerror = () => reject(new Error("Failed to update image"))
         }
 
@@ -313,7 +326,9 @@ class Wallpaper {
   public async downloadPendingImages() {
     try {
       const allImages = await this._getAllStoredImages()
-      const pendingImages = allImages.filter((img) => !img.downloaded && img.source !== "local")
+      const pendingImages = allImages.filter(
+        (img) => !img.downloaded && !img.downloadFailed && img.source !== "local"
+      )
 
       if (pendingImages.length === 0) {
         console.log("No pending images to download")
