@@ -89,11 +89,18 @@ const ImportFromBrowserBookmarks = () => {
           </Button>
           <Button
             disabled={!selectedFolder}
-            onClick={() => {
-              setSettings((prev) => ({
-                ...prev,
+            onClick={async () => {
+              // Get current settings from storage
+              const result = await chrome.storage.sync.get("settings")
+              const currentSettings = result.settings
+                ? JSON.parse(result.settings)
+                : {}
+
+              // Update settings with selected rootFolder
+              const updatedSettings = {
+                ...currentSettings,
                 general: {
-                  ...prev.general,
+                  ...currentSettings.general,
                   rootFolder: selectedFolder,
                 },
               }))

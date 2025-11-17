@@ -29,14 +29,26 @@ const CreateNewBookmarkFolder = () => {
     const bookmark = await chrome.bookmarks.create({
       title: bookmarkFolderName,
     })
-    setSettings((prev) => {
-      return {
-        ...prev,
-        general: {
-          ...prev.general,
-          rootFolder: bookmark.id,
-        },
-      }
+    
+    // Get current settings from storage
+    const result = await chrome.storage.sync.get("settings")
+    const currentSettings = result.settings
+      ? JSON.parse(result.settings)
+      : {}
+    
+    // Update settings with new rootFolder
+    const updatedSettings = {
+      ...currentSettings,
+      general: {
+        ...currentSettings.general,
+        rootFolder: bookmark.id,
+      },
+    }
+    
+    // Save to Chrome storage and wait for completion
+    // This is especially important in Firefox where storage operations may take longer
+    await chrome.storage.sync.set({
+      settings: JSON.stringify(updatedSettings),
     })
     setTimeout(() => {
       chrome.tabs.create({}, () => {
