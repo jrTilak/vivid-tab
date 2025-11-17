@@ -50,13 +50,11 @@ const CreateNewBookmarkFolder = () => {
     await chrome.storage.sync.set({
       settings: JSON.stringify(updatedSettings),
     })
-    
-    // Update local state to keep UI in sync
-    setSettings(updatedSettings)
-    
-    // Close the welcome tab and open a new tab
-    chrome.tabs.create({})
-    chrome.tabs.remove(activeTabId)
+    setTimeout(() => {
+      chrome.tabs.create({}, () => {
+        chrome.tabs.remove(activeTabId)
+      })
+    }, 100)
   }
 
   return (

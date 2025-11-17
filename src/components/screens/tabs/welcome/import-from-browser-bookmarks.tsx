@@ -103,20 +103,12 @@ const ImportFromBrowserBookmarks = () => {
                   ...currentSettings.general,
                   rootFolder: selectedFolder,
                 },
-              }
-
-              // Save to Chrome storage and wait for completion
-              // This is especially important in Firefox where storage operations may take longer
-              await chrome.storage.sync.set({
-                settings: JSON.stringify(updatedSettings),
-              })
-
-              // Update local state to keep UI in sync
-              setSettings(updatedSettings)
-
-              // Close the welcome tab and open a new tab
-              chrome.tabs.create({})
-              chrome.tabs.remove(activeTabId)
+              }))
+              setTimeout(() => {
+                chrome.tabs.create({}, () => {
+                  chrome.tabs.remove(activeTabId)
+                })
+              }, 100)
             }}
             variant="ghost"
             size="sm"

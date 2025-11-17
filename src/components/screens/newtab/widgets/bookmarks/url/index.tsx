@@ -120,19 +120,19 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
   }, [editDialogOpen, fetchIcon])
 
   const openLink = useCallback((url: string, newTab?: boolean) => {
-    // close the current tab if newTab is false
-    if (!newTab) {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs && tabs.length > 0 && tabs[0].id) {
-          chrome.tabs.remove(tabs[0].id)
-        } else {
-          console.error("No active tab found to close.")
-        }
-      })
-    }
-
-    // create a new tab with the url
-    chrome.tabs.create({ url: url })
+    // create a new tab with the url first
+    chrome.tabs.create({ url: url }, (newTabCreated) => {
+      // close the current tab if newTab is false, only after the new tab is created
+      if (!newTab && newTabCreated) {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          if (tabs && tabs.length > 0 && tabs[0].id) {
+            chrome.tabs.remove(tabs[0].id)
+          } else {
+            console.error("No active tab found to close.")
+          }
+        })
+      }
+    })
   }, [])
 
   const { isOver, setNodeRef } = useDroppable({
