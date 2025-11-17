@@ -34,14 +34,23 @@ const useImage = (imageId: string | null) => {
 
       getRequest.onsuccess = () => {
         if (getRequest.result) {
+          const result = getRequest.result
           setImageData({
-            src: getRequest.result.src,
-            source: getRequest.result.source || "local",
-            pixabayId: getRequest.result.pixabayId,
-            tags: getRequest.result.tags,
-            user: getRequest.result.user,
-            fetchedAt: getRequest.result.fetchedAt,
+            src: result.src,
+            source: result.source || "local",
+            pixabayId: result.pixabayId,
+            tags: result.tags,
+            user: result.user,
+            fetchedAt: result.fetchedAt,
           })
+          
+          // If the image is not yet downloaded, trigger background download
+          if (!result.downloaded && result.source !== "local") {
+            // Import wallpaper dynamically to avoid circular dependencies
+            import("@/lib/wallpapers").then(({ wallpaper }) => {
+              wallpaper.downloadPendingImages().catch(console.error)
+            })
+          }
         } else {
           console.warn("No image found with ID:", imageId)
           setImageData(null)

@@ -7,9 +7,11 @@ import { Wallhaven } from "./extensions/wallhaven"
  */
 export interface StoredImage {
   id: string
-  src: string // base64 dataURL
-  source: string // "pixabay" | "local"
+  src: string // base64 dataURL or URL if not yet downloaded
+  source: string // "pixabay" | "local" | "wallhaven"
   fetchedAt: number
+  downloaded?: boolean // true if src is base64, false/undefined if src is still a URL
+  originalUrl?: string // the original URL before download
 }
 
 /**
@@ -95,18 +97,15 @@ class Wallpaper {
   }
 
   /**
-   * Store one image in IndexedDB
+   * Store image URL in IndexedDB (without downloading yet)
    */
-  private async _storeImageToIndexedDB({
+  private async _storeImageUrlToIndexedDB({
     imageUrl,
     source,
   }: {
     imageUrl: string
     source: string
   }): Promise<string | null> {
-    const base64 = await this._downloadAsBase64(imageUrl)
-    if (!base64) return null
-
     return new Promise((resolve, reject) => {
       const request = indexedDB.open("ImageDB", 1)
 
@@ -123,19 +122,89 @@ class Wallpaper {
         const tx = db.transaction("images", "readwrite")
         const store = tx.objectStore("images")
 
-        const id = `${source}_${Date.now()}`
+        const id = `${source}_${Date.now()}_${Math.random().toString(36).substring(7)}`
 
         const imageObject: StoredImage = {
           id,
-          src: base64,
+          src: imageUrl, // Store URL initially
           source,
           fetchedAt: Date.now(),
+          downloaded: false, // Mark as not downloaded yet
+          originalUrl: imageUrl,
         }
 
         store.put(imageObject)
 
         tx.oncomplete = () => resolve(id)
         tx.onerror = () => reject(new Error("Failed to store image"))
+      }
+
+      request.onerror = () => reject(new Error("Failed to open IndexedDB"))
+    })
+  }
+
+  /**
+   * Download and update an image that was stored as URL only
+   */
+  private async _downloadAndUpdateImage(imageId: string): Promise<boolean> {
+    try {
+      // Get the image from IndexedDB
+      const image = await this._getImageById(imageId)
+
+      if (!image || image.downloaded) {
+        return true // Already downloaded or doesn't exist
+      }
+
+      // Download the image
+      const base64 = await this._downloadAsBase64(image.originalUrl || image.src)
+
+      if (!base64) return false
+
+      // Update in IndexedDB
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open("ImageDB", 1)
+
+        request.onsuccess = (event) => {
+          const db = (event.target as IDBOpenDBRequest).result
+          const tx = db.transaction("images", "readwrite")
+          const store = tx.objectStore("images")
+
+          const updatedImage: StoredImage = {
+            ...image,
+            src: base64,
+            downloaded: true,
+          }
+
+          store.put(updatedImage)
+
+          tx.oncomplete = () => resolve(true)
+          tx.onerror = () => reject(new Error("Failed to update image"))
+        }
+
+        request.onerror = () => reject(new Error("Failed to open IndexedDB"))
+      })
+    } catch (error) {
+      console.error("Error downloading image:", error)
+
+      return false
+    }
+  }
+
+  /**
+   * Get a single image by ID
+   */
+  private async _getImageById(imageId: string): Promise<StoredImage | null> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open("ImageDB", 1)
+
+      request.onsuccess = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result
+        const tx = db.transaction("images", "readonly")
+        const store = tx.objectStore("images")
+        const getRequest = store.get(imageId)
+
+        getRequest.onsuccess = () => resolve(getRequest.result || null)
+        getRequest.onerror = () => reject(new Error("Failed to get image"))
       }
 
       request.onerror = () => reject(new Error("Failed to open IndexedDB"))
@@ -221,21 +290,54 @@ class Wallpaper {
   }
 
   /**
-   * Store multiple images
+   * Store multiple image URLs (without downloading yet)
    */
-  private async _storeImages(images: { imageUrl: string; source: string }[]) {
+  private async _storeImageUrls(images: { imageUrl: string; source: string }[]) {
     const ids: string[] = []
 
     for (const img of images) {
       try {
-        const id = await this._storeImageToIndexedDB(img)
+        const id = await this._storeImageUrlToIndexedDB(img)
         if (id) ids.push(id)
       } catch (e) {
-        console.error("Error storing image", e)
+        console.error("Error storing image URL", e)
       }
     }
 
     return ids
+  }
+
+  /**
+   * Download pending images in the background
+   */
+  public async downloadPendingImages() {
+    try {
+      const allImages = await this._getAllStoredImages()
+      const pendingImages = allImages.filter((img) => !img.downloaded && img.source !== "local")
+
+      if (pendingImages.length === 0) {
+        console.log("No pending images to download")
+
+        return
+      }
+
+      console.log(`Downloading ${pendingImages.length} pending images...`)
+
+      // Download images one by one to avoid overwhelming the system
+      for (const image of pendingImages) {
+        try {
+          await this._downloadAndUpdateImage(image.id)
+          // Small delay between downloads to avoid rate limiting
+          await new Promise((resolve) => setTimeout(resolve, 500))
+        } catch (error) {
+          console.error(`Failed to download image ${image.id}:`, error)
+        }
+      }
+
+      console.log("Finished downloading pending images")
+    } catch (error) {
+      console.error("Error in downloadPendingImages:", error)
+    }
   }
 
   /**
@@ -288,8 +390,8 @@ class Wallpaper {
       // remove old online images
       await this._deleteOldImages(extensionName)
 
-      // store new ones
-      const ids = await this._storeImages(
+      // store image URLs first (without downloading)
+      const ids = await this._storeImageUrls(
         images.map((url) => ({
           imageUrl: url,
           source: extensionName,
@@ -320,7 +422,13 @@ class Wallpaper {
         [LAST_ONLINE_IMAGES_FETCHED_AT]: Date.now().toString(),
       })
 
-      console.log(`Stored ${ids.length} new online images`)
+      console.log(`Stored ${ids.length} new online image URLs`)
+
+      // Start downloading images in the background
+      // This will continue even if the user refreshes the page
+      this.downloadPendingImages().catch((error) => {
+        console.error("Background download error:", error)
+      })
     } catch (error) {
       console.error(error)
     }

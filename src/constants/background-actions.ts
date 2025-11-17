@@ -8,4 +8,5 @@ export type BackgroundAction = keyof typeof BACKGROUND_ACTIONS
 
 export const ALARMS = {
   FETCH_ONLINE_IMAGES: "FETCH_ONLINE_IMAGES",
+  DOWNLOAD_PENDING_IMAGES: "DOWNLOAD_PENDING_IMAGES",
 }
