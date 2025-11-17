@@ -24,7 +24,7 @@ export default function Homepage() {
     },
   } = useSettings()
 
-  const imageSrc = useWallpaper()
+  const imageData = useWallpaper()
 
   const COMPONENTS = useMemo(() => {
     return {
@@ -74,7 +74,7 @@ export default function Homepage() {
       <div className="min-h-screen w-full bg-cover bg-center p-6 relative select-none transition-all">
         <div
           style={{
-            backgroundImage: `url(${!wallpapers.selectedImageId ? background : imageSrc})`,
+            backgroundImage: `url(${!wallpapers.selectedImageId ? background : imageData?.src})`,
           }}
           className={cn(
             "h-full w-full bg-cover bg-center bg-no-repeat absolute inset-0",
@@ -142,6 +142,15 @@ export default function Homepage() {
             )}
           </div>
         </div>
+
+        {/* Image Credits */}
+        {imageData?.source === "pixabay" && (
+          <div className="fixed bottom-4 left-4 z-50">
+            <div className="bg-black/50 backdrop-blur-sm text-white text-xs px-2 py-1 rounded">
+              Images powered by Pixabay
+            </div>
+          </div>
+        )}
       </div>
     </>
   )

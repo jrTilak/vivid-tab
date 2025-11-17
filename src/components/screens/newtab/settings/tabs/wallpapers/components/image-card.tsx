@@ -13,7 +13,7 @@ const ImageCard = ({
   isSelected: boolean
   onSelect: () => void
 }) => {
-  const imageSrc = useImage(imageId)
+  const imageData = useImage(imageId)
   const { setSettings } = useSettings()
 
   const deleteImageById = (imageId: string) => {
@@ -58,7 +58,7 @@ const ImageCard = ({
       onClick={isSelected ? null : onSelect}
     >
       <img
-        src={imageId === null ? defaultImage : imageSrc}
+        src={imageId === null ? defaultImage : imageData?.src}
         width={200}
         height={200}
         className="w-full h-48 object-cover rounded-lg transition-transform group-hover:group-disabled:scale-100 group-hover:scale-105 brightness-75"
@@ -69,6 +69,11 @@ const ImageCard = ({
           variant="secondary"
         >
           Selected
+        </Badge>
+      )}
+      {imageData?.source === "pixabay" && (
+        <Badge className="absolute top-2 left-2 text-xs" variant="outline">
+          Pixabay
         </Badge>
       )}
       {imageId !== null && (
