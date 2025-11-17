@@ -1,5 +1,6 @@
 import { LAST_ONLINE_IMAGES_FETCHED_AT } from "@/constants/keys"
 import { Pixabay } from "./extensions/pixabay"
+import { Wallhaven } from "./extensions/wallhaven"
 
 /**
  * What IndexedDB actually stores
@@ -26,9 +27,12 @@ export interface WallpaperExtension {
 
 class Wallpaper {
   private _extensions: Record<string, WallpaperExtension> = {}
+  private _activeExtensionName: string
 
   constructor() {
     this._addExtension(new Pixabay())
+    this._addExtension(new Wallhaven())
+    this._activeExtensionName = "wallhaven"
   }
 
   /**
@@ -266,7 +270,7 @@ class Wallpaper {
         if (tabs.length === 0) return
       }
 
-      const extensionName = "pixabay"
+      const extensionName = this._activeExtensionName
 
       // fetch API images
       const images = await this._fetchImagesFromExtension(
