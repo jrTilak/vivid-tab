@@ -13,14 +13,24 @@ export const useWallpaper = () => {
     let selectedImageId = wallpapers.selectedImageId
     let shouldUpdateSettings = false
 
+    const newImage = () => {
+      if (wallpapers.images.length === 0) return selectedImageId
+
+      const currentImageIndex = wallpapers.images.indexOf(selectedImageId)
+
+      // generating from 0 - length ie one more than acutal images so that we can also show the default wallpaper at last index
+      return wallpapers.images[
+        randomInt(0, wallpapers.images.length, [currentImageIndex])
+      ]
+    }
+
     switch (background.randomizeWallpaper) {
       case "off":
         // do nothing - keep current selectedImageId
         break
       case "on-each-tab":
         if (wallpapers.images.length > 0) {
-          selectedImageId =
-            wallpapers.images[randomInt(0, wallpapers.images.length)]
+          selectedImageId = newImage()
           shouldUpdateSettings = true
         }
 
@@ -32,8 +42,7 @@ export const useWallpaper = () => {
           if (wallpapers.images.length > 0) {
             if (!lastWallpaperChangedAt) {
               // First time - set a random wallpaper and timestamp
-              const newSelectedImageId =
-                wallpapers.images[randomInt(0, wallpapers.images.length)]
+              const newSelectedImageId = newImage()
 
               setSettings((prev) => ({
                 ...prev,
@@ -55,8 +64,7 @@ export const useWallpaper = () => {
               const diffInHours = diff / (1000 * 60 * 60)
 
               if (diffInHours >= 1) {
-                const newSelectedImageId =
-                  wallpapers.images[randomInt(0, wallpapers.images.length)]
+                const newSelectedImageId = newImage()
 
                 setSettings((prev) => ({
                   ...prev,
@@ -81,8 +89,7 @@ export const useWallpaper = () => {
           if (wallpapers.images.length > 0) {
             if (!lastWallpaperChangedAt) {
               // First time - set a random wallpaper and timestamp
-              const newSelectedImageId =
-                wallpapers.images[randomInt(0, wallpapers.images.length)]
+              const newSelectedImageId = newImage()
 
               setSettings((prev) => ({
                 ...prev,
@@ -104,8 +111,7 @@ export const useWallpaper = () => {
               const diffInHours = diff / (1000 * 60 * 60)
 
               if (diffInHours >= 24) {
-                const newSelectedImageId =
-                  wallpapers.images[randomInt(0, wallpapers.images.length)]
+                const newSelectedImageId = newImage()
 
                 setSettings((prev) => ({
                   ...prev,
