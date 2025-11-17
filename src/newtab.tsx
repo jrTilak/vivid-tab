@@ -2,7 +2,7 @@ import Homepage from "@/components/screens/newtab"
 import { Settings } from "./components/screens/newtab/settings"
 import { RootProvider } from "./providers/root-provider"
 
-function Index() {
+function NewtabPage() {
   return (
     <RootProvider>
       <Homepage />
@@ -13,4 +13,4 @@ function Index() {
   )
 }
 
-export default Index
+export default NewtabPage

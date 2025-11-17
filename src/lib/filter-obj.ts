@@ -23,4 +23,4 @@ const filterObj = <T extends Record<string, unknown>>(
   return result
 }
 
-export default filterObj
+export { filterObj }

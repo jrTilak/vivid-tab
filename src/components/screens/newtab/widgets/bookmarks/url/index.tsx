@@ -248,7 +248,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
                 }
               }}
               className={cn(
-                "flex items-center gap-2 p-2 rounded-lg transition-colors hover:bg-accent/10 overflow-hidden w-full cursor-pointer disabled:cursor-default transition-transform",
+                "flex items-center gap-2 p-2 rounded-lg hover:bg-accent/10 overflow-hidden w-full cursor-pointer disabled:cursor-default transition-all",
                 isOver && "bg-accent/10",
                 isDragging && "bg-destructive/20",
                 isDragging && "relative z-50",

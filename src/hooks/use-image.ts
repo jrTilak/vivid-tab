@@ -1,13 +1,5 @@
+import { type StoredImage } from "@/lib/wallpapers"
 import { useEffect, useState } from "react"
-
-interface ImageData {
-  src: string
-  source?: "local" | "pixabay"
-  pixabayId?: number
-  tags?: string
-  user?: string
-  fetchedAt?: number
-}
 
 /**
  * Retrieves an image from IndexedDB using its ID
@@ -15,7 +7,7 @@ interface ImageData {
  * Returns: object with image data including source metadata
  */
 const useImage = (imageId: string | null) => {
-  const [imageData, setImageData] = useState<ImageData | null>(null)
+  const [imageData, setImageData] = useState<StoredImage | null>(null)
 
   useEffect(() => {
     if (!imageId) {
@@ -34,16 +26,9 @@ const useImage = (imageId: string | null) => {
 
       getRequest.onsuccess = () => {
         if (getRequest.result) {
-          const result = getRequest.result
-          setImageData({
-            src: result.src,
-            source: result.source || "local",
-            pixabayId: result.pixabayId,
-            tags: result.tags,
-            user: result.user,
-            fetchedAt: result.fetchedAt,
-          })
-          
+          const result = getRequest.result as StoredImage
+          setImageData(result)
+
           // If the image is not yet downloaded, trigger background download
           if (!result.downloaded && result.source !== "local") {
             // Import wallpaper dynamically to avoid circular dependencies
