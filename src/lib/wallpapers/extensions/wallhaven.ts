@@ -34,7 +34,7 @@ export class Wallhaven implements WallpaperExtension {
   }
 
   private async _fetchImages(searchTerm?: string, page = 1): Promise<string[]> {
-    let url = `https://wallhaven.cc/api/v1/search?page=${page}&resolutions=1920x1080&sorting=random`
+    let url = `https://wallhaven.cc/api/v1/search?page=${page}&resolutions=1920x1080&sorting=random&seed=${new Date().getTime()}`
     if (searchTerm) url += `&q=${encodeURIComponent(searchTerm)}`
 
     try {
