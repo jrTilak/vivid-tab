@@ -69,7 +69,13 @@ const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         if (raw) {
           try {
             const parsed = SettingsSchema.parse(JSON.parse(raw))
-            setSettings(parsed)
+            // Only update if the new value is different from current settings
+            setSettings((prev) => {
+              if (JSON.stringify(prev) !== raw) {
+                return parsed
+              }
+              return prev
+            })
           } catch (err) {
             console.error("Failed to parse settings from storage change:", err)
           }
