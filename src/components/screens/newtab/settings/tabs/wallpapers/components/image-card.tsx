@@ -61,7 +61,7 @@ const ImageCard = ({
         src={imageId === null ? defaultImage : imageData?.src}
         width={200}
         height={200}
-        className="w-full h-48 object-cover rounded-lg transition-transform group-disabled:group-hover:scale-100 group-hover:scale-105 brightness-75"
+        className="w-full h-48 object-cover rounded-lg transition-transform group-hover:group-disabled:scale-100 group-hover:scale-105 brightness-75"
       />
       {isSelected && (
         <Badge

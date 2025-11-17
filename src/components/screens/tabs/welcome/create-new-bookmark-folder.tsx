@@ -29,21 +29,24 @@ const CreateNewBookmarkFolder = () => {
     const bookmark = await chrome.bookmarks.create({
       title: bookmarkFolderName,
     })
-
-    setSettings((prev) => ({
-      ...prev,
-      general: {
-        ...prev.general,
-        rootFolder: bookmark.id,
-      },
-    }))
-    chrome.tabs.create({})
-    chrome.tabs.remove(activeTabId)
+    setSettings((prev) => {
+      return {
+        ...prev,
+        general: {
+          ...prev.general,
+          rootFolder: bookmark.id,
+        },
+      }
+    })
+    setTimeout(() => {
+      chrome.tabs.create({})
+      chrome.tabs.remove(activeTabId)
+    }, 100)
   }
 
   return (
     <motion.div {...ANIMATION_PROPS[animationName]}>
-      <Card className="w-full max-w-lg bg-background text-center min-w-[512px] text-foreground">
+      <Card className="w-full max-w-lg text-center min-w-lg text-foreground gap-4">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Create Bookmark Folder</CardTitle>
           <p className="text-sm">

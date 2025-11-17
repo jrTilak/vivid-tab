@@ -204,7 +204,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
                   }
                 }}
                 className={cn(
-                  "flex items-center flex-col space-y-1 p-2 rounded-lg hover:scale-105 text-center text-xs w-24",
+                  "flex items-center cursor-pointer disabled:cursor-default flex-col space-y-1 p-2 rounded-lg hover:scale-105 text-center text-xs w-24 transition-transform",
                   isOver && "bg-accent/10",
                   isDragging && "bg-destructive/20",
                   isDragging && "relative z-50",
@@ -248,7 +248,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
                 }
               }}
               className={cn(
-                "flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-accent/10 overflow-hidden w-full",
+                "flex items-center gap-2 p-2 rounded-lg transition-colors hover:bg-accent/10 overflow-hidden w-full cursor-pointer disabled:cursor-default transition-transform",
                 isOver && "bg-accent/10",
                 isDragging && "bg-destructive/20",
                 isDragging && "relative z-50",
@@ -295,7 +295,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
               <ExternalLinkIcon className="size-4" />
             </ContextMenuShortcut>
           </ContextMenuItem>
-          <ContextMenuSeparator />
+          <ContextMenuSeparator className="bg-border/50" />
           <ContextMenuItem
             onClick={() => setTimeout(() => setEditDialogOpen(true), 100)}
           >
@@ -314,7 +314,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
           </ContextMenuItem>
           <ContextMenuItem
             onClick={() => setIsDeleteDialogOpen(true)}
-            className="text-destructive"
+            className="text-red-500"
           >
             Delete
             <ContextMenuShortcut>
