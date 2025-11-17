@@ -166,9 +166,23 @@ class Wallpaper {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open("ImageDB", 1)
 
+      request.onupgradeneeded = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result
+
+        if (!db.objectStoreNames.contains("images")) {
+          db.createObjectStore("images", { keyPath: "id" })
+        }
+      }
+
       request.onsuccess = (event) => {
         const db = (event.target as IDBOpenDBRequest).result
+
+        if (!db) resolve()
+
         const tx = db.transaction("images", "readwrite")
+
+        if (!tx) resolve()
+
         const store = tx.objectStore("images")
 
         const getAllReq = store.getAll()
