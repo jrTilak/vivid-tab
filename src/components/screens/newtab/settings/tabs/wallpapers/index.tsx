@@ -104,7 +104,7 @@ export default function WallpaperSettings() {
     try {
       console.log("Force fetching new images from Pixabay...")
 
-      wallpaper.fetchOnlineImages(true)
+      await wallpaper.fetchOnlineImages(true)
     } catch (error) {
       console.error("Error in forceRefreshImages:", error)
     } finally {

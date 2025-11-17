@@ -57,6 +57,31 @@ const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       setSettings(parsed)
       setIsLoaded(true)
     })
+
+    // Listen for changes to settings in Chrome storage
+    const handleStorageChange = (
+      changes: { [key: string]: chrome.storage.StorageChange },
+      areaName: string,
+    ) => {
+      if (areaName === "sync" && changes.settings) {
+        const raw = changes.settings.newValue
+
+        if (raw) {
+          try {
+            const parsed = SettingsSchema.parse(JSON.parse(raw))
+            setSettings(parsed)
+          } catch (err) {
+            console.error("Failed to parse settings from storage change:", err)
+          }
+        }
+      }
+    }
+
+    chrome.storage.onChanged.addListener(handleStorageChange)
+
+    return () => {
+      chrome.storage.onChanged.removeListener(handleStorageChange)
+    }
   }, [])
 
   useEffect(() => {
