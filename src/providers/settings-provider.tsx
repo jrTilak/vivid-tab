@@ -74,6 +74,7 @@ const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
               if (JSON.stringify(prev) !== raw) {
                 return parsed
               }
+
               return prev
             })
           } catch (err) {
