@@ -11,10 +11,6 @@ import ImageCard from "./components/image-card"
 import UploadButton from "./components/upload-button"
 import { wallpaper } from "@/lib/wallpapers"
 
-export interface ImageData {
-  src: string
-}
-
 export default function WallpaperSettings() {
   const {
     settings: {
