@@ -7,8 +7,8 @@
   "scripts": {
     "dev": "plasmo dev",
     "dev:f": "plasmo dev --target=firefox-mv3",
-    "build": "plasmo build",
-    "build:f": "plasmo build --target=firefox-mv3",
+    "build": "plasmo build && node scripts/post-build.js chrome-mv3-prod",
+    "build:f": "plasmo build --target=firefox-mv3 && node scripts/post-build.js firefox-mv3-prod",
     "package": "plasmo package",
     "format": "prettier --write .",
     "lint": "eslint .",

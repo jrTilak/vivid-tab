@@ -1,3 +1,5 @@
+import "@/styles/index.css"
+
 import Homepage from "@/components/screens/newtab"
 import { Settings } from "./components/screens/newtab/settings"
 import { RootProvider } from "./providers/root-provider"
