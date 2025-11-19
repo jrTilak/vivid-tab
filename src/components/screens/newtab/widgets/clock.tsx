@@ -1,7 +1,9 @@
 import { Card } from "@/components/ui/card"
 import { useSettings } from "@/providers/settings-provider"
 import React, { useEffect, useState } from "react"
-import { formatDate } from "date-fns"
+
+// importing as * to avoid excluding fns during treeshaking
+import * as datefns from "date-fns/format"
 
 interface TimerSettings {
   showSeconds?: boolean
@@ -27,20 +29,22 @@ const Clock = () => {
     if (!timer) return "00:00"
 
     if (timer.timeFormat === "12h" && timer.showSeconds) {
-      return formatDate(date, "hh:mm:ss a")
+      return datefns.formatDate(date, "hh:mm:ss a")
     } else if (timer.timeFormat === "24h" && timer.showSeconds) {
-      return formatDate(date, "HH:mm:ss")
+      return datefns.formatDate(date, "HH:mm:ss")
     } else if (timer.timeFormat === "12h") {
-      return formatDate(date, "hh:mm a")
+      return datefns.formatDate(date, "hh:mm a")
     } else if (timer.timeFormat === "24h") {
-      return formatDate(date, "HH:mm")
+      return datefns.formatDate(date, "HH:mm")
     }
   }
 
   return (
     <Card className="p-6">
       <div className="text-5xl font-light">{formatTime(time, timer)}</div>
-      <div className="mt-1 text-sm">{formatDate(time, "eeee dd, MMMM")}</div>
+      <div className="mt-1 text-sm">
+        {datefns.formatDate(time, "eeee dd, MMMM")}
+      </div>
     </Card>
   )
 }
