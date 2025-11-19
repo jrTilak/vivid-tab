@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { useSettings } from "@/providers/settings-provider"
 
 import { ChevronLeftIcon, ChevronRight } from "lucide-react"
 import { motion } from "motion/react"
@@ -27,7 +26,6 @@ import { useWelcomeContext } from "./_context"
 const ImportFromBrowserBookmarks = () => {
   const folders = useFlattenBookmarkFolders()
   const [selectedFolder, setSelectedFolder] = useState<string>("")
-  const { setSettings } = useSettings()
   const activeTabId = useBrowserActiveTab()
   const { animationName, setAnimationName, scrollToTab } = useWelcomeContext()
 
@@ -103,7 +101,14 @@ const ImportFromBrowserBookmarks = () => {
                   ...currentSettings.general,
                   rootFolder: selectedFolder,
                 },
-              }))
+              }
+
+              // Save to Chrome storage and wait for completion
+              // This is especially important in Firefox where storage operations may take longer
+              await chrome.storage.sync.set({
+                settings: JSON.stringify(updatedSettings),
+              })
+
               setTimeout(() => {
                 chrome.tabs.create({}, () => {
                   chrome.tabs.remove(activeTabId)

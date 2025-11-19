@@ -5,9 +5,9 @@ import PreviewCard from "./preview-card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import filterObj from "@/lib/filter-obj"
+import { filterObj } from "@/lib/filter-obj"
 import { DndContext, type DragEndEvent } from "@dnd-kit/core"
-import findObjValue from "@/lib/find-obj"
+import { findObjValue } from "@/lib/find-obj"
 
 const LayoutsSettings = () => {
   const {

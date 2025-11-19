@@ -120,19 +120,11 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
   }, [editDialogOpen, fetchIcon])
 
   const openLink = useCallback((url: string, newTab?: boolean) => {
-    // create a new tab with the url first
-    chrome.tabs.create({ url: url }, (newTabCreated) => {
-      // close the current tab if newTab is false, only after the new tab is created
-      if (!newTab && newTabCreated) {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          if (tabs && tabs.length > 0 && tabs[0].id) {
-            chrome.tabs.remove(tabs[0].id)
-          } else {
-            console.error("No active tab found to close.")
-          }
-        })
-      }
-    })
+    if (newTab) {
+      chrome.tabs.create({ url: url, active: true })
+    } else {
+      chrome.tabs.update({ url: url, active: true })
+    }
   }, [])
 
   const { isOver, setNodeRef } = useDroppable({
@@ -248,7 +240,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
                 }
               }}
               className={cn(
-                "flex items-center gap-2 p-2 rounded-lg transition-colors hover:bg-accent/10 overflow-hidden w-full cursor-pointer disabled:cursor-default transition-transform",
+                "flex items-center gap-2 p-2 rounded-lg hover:bg-accent/10 overflow-hidden w-full cursor-pointer disabled:cursor-default transition-all",
                 isOver && "bg-accent/10",
                 isDragging && "bg-destructive/20",
                 isDragging && "relative z-50",

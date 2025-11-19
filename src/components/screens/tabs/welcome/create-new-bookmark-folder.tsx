@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { useSettings } from "@/providers/settings-provider"
 import { ChevronLeftIcon, ChevronRight } from "lucide-react"
 import { motion } from "motion/react"
 import React, { useState } from "react"
@@ -21,7 +20,6 @@ const CreateNewBookmarkFolder = () => {
   const [bookmarkFolderName, setBookmarkFolderName] = useState(
     DEFAULT_BOOKMARK_FOLDER_NAME,
   )
-  const { setSettings } = useSettings()
   const activeTabId = useBrowserActiveTab()
   const { animationName, scrollToTab, setAnimationName } = useWelcomeContext()
 
@@ -29,13 +27,11 @@ const CreateNewBookmarkFolder = () => {
     const bookmark = await chrome.bookmarks.create({
       title: bookmarkFolderName,
     })
-    
+
     // Get current settings from storage
     const result = await chrome.storage.sync.get("settings")
-    const currentSettings = result.settings
-      ? JSON.parse(result.settings)
-      : {}
-    
+    const currentSettings = result.settings ? JSON.parse(result.settings) : {}
+
     // Update settings with new rootFolder
     const updatedSettings = {
       ...currentSettings,
@@ -44,7 +40,7 @@ const CreateNewBookmarkFolder = () => {
         rootFolder: bookmark.id,
       },
     }
-    
+
     // Save to Chrome storage and wait for completion
     // This is especially important in Firefox where storage operations may take longer
     await chrome.storage.sync.set({

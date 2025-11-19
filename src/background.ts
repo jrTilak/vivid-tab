@@ -75,17 +75,24 @@ chrome.runtime.onInstalled.addListener((details) => {
 
   // Set up alarm for hourly image fetching
   chrome.alarms.create(ALARMS.FETCH_ONLINE_IMAGES, { periodInMinutes: 60 * 3 })
-  
+
   // Set up alarm for downloading pending images (every 5 minutes)
   chrome.alarms.create(ALARMS.DOWNLOAD_PENDING_IMAGES, { periodInMinutes: 5 })
 })
 
 // Handle alarm for periodic image fetching
 chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === ALARMS.FETCH_ONLINE_IMAGES) {
-    wallpaper.fetchOnlineImages()
-  } else if (alarm.name === ALARMS.DOWNLOAD_PENDING_IMAGES) {
-    wallpaper.downloadPendingImages()
+  switch (alarm.name) {
+    case ALARMS.FETCH_ONLINE_IMAGES:
+      wallpaper.fetchOnlineImages()
+      break
+
+    case ALARMS.DOWNLOAD_PENDING_IMAGES:
+      wallpaper.downloadPendingImages()
+      break
+
+    default:
+      break
   }
 })
 

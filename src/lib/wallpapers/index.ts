@@ -162,7 +162,9 @@ class Wallpaper {
       const attempts = (image.downloadAttempts || 0) + 1
 
       // Download the image
-      const base64 = await this._downloadAsBase64(image.originalUrl || image.src)
+      const base64 = await this._downloadAsBase64(
+        image.originalUrl || image.src,
+      )
 
       // Update in IndexedDB
       return new Promise((resolve, reject) => {
@@ -305,7 +307,9 @@ class Wallpaper {
   /**
    * Store multiple image URLs (without downloading yet)
    */
-  private async _storeImageUrls(images: { imageUrl: string; source: string }[]) {
+  private async _storeImageUrls(
+    images: { imageUrl: string; source: string }[],
+  ) {
     const ids: string[] = []
 
     for (const img of images) {
@@ -327,7 +331,8 @@ class Wallpaper {
     try {
       const allImages = await this._getAllStoredImages()
       const pendingImages = allImages.filter(
-        (img) => !img.downloaded && !img.downloadFailed && img.source !== "local"
+        (img) =>
+          !img.downloaded && !img.downloadFailed && img.source !== "local",
       )
 
       if (pendingImages.length === 0) {
