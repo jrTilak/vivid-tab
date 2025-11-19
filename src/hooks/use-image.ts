@@ -1,5 +1,5 @@
 import { type StoredImage } from "@/lib/wallpapers"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 
 /**
  * Retrieves an image from IndexedDB using its ID
@@ -8,6 +8,8 @@ import { useEffect, useState } from "react"
  */
 const useImage = (imageId: string | null) => {
   const [imageData, setImageData] = useState<StoredImage | null>(null)
+  // Track if we've already triggered download for this image to prevent infinite loops
+  const downloadTriggered = useRef<Set<string>>(new Set())
 
   useEffect(() => {
     if (!imageId) {
@@ -30,7 +32,9 @@ const useImage = (imageId: string | null) => {
           setImageData(result)
 
           // If the image is not yet downloaded, trigger background download
-          if (!result.downloaded && result.source !== "local") {
+          // Only trigger once per image to prevent infinite loops
+          if (!result.downloaded && result.source !== "local" && !downloadTriggered.current.has(imageId)) {
+            downloadTriggered.current.add(imageId)
             // Import wallpaper dynamically to avoid circular dependencies
             import("@/lib/wallpapers").then(({ wallpaper }) => {
               wallpaper.downloadPendingImages().catch(console.error)

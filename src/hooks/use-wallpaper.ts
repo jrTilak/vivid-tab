@@ -1,5 +1,5 @@
 import { useSettings } from "@/providers/settings-provider"
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { useImage } from "./use-image"
 import { randomInt } from "@/lib/random"
 import { LAST_WALLPAPER_CHANGED_AT } from "@/constants/keys"
@@ -9,14 +9,20 @@ export const useWallpaper = () => {
     settings: { wallpapers, background },
     setSettings,
   } = useSettings()
+  
+  // Track if we've already run the effect for "on-each-tab" mode
+  const hasRunOnMount = useRef(false)
+  
   useEffect(() => {
-    let selectedImageId = wallpapers.selectedImageId
-    let shouldUpdateSettings = false
-
+    // For "on-each-tab" mode, only run once on mount
+    if (background.randomizeWallpaper === "on-each-tab" && hasRunOnMount.current) {
+      return
+    }
+    
     const newImage = () => {
-      if (wallpapers.images.length === 0) return selectedImageId
+      if (wallpapers.images.length === 0) return wallpapers.selectedImageId
 
-      const currentImageIndex = wallpapers.images.indexOf(selectedImageId)
+      const currentImageIndex = wallpapers.images.indexOf(wallpapers.selectedImageId)
 
       // generating from 0 - length ie one more than acutal images so that we can also show the default wallpaper at last index
       return wallpapers.images[
@@ -30,8 +36,15 @@ export const useWallpaper = () => {
         break
       case "on-each-tab":
         if (wallpapers.images.length > 0) {
-          selectedImageId = newImage()
-          shouldUpdateSettings = true
+          const selectedImageId = newImage()
+          setSettings((prev) => ({
+            ...prev,
+            wallpapers: {
+              ...prev.wallpapers,
+              selectedImageId: selectedImageId,
+            },
+          }))
+          hasRunOnMount.current = true
         }
 
         break
@@ -132,18 +145,7 @@ export const useWallpaper = () => {
       default:
         break
     }
-
-    // Only update settings for "on-each-tab" case synchronously
-    if (shouldUpdateSettings) {
-      setSettings((prev) => ({
-        ...prev,
-        wallpapers: {
-          ...prev.wallpapers,
-          selectedImageId: selectedImageId,
-        },
-      }))
-    }
-  }, [background.randomizeWallpaper])
+  }, [background.randomizeWallpaper, wallpapers.images.length])
 
   const imageData = useImage(wallpapers.selectedImageId)
 
