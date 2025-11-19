@@ -87,7 +87,7 @@ const BookmarkFolder = (props: Props) => {
               style={style}
               onClick={props.onOpenFolder}
               className={cn(
-                "flex flex-col  space-y-1 p-2 rounded-lg hover:scale-105 w-24 disabled:opacity-50",
+                "flex flex-col space-y-1 p-2 rounded-lg hover:scale-105 w-24 disabled:opacity-50 cursor-pointer disabled:cursor-default transition-transform",
                 isOver && "bg-accent/10",
                 isDragging && "bg-destructive/20",
                 isDragging && "relative z-50",
@@ -133,7 +133,7 @@ const BookmarkFolder = (props: Props) => {
               style={style}
               ref={setNodeRef}
               className={cn(
-                "flex space-x-1 p-2 items-center rounded-lg transition-colors disabled:opacity-50",
+                "flex gap-2 p-2 items-center rounded-lg transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-default transition-transform",
                 isOver && "bg-accent/10",
                 isDragging && "scale-110 bg-destructive/20",
                 isDragging && "relative z-50",
@@ -198,7 +198,7 @@ const BookmarkFolder = (props: Props) => {
           </ContextMenuItem>
           <ContextMenuItem
             onClick={() => setTimeout(() => setIsDeleteDialogOpen(true), 100)}
-            className="text-destructive"
+            className="text-red-500"
           >
             Delete
             <ContextMenuShortcut>

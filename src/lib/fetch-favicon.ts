@@ -2,6 +2,9 @@
  *  Fetches favicon of a specific website
  */
 const fetchFavicon = async (url: string) => {
+  // not allowded to read local files.
+  if (url.startsWith("file://")) return { title: null, favicon: null }
+
   try {
     const response = await fetch(url)
     const html = await response.text()

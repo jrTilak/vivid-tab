@@ -18,6 +18,10 @@ export const DEFAULT_SETTINGS = {
   wallpapers: {
     selectedImageId: null,
     images: [] as string[],
+    onlineImages: {
+      enabled: true,
+      keywords: "",
+    },
   },
   layout: {
     0: "searchbar",
@@ -45,6 +49,6 @@ export const DEFAULT_SETTINGS = {
   background: {
     blurIntensity: 5,
     brightness: 9,
-    randomizeWallpaper: "off",
+    randomizeWallpaper: "on-each-tab",
   },
 } as const
