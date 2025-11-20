@@ -5,7 +5,8 @@
     ".plasmo/index.d.ts",
     "./**/*.ts",
     "./**/*.tsx",
-    "src/components/welcome/import-from-browser-bookmarks.tsx", "knip.js",
+    "src/components/welcome/import-from-browser-bookmarks.tsx",
+    "knip.js",
   ],
   "compilerOptions": {
     "paths": {
