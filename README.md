@@ -75,7 +75,10 @@ Vivid Tab is an evolving project with room for enhancements. If you have ideas o
 
 ## 📜 License
 
-This project is open-source and available under the [MIT License](LICENSE).
+This project is open-source and available under a Modified MIT License (see LICENSE for details).
+
+> **Attribution Requirement:**  
+> Any copies, distributions, or substantial portions of this software or derivative works must include clear and explicit credit to the original author: **jrTilak** (e.g., "Original author: jrTilak" in documentation, about sections, or credits).
 
 ---
 
