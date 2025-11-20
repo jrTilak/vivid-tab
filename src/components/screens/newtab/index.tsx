@@ -74,7 +74,7 @@ export default function Homepage() {
       <div className="min-h-screen w-full bg-cover bg-center p-6 relative select-none transition-all">
         <div
           style={{
-            backgroundImage: `url(${!wallpapers.selectedImageId ? background : imageData?.src})`,
+            backgroundImage: `url(${!wallpapers.selectedImageId ? background : imageData?.src || background})`,
           }}
           className={cn(
             "h-full w-full bg-cover bg-center bg-no-repeat absolute inset-0",
