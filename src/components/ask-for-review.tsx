@@ -134,7 +134,7 @@ const AskForReview = () => {
               <button
                 className={cn(
                   buttonVariants({ variant: "outline" }),
-                  "flex flex-col min-w-[150px] aspect-square h-auto aspect-square px-4 py-4",
+                  "flex flex-col min-w-[150px] aspect-square h-auto px-4 py-4",
                 )}
                 onClick={handleNotReally}
               >
@@ -148,7 +148,7 @@ const AskForReview = () => {
               <button
                 className={cn(
                   buttonVariants({ variant: "outline" }),
-                  "flex flex-col min-w-[150px] aspect-square h-auto aspect-square px-4 py-4",
+                  "flex flex-col min-w-[150px] aspect-square h-auto px-4 py-4",
                 )}
                 onClick={handleLikeIt}
               >
