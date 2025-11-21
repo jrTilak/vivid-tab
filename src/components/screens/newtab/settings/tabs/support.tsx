@@ -23,6 +23,32 @@ type SupportItem =
       onClick: () => void
     }
 
+const SupportCardContent = ({
+  title,
+  desc,
+  icon,
+}: {
+  title: string
+  desc: string
+  icon: React.ReactNode
+}) => (
+  <CardContent className="flex items-center justify-between p-6">
+    <div className="space-y-1">
+      <h3 className="font-medium leading-none tracking-tight text-xl text-foreground">
+        {title}
+      </h3>
+      <p className="text-sm text-muted-foreground">{desc}</p>
+    </div>
+    <div className="ml-4 shrink-0 text-foreground/60">
+      {typeof icon === "string" ? (
+        <img src={icon} alt={title} className="rounded-md size-6" />
+      ) : (
+        icon
+      )}
+    </div>
+  </CardContent>
+)
+
 const Support = ({ onCloseSettings }: SupportProps) => {
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false)
 
@@ -35,10 +61,10 @@ const Support = ({ onCloseSettings }: SupportProps) => {
 
   const items: SupportItem[] = [
     {
-      title: "Github",
+      title: "GitHub",
       url: "https://github.com/jrtilak/vivid-tab",
       icon: <GithubIcon />,
-      desc: "Contribute on Github",
+      desc: "Contribute on GitHub",
       isButton: false,
     },
     {
@@ -69,25 +95,11 @@ const Support = ({ onCloseSettings }: SupportProps) => {
                 className="block w-full text-left"
                 type="button"
               >
-                <CardContent className="flex items-center justify-between p-6">
-                  <div className="space-y-1">
-                    <h3 className="font-medium leading-none tracking-tight text-xl text-foreground">
-                      {item.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">{item.desc}</p>
-                  </div>
-                  <div className="ml-4 shrink-0 text-foreground/60">
-                    {typeof item.icon === "string" ? (
-                      <img
-                        src={item.icon}
-                        alt={item.title}
-                        className="rounded-md size-6"
-                      />
-                    ) : (
-                      item.icon
-                    )}
-                  </div>
-                </CardContent>
+                <SupportCardContent
+                  title={item.title}
+                  desc={item.desc}
+                  icon={item.icon}
+                />
               </button>
             ) : (
               <a
@@ -96,25 +108,11 @@ const Support = ({ onCloseSettings }: SupportProps) => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <CardContent className="flex items-center justify-between p-6">
-                  <div className="space-y-1">
-                    <h3 className="font-medium leading-none tracking-tight text-xl text-foreground">
-                      {item.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">{item.desc}</p>
-                  </div>
-                  <div className="ml-4 shrink-0 text-foreground/60">
-                    {typeof item.icon === "string" ? (
-                      <img
-                        src={item.icon}
-                        alt={item.title}
-                        className="rounded-md size-6"
-                      />
-                    ) : (
-                      item.icon
-                    )}
-                  </div>
-                </CardContent>
+                <SupportCardContent
+                  title={item.title}
+                  desc={item.desc}
+                  icon={item.icon}
+                />
               </a>
             )}
           </Card>
