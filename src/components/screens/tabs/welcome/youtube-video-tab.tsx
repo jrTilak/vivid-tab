@@ -5,6 +5,9 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 import { motion } from "motion/react"
 import { useWelcomeContext } from "./_context"
 
+// 16:9 aspect ratio for video player (9/16 = 0.5625)
+const VIDEO_ASPECT_RATIO_PADDING = "56.25%"
+
 const YouTubeVideoTab = () => {
   const { animationName, scrollToTab, setAnimationName } = useWelcomeContext()
 
@@ -13,7 +16,7 @@ const YouTubeVideoTab = () => {
   
   // Extract video ID from YouTube URL
   const getVideoId = (url: string) => {
-    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)
 
     return match ? match[1] : ""
   }
@@ -37,7 +40,7 @@ const YouTubeVideoTab = () => {
         </CardHeader>
         <CardContent className="px-6">
           {embedUrl ? (
-            <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+            <div className="relative w-full" style={{ paddingBottom: VIDEO_ASPECT_RATIO_PADDING }}>
               <iframe
                 src={embedUrl}
                 title="How to use Vivid Tab"
