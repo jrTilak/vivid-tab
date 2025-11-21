@@ -10,6 +10,7 @@ import { cn } from "@/lib/cn"
 import { Searchbar } from "./widgets/searchbar"
 import { useWallpaper } from "@/hooks/use-wallpaper"
 import { Bookmarks } from "./widgets/bookmarks"
+import { NextWallpaperButton } from "./next-wallpaper-button"
 
 type Layout = "small" | "mid" | "large"
 
@@ -172,6 +173,9 @@ export default function Homepage() {
             </div>
           </div>
         )}
+
+        {/* Next Wallpaper Button */}
+        <NextWallpaperButton />
       </div>
     </>
   )
