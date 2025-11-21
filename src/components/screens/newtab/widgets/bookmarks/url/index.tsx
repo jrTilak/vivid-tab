@@ -213,7 +213,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
                     className="rounded-md object-contain object-center size-12"
                   />
                   <AvatarFallback className="size-12">
-                    {data.title
+                    {(data.title || "")
                       .replace(/[^a-zA-Z ]/g, "")
                       .trim()
                       .toLowerCase()
@@ -262,7 +262,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
                   className="rounded-md object-contain object-center size-12"
                 />
                 <AvatarFallback className="size-12">
-                  {data.title
+                  {(data.title || "")
                     .replace(/[^a-zA-Z ]/g, "")
                     .trim()
                     .toLowerCase()
