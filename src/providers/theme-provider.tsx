@@ -46,9 +46,9 @@ export function ThemeProvider({
       root.classList.add(systemTheme)
 
       return
+    } else {
+      root.classList.add(theme)
     }
-
-    root.classList.add(theme)
   }, [theme])
 
   const value = {

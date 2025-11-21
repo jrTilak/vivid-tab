@@ -15,7 +15,7 @@ const Support = () => {
       ].map((item, i) => (
         <Card
           key={i}
-          className="overflow-hidden transition-all bg-muted hover:scale-[1.01] border-solid border shadow-none"
+          className="overflow-hidden transition-all bg-muted border-solid border shadow-none"
         >
           <a
             href={item.url}
@@ -30,7 +30,7 @@ const Support = () => {
                 </h3>
                 <p className="text-sm text-muted-foreground">{item.desc}</p>
               </div>
-              <div className="ml-4 flex-shrink-0 text-foreground/60">
+              <div className="ml-4 shrink-0 text-foreground/60">
                 {typeof item.icon === "string" ? (
                   <img
                     src={item.icon}

@@ -19,7 +19,7 @@ const Searchbar = () => {
         <div
           onClick={() => setIsOpen(true)}
           className={cn(
-            "flex-grow flex h-10 w-full rounded-md border border-input bg-background/80 backdrop-blur-xl px-3 py-2 text-base md:text-sm relative group-hover:border-accent group-hover:shadow-lg",
+            "grow flex h-10 w-full rounded-md border border-input bg-background/80 backdrop-blur-xl px-3 py-2 text-base md:text-sm relative group-hover:border-accent group-hover:shadow-lg",
           )}
         >
           <span className="text-muted-foreground">

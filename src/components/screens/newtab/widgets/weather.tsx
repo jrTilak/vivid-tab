@@ -18,30 +18,28 @@ const Weather = () => {
 
   return (
     <Card className="p-6">
-      {
-        <div className="flex space-x-3">
-          <img
-            src={
-              weatherData.condition.icon.startsWith("http")
-                ? weatherData.condition.icon
-                : `https:${weatherData.condition.icon}`
-            }
-            alt="weather icon"
-            className="h-8 w-8 mt-1"
-          />
-          <div>
-            <div className="text-2xl">
-              {temperature.unit === "celsius"
-                ? `${weatherData.temp.celsius}°C`
-                : `${weatherData.temp.fahrenheit}°F`}
-            </div>
-            <div className="text-sm">{weatherData.location}</div>
-            <div className="text-xs text-foreground/40 dark:text-muted-foreground">
-              {weatherData.condition.text}
-            </div>
+      <div className="flex space-x-3">
+        <img
+          src={
+            weatherData.condition.icon.startsWith("http")
+              ? weatherData.condition.icon
+              : `https:${weatherData.condition.icon}`
+          }
+          alt="weather icon"
+          className="h-8 w-8 mt-1"
+        />
+        <div>
+          <div className="text-2xl">
+            {temperature.unit === "celsius"
+              ? `${weatherData.temp.celsius}°C`
+              : `${weatherData.temp.fahrenheit}°F`}
+          </div>
+          <div className="text-sm">{weatherData.location}</div>
+          <div className="text-xs text-foreground/40 dark:text-muted-foreground">
+            {weatherData.condition.text}
           </div>
         </div>
-      }
+      </div>
     </Card>
   )
 }

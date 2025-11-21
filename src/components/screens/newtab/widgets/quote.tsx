@@ -27,7 +27,7 @@ const Quote = () => {
 
   useAsyncEffect(async () => {
     const [err, data] = await tryCatchAsync(async () => {
-      const baseUrl = "http://api.quotable.io/quotes/random"
+      const baseUrl = "https://api.quotable.io/quotes/random"
       const urlWithTags =
         categories.length > 0
           ? `${baseUrl}?tags=${categories.join("|")}&maxLength=80`

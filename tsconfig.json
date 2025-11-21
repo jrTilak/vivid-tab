@@ -6,6 +6,7 @@
     "./**/*.ts",
     "./**/*.tsx",
     "src/components/welcome/import-from-browser-bookmarks.tsx",
+    "knip.js",
   ],
   "compilerOptions": {
     "paths": {

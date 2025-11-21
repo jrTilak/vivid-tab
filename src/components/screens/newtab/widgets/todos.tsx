@@ -136,7 +136,7 @@ const Todos = () => {
                 <button
                   tabIndex={-1}
                   onClick={() => deleteTodo(todo.id)}
-                  className="text-destructive scale-0 group-hover:scale-100 transition-transform"
+                  className="text-destructive scale-0 group-hover:scale-100 transition-transform cursor-pointer disabled:cursor-default"
                 >
                   <TrashIcon className="h-4 w-4" />
                 </button>

@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { useSettings } from "@/providers/settings-provider"
 
 import { ChevronLeftIcon, ChevronRight } from "lucide-react"
 import { motion } from "motion/react"
@@ -27,13 +26,12 @@ import { useWelcomeContext } from "./_context"
 const ImportFromBrowserBookmarks = () => {
   const folders = useFlattenBookmarkFolders()
   const [selectedFolder, setSelectedFolder] = useState<string>("")
-  const { setSettings } = useSettings()
   const activeTabId = useBrowserActiveTab()
   const { animationName, setAnimationName, scrollToTab } = useWelcomeContext()
 
   return (
     <motion.div {...ANIMATION_PROPS[animationName]}>
-      <Card className="w-full max-w-lg bg-background text-center min-w-[512px] text-foreground pt-12">
+      <Card className="w-full max-w-lg text-center min-w-lg text-foreground pt-12 gap-4">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">
             Import from browser bookmarks
@@ -89,16 +87,33 @@ const ImportFromBrowserBookmarks = () => {
           </Button>
           <Button
             disabled={!selectedFolder}
-            onClick={() => {
-              setSettings((prev) => ({
-                ...prev,
+            onClick={async () => {
+              // Get current settings from storage
+              const result = await chrome.storage.sync.get("settings")
+              const currentSettings = result.settings
+                ? JSON.parse(result.settings)
+                : {}
+
+              // Update settings with selected rootFolder
+              const updatedSettings = {
+                ...currentSettings,
                 general: {
-                  ...prev.general,
+                  ...currentSettings.general,
                   rootFolder: selectedFolder,
                 },
-              }))
-              chrome.tabs.create({})
-              chrome.tabs.remove(activeTabId)
+              }
+
+              // Save to Chrome storage and wait for completion
+              // This is especially important in Firefox where storage operations may take longer
+              await chrome.storage.sync.set({
+                settings: JSON.stringify(updatedSettings),
+              })
+
+              setTimeout(() => {
+                chrome.tabs.create({}, () => {
+                  chrome.tabs.remove(activeTabId)
+                })
+              }, 100)
             }}
             variant="ghost"
             size="sm"
