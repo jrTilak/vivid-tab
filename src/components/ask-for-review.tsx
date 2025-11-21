@@ -1,6 +1,6 @@
 import sadEmoji from "data-base64:@/assets/sad.png"
 import happyEmoji from "data-base64:@/assets/happy.png"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -12,11 +12,40 @@ import { buttonVariants } from "./ui/button"
 import { cn } from "@/lib/cn"
 import { LOCAL_STORAGE } from "@/constants/keys"
 
-const AskForReview = () => {
-  const [isOpen, setIsOpen] = useState(false)
+type AskForReviewProps = {
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  skipAutoTrigger?: boolean
+}
+
+const AskForReview = ({
+  open: controlledOpen,
+  onOpenChange,
+  skipAutoTrigger = false,
+}: AskForReviewProps = {}) => {
+  const [internalOpen, setInternalOpen] = useState(false)
+
+  const isControlled = controlledOpen !== undefined
+  const isOpen = isControlled ? controlledOpen : internalOpen
+
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (isControlled) {
+        onOpenChange?.(open)
+      } else {
+        setInternalOpen(open)
+      }
+    },
+    [isControlled, onOpenChange],
+  )
 
   // Check whether to show the dialog or not!
   useEffect(() => {
+    // Skip automatic triggering if controlled externally or skipAutoTrigger is true
+    if (isControlled || skipAutoTrigger) {
+      return
+    }
+
     const checkAndShowReview = async () => {
       try {
         const result = await chrome.storage.local.get([
@@ -47,7 +76,7 @@ const AskForReview = () => {
 
         // First time: show on 7th day
         if (timesAsked === 0 && daysSinceInstall >= 7) {
-          setIsOpen(true)
+          handleOpenChange(true)
           // Save the timestamp and increment count
           await chrome.storage.local.set({
             [LOCAL_STORAGE.reviewLastAskedAt]: now.toString(),
@@ -65,7 +94,7 @@ const AskForReview = () => {
           )
 
           if (daysSinceLastAsk >= 90) {
-            setIsOpen(true)
+            handleOpenChange(true)
             // Save the timestamp and increment count
             await chrome.storage.local.set({
               [LOCAL_STORAGE.reviewLastAskedAt]: now.toString(),
@@ -79,7 +108,7 @@ const AskForReview = () => {
     }
 
     checkAndShowReview()
-  }, [])
+  }, [isControlled, skipAutoTrigger, handleOpenChange])
 
   return (
     <Dialog open={isOpen}>

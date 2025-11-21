@@ -143,7 +143,9 @@ export function Settings() {
             <DialogTitle>Settings</DialogTitle>
           </DialogHeader>
           <div className="mb-20 max-h-[500px] overflow-y-scroll h-full">
-            {React.createElement(TABS[activeTabIndex].component)}
+            {React.createElement(TABS[activeTabIndex].component, {
+              onCloseSettings: () => setOpen(false),
+            })}
           </div>
           <DialogFooter className="border-t p-4 absolute bottom-0 right-0 w-full">
             <Button
