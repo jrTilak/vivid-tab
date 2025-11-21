@@ -24,7 +24,7 @@ export const getBrowserStoreUrl = (): string => {
   }
 
   // Default to Chrome Web Store
-  return "https://chromewebstore.google.com/detail/vivid-tab/your-extension-id"
+  return "https://chrome.google.com/webstore/detail/vivid-tab/hchlkclbagoklpnijoadpghhcjpeoeim"
 }
 
 export const getFeedbackFormUrl = (): string => {
