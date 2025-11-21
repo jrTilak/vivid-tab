@@ -19,6 +19,9 @@ export const useNextWallpaper = () => {
     )
 
     // Get a random wallpaper, excluding the current one (if found)
+    // Note: randomInt uses max=wallpapers.images.length (not length-1) intentionally
+    // This allows selecting the default wallpaper when randomInt returns length
+    // (since wallpapers.images[length] returns undefined, triggering default fallback)
     const excludeIndices = currentImageIndex >= 0 ? [currentImageIndex] : []
     const newImageId =
       wallpapers.images[randomInt(0, wallpapers.images.length, excludeIndices)]
