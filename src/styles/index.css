@@ -83,3 +83,24 @@
     -ms-overflow-style: none;
   }
 }
+
+/* Review Dialog Styles - BEM methodology */
+.vt-dialog {
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+}
+
+.vt-dialog__title {
+  @apply text-lg font-semibold text-foreground;
+}
+
+.vt-dialog__message {
+  @apply text-sm text-muted-foreground;
+}
+
+.vt-dialog__cta {
+  @apply focus:ring-2 focus:ring-ring focus:ring-offset-2;
+}
+
+.vt-dialog__hint {
+  @apply text-xs text-muted-foreground italic;
+}

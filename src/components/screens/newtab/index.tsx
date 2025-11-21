@@ -10,6 +10,8 @@ import { cn } from "@/lib/cn"
 import { Searchbar } from "./widgets/searchbar"
 import { useWallpaper } from "@/hooks/use-wallpaper"
 import { Bookmarks } from "./widgets/bookmarks"
+import { ReviewDialog } from "@/components/dialogs/review-dialog"
+import { useReviewDialog } from "@/hooks/use-review-dialog"
 
 type Layout = "small" | "mid" | "large"
 
@@ -25,6 +27,7 @@ export default function Homepage() {
   } = useSettings()
 
   const imageSrc = useWallpaper()
+  const { showReviewDialog, setShowReviewDialog } = useReviewDialog()
 
   const COMPONENTS = useMemo(() => {
     return {
@@ -71,6 +74,10 @@ export default function Homepage() {
 
   return (
     <>
+      <ReviewDialog
+        open={showReviewDialog}
+        onOpenChange={setShowReviewDialog}
+      />
       <div className="min-h-screen w-full bg-cover bg-center p-6 relative select-none transition-all">
         <div
           style={{
