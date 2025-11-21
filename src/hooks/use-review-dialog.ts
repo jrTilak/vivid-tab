@@ -7,7 +7,7 @@ export const useReviewDialog = () => {
   const [showReviewDialog, setShowReviewDialog] = useState(false)
 
   useEffect(() => {
-    const checkReviewStatus = async () => {
+    const checkReviewStatus = () => {
       chrome.storage.local.get(
         [
           REVIEW_TRACKING.installDate,

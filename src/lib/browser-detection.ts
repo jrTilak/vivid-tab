@@ -1,16 +1,19 @@
 export type BrowserType = "chrome" | "firefox" | "unknown"
 
 export const detectBrowser = (): BrowserType => {
-  if (typeof chrome !== "undefined" && chrome.runtime) {
-    const userAgent = navigator.userAgent.toLowerCase()
+  const userAgent = navigator.userAgent.toLowerCase()
 
-    if (userAgent.includes("firefox")) {
-      return "firefox"
-    }
+  // Check for Firefox first
+  if (userAgent.includes("firefox")) {
+    return "firefox"
+  }
 
-    if (userAgent.includes("chrome") || userAgent.includes("chromium")) {
-      return "chrome"
-    }
+  // Check for Chrome/Chromium (but not Edge which also contains "chrome")
+  if (
+    (userAgent.includes("chrome") || userAgent.includes("chromium")) &&
+    !userAgent.includes("edg")
+  ) {
+    return "chrome"
   }
 
   return "unknown"
