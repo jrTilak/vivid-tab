@@ -1,4 +1,5 @@
 import { WelcomeTab } from "./welcome-tab"
+import { YouTubeVideoTab } from "./youtube-video-tab"
 import { ImportTab } from "./import-tab"
 import { CreateNewBookmarkFolder } from "./create-new-bookmark-folder"
 import { ImportFromBrowserBookmarks } from "./import-from-browser-bookmarks"
@@ -7,6 +8,7 @@ import { useWelcomeContext } from "./_context"
 
 const TABS = {
   WELCOME: WelcomeTab,
+  YOUTUBE_VIDEO: YouTubeVideoTab,
   IMPORT: ImportTab,
   CREATE_NEW_BOOKMARK_FOLDER: CreateNewBookmarkFolder,
   IMPORT_FROM_BROWSER_BOOKMARKS: ImportFromBrowserBookmarks,
