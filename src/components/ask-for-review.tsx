@@ -111,11 +111,21 @@ const AskForReview = ({
   }, [isControlled, skipAutoTrigger, handleOpenChange])
 
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent
         className="sm:max-w-md"
-        onInteractOutside={(e) => e.preventDefault()}
-        onEscapeKeyDown={(e) => e.preventDefault()}
+        onInteractOutside={(e) => {
+          // Allow closing when manually triggered (controlled)
+          if (!isControlled) {
+            e.preventDefault()
+          }
+        }}
+        onEscapeKeyDown={(e) => {
+          // Allow closing when manually triggered (controlled)
+          if (!isControlled) {
+            e.preventDefault()
+          }
+        }}
       >
         <DialogHeader>
           <DialogTitle className="text-2xl">Enjoying Vivid Tab?</DialogTitle>

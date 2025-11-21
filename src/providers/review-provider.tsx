@@ -29,9 +29,3 @@ export const useReview = () => {
 
   return context
 }
-
-export const useReviewState = () => {
-  const [isOpen, setIsOpen] = useState(false)
-
-  return { isOpen, setIsOpen }
-}

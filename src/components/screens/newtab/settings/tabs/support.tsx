@@ -7,6 +7,22 @@ type SupportProps = {
   onCloseSettings?: () => void
 }
 
+type SupportItem =
+  | {
+      title: string
+      icon: React.ReactNode
+      desc: string
+      isButton: false
+      url: string
+    }
+  | {
+      title: string
+      icon: React.ReactNode
+      desc: string
+      isButton: true
+      onClick: () => void
+    }
+
 const Support = ({ onCloseSettings }: SupportProps) => {
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false)
 
@@ -17,6 +33,23 @@ const Support = ({ onCloseSettings }: SupportProps) => {
     setReviewDialogOpen(true)
   }
 
+  const items: SupportItem[] = [
+    {
+      title: "Github",
+      url: "https://github.com/jrtilak/vivid-tab",
+      icon: <GithubIcon />,
+      desc: "Contribute on Github",
+      isButton: false,
+    },
+    {
+      title: "Leave a Review",
+      icon: <StarIcon />,
+      desc: "Help us improve",
+      isButton: true,
+      onClick: handleReviewClick,
+    },
+  ]
+
   return (
     <>
       <AskForReview
@@ -25,22 +58,7 @@ const Support = ({ onCloseSettings }: SupportProps) => {
         skipAutoTrigger={true}
       />
       <div className="p-4 grid grid-cols-2 gap-4">
-        {[
-          {
-            title: "Github",
-            url: "https://github.com/jrtilak/vivid-tab",
-            icon: <GithubIcon />,
-            desc: "Contribute on Github",
-            isButton: false,
-          },
-          {
-            title: "Leave a Review",
-            icon: <StarIcon />,
-            desc: "Help us improve",
-            isButton: true,
-            onClick: handleReviewClick,
-          },
-        ].map((item, i) => (
+        {items.map((item, i) => (
           <Card
             key={i}
             className="overflow-hidden transition-all bg-muted border-solid border shadow-none"
