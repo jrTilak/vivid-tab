@@ -18,11 +18,10 @@ export const useNextWallpaper = () => {
       wallpapers.selectedImageId,
     )
 
-    // Get a random wallpaper, excluding the current one
+    // Get a random wallpaper, excluding the current one (if found)
+    const excludeIndices = currentImageIndex >= 0 ? [currentImageIndex] : []
     const newImageId =
-      wallpapers.images[
-        randomInt(0, wallpapers.images.length, [currentImageIndex])
-      ]
+      wallpapers.images[randomInt(0, wallpapers.images.length, excludeIndices)]
 
     // Update settings with new wallpaper
     setSettings((prev) => ({
