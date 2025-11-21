@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { ALARMS, BACKGROUND_ACTIONS, } from "./constants/background-actions"
+import { ALARMS, BACKGROUND_ACTIONS } from "./constants/background-actions"
 import { LOCAL_STORAGE } from "./constants/keys"
 import { wallpaper } from "./lib/wallpapers"
 
@@ -70,8 +70,10 @@ chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === "install") {
     chrome.tabs.create({ url: chrome.runtime.getURL("tabs/welcome.html") })
 
-    // also save installed date 
-    chrome.storage.local.set({ [LOCAL_STORAGE.installedDate]: new Date().toString() })
+    // also save installed date
+    chrome.storage.local.set({
+      [LOCAL_STORAGE.installedDate]: new Date().toString(),
+    })
 
     // Also fetch images when extension starts
     wallpaper.fetchOnlineImages(true)

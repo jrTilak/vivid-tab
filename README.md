@@ -73,6 +73,17 @@ Vivid Tab is an evolving project with room for enhancements. If you have ideas o
 
 ---
 
+## 🙏 Credits
+
+Vivid Tab is built with the help of these amazing resources:
+
+- 🎨 **[SVG Repo](https://www.svgrepo.com/)** - For the beautiful SVG icons used throughout the extension.
+- 😊 **[Brixmoji](https://brixmoji.com/)** - For the awesome emojis that bring personality to the interface.
+- 🖼️ **[Pixabay](https://pixabay.com/)** & **[Wallhaven](https://wallhaven.cc/)** - For providing wallpaper APIs that enhance the visual experience.
+- 🚀 **[Plasmo](https://www.plasmo.com/)** - For the awesome framework that makes building Chrome extensions a breeze.
+
+---
+
 ## 📜 License
 
 This project is open-source and available under the [MIT License](LICENSE).

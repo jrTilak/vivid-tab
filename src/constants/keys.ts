@@ -8,5 +8,5 @@ export const LOCAL_STORAGE = {
   weather: "vivid-tab.cached-weather",
   installedDate: "vivid-tab.installed-date",
   reviewLastAskedAt: "vivid-tab.review-last-asked-at",
-  reviewTimesAsked: "vivid-tab.review-times-asked"
+  reviewTimesAsked: "vivid-tab.review-times-asked",
 }
