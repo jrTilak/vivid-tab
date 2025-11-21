@@ -95,6 +95,7 @@ const AskForReview = () => {
   const handleFeedbackRedirect = () => {
     window.open(process.env.PLASMO_PUBLIC_FEEDBACK_URL, "_blank")
     setIsOpen(false)
+    setDialogStep("initial")
   }
 
   const handleRatingRedirect = () => {
@@ -104,10 +105,12 @@ const AskForReview = () => {
         : process.env.PLASMO_PUBLIC_CHROME_WEBSTORE_URL
     window.open(url, "_blank")
     setIsOpen(false)
+    setDialogStep("initial")
   }
 
   const handleClose = () => {
     setIsOpen(false)
+    setDialogStep("initial")
   }
 
   return (
