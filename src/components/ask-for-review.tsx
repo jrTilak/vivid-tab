@@ -138,7 +138,7 @@ const AskForReview = ({
           <a
             className={cn(
               buttonVariants({ variant: "outline" }),
-              "flex flex-col min-w-[150px] aspect-square h-auto aspect-square px-4 py-4",
+              "flex flex-col min-w-[150px] aspect-square h-auto px-4 py-4",
             )}
             href={process.env.PLASMO_PUBLIC_FEEDBACK_URL}
           >
@@ -152,7 +152,7 @@ const AskForReview = ({
           <a
             className={cn(
               buttonVariants({ variant: "outline" }),
-              "flex flex-col min-w-[150px] aspect-square h-auto aspect-square px-4 py-4",
+              "flex flex-col min-w-[150px] aspect-square h-auto px-4 py-4",
             )}
             href={
               process.env.PLASMO_PUBLIC_BROWSER_NAME === "firefox"
