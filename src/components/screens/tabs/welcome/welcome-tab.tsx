@@ -28,7 +28,7 @@ const WelcomeTab = () => {
         <CardFooter className="flex justify-center pt-4 flex-col items-center">
           <Button
             onClick={() => {
-              scrollToTab("IMPORT")
+              scrollToTab("YOUTUBE_VIDEO")
               setAnimationName("rightToLeft")
             }}
             variant="secondary"
