@@ -14,12 +14,21 @@ import { LOCAL_STORAGE } from "@/constants/keys"
 
 type DialogStep = "initial" | "feedback" | "rating"
 
+type AskForReviewProps = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
+const AskForReview = ({ open, onOpenChange }: AskForReviewProps) => {
+  const [hasAutoTriggered, setHasAutoTriggered] = useState(false)
 const AskForReview = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [dialogStep, setDialogStep] = useState<DialogStep>("initial")
 
   // Check whether to show the dialog or not!
   useEffect(() => {
+    if (hasAutoTriggered) return
+
     const checkAndShowReview = async () => {
       try {
         const result = await chrome.storage.local.get([
@@ -50,7 +59,8 @@ const AskForReview = () => {
 
         // First time: show on 7th day
         if (timesAsked === 0 && daysSinceInstall >= 7) {
-          setIsOpen(true)
+          onOpenChange(true)
+          setHasAutoTriggered(true)
           // Save the timestamp and increment count
           await chrome.storage.local.set({
             [LOCAL_STORAGE.reviewLastAskedAt]: now.toString(),
@@ -68,7 +78,8 @@ const AskForReview = () => {
           )
 
           if (daysSinceLastAsk >= 90) {
-            setIsOpen(true)
+            onOpenChange(true)
+            setHasAutoTriggered(true)
             // Save the timestamp and increment count
             await chrome.storage.local.set({
               [LOCAL_STORAGE.reviewLastAskedAt]: now.toString(),
@@ -82,7 +93,7 @@ const AskForReview = () => {
     }
 
     checkAndShowReview()
-  }, [])
+  }, [hasAutoTriggered, onOpenChange])
 
   const handleNotReally = () => {
     setDialogStep("feedback")
@@ -114,7 +125,7 @@ const AskForReview = () => {
   }
 
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="sm:max-w-md"
         onInteractOutside={(e) => e.preventDefault()}
