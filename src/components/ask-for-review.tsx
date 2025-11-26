@@ -12,11 +12,18 @@ import { buttonVariants } from "./ui/button"
 import { cn } from "@/lib/cn"
 import { LOCAL_STORAGE } from "@/constants/keys"
 
-const AskForReview = () => {
-  const [isOpen, setIsOpen] = useState(false)
+type AskForReviewProps = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
+const AskForReview = ({ open, onOpenChange }: AskForReviewProps) => {
+  const [hasAutoTriggered, setHasAutoTriggered] = useState(false)
 
   // Check whether to show the dialog or not!
   useEffect(() => {
+    if (hasAutoTriggered) return
+
     const checkAndShowReview = async () => {
       try {
         const result = await chrome.storage.local.get([
@@ -47,7 +54,8 @@ const AskForReview = () => {
 
         // First time: show on 7th day
         if (timesAsked === 0 && daysSinceInstall >= 7) {
-          setIsOpen(true)
+          onOpenChange(true)
+          setHasAutoTriggered(true)
           // Save the timestamp and increment count
           await chrome.storage.local.set({
             [LOCAL_STORAGE.reviewLastAskedAt]: now.toString(),
@@ -65,7 +73,8 @@ const AskForReview = () => {
           )
 
           if (daysSinceLastAsk >= 90) {
-            setIsOpen(true)
+            onOpenChange(true)
+            setHasAutoTriggered(true)
             // Save the timestamp and increment count
             await chrome.storage.local.set({
               [LOCAL_STORAGE.reviewLastAskedAt]: now.toString(),
@@ -79,10 +88,10 @@ const AskForReview = () => {
     }
 
     checkAndShowReview()
-  }, [])
+  }, [hasAutoTriggered, onOpenChange])
 
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="sm:max-w-md"
         onInteractOutside={(e) => e.preventDefault()}
@@ -99,7 +108,7 @@ const AskForReview = () => {
           <a
             className={cn(
               buttonVariants({ variant: "outline" }),
-              "flex flex-col min-w-[150px] aspect-square h-auto aspect-square px-4 py-4",
+              "flex flex-col min-w-[150px] aspect-square h-auto px-4 py-4",
             )}
             href={process.env.PLASMO_PUBLIC_FEEDBACK_URL}
           >
@@ -113,7 +122,7 @@ const AskForReview = () => {
           <a
             className={cn(
               buttonVariants({ variant: "outline" }),
-              "flex flex-col min-w-[150px] aspect-square h-auto aspect-square px-4 py-4",
+              "flex flex-col min-w-[150px] aspect-square h-auto px-4 py-4",
             )}
             href={
               process.env.PLASMO_PUBLIC_BROWSER_NAME === "firefox"
