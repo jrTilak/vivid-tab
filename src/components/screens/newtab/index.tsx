@@ -174,7 +174,6 @@ export default function Homepage() {
           </div>
         )}
 
-        {/* Next Wallpaper Button */}
         <NextWallpaperButton />
       </div>
     </>
