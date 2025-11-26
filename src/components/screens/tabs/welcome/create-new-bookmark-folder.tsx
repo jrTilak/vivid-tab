@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { useSettings } from "@/providers/settings-provider"
 import { ChevronLeftIcon, ChevronRight } from "lucide-react"
 import { motion } from "motion/react"
 import React, { useState } from "react"
@@ -21,7 +20,6 @@ const CreateNewBookmarkFolder = () => {
   const [bookmarkFolderName, setBookmarkFolderName] = useState(
     DEFAULT_BOOKMARK_FOLDER_NAME,
   )
-  const { setSettings } = useSettings()
   const activeTabId = useBrowserActiveTab()
   const { animationName, scrollToTab, setAnimationName } = useWelcomeContext()
 
@@ -30,20 +28,34 @@ const CreateNewBookmarkFolder = () => {
       title: bookmarkFolderName,
     })
 
-    setSettings((prev) => ({
-      ...prev,
+    // Get current settings from storage
+    const result = await chrome.storage.sync.get("settings")
+    const currentSettings = result.settings ? JSON.parse(result.settings) : {}
+
+    // Update settings with new rootFolder
+    const updatedSettings = {
+      ...currentSettings,
       general: {
-        ...prev.general,
+        ...currentSettings.general,
         rootFolder: bookmark.id,
       },
-    }))
-    chrome.tabs.create({})
-    chrome.tabs.remove(activeTabId)
+    }
+
+    // Save to Chrome storage and wait for completion
+    // This is especially important in Firefox where storage operations may take longer
+    await chrome.storage.sync.set({
+      settings: JSON.stringify(updatedSettings),
+    })
+    setTimeout(() => {
+      chrome.tabs.create({}, () => {
+        chrome.tabs.remove(activeTabId)
+      })
+    }, 100)
   }
 
   return (
     <motion.div {...ANIMATION_PROPS[animationName]}>
-      <Card className="w-full max-w-lg bg-background text-center min-w-[512px] text-foreground">
+      <Card className="w-full max-w-lg text-center min-w-lg text-foreground gap-4">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Create Bookmark Folder</CardTitle>
           <p className="text-sm">

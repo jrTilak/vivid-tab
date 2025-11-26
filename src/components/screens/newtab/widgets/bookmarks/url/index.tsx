@@ -32,7 +32,10 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
-  const { icon, fetchIcon } = useIcon({ id: props.id, defaultIcon: getFileIcon(props.url) })
+  const { icon, fetchIcon } = useIcon({
+    id: props.id,
+    defaultIcon: getFileIcon(props.url),
+  })
 
   const {
     settings: { general },
@@ -117,19 +120,11 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
   }, [editDialogOpen, fetchIcon])
 
   const openLink = useCallback((url: string, newTab?: boolean) => {
-    // close the current tab if newTab is false
-    if (!newTab) {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs && tabs.length > 0 && tabs[0].id) {
-          chrome.tabs.remove(tabs[0].id)
-        } else {
-          console.error("No active tab found to close.");
-        }
-      })
+    if (newTab) {
+      chrome.tabs.create({ url: url, active: true })
+    } else {
+      chrome.tabs.update({ url: url, active: true })
     }
-
-    // create a new tab with the url
-    chrome.tabs.create({ url: url, })
   }, [])
 
   const { isOver, setNodeRef } = useDroppable({
@@ -150,8 +145,8 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
 
   const style = transform
     ? {
-      transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-    }
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
     : undefined
 
   const handleClick = (url: string, aux: boolean = false) => {
@@ -201,7 +196,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
                   }
                 }}
                 className={cn(
-                  "flex items-center flex-col space-y-1 p-2 rounded-lg hover:scale-105 text-center text-xs w-24",
+                  "flex items-center cursor-pointer disabled:cursor-default flex-col space-y-1 p-2 rounded-lg hover:scale-105 text-center text-xs w-24 transition-transform",
                   isOver && "bg-accent/10",
                   isDragging && "bg-destructive/20",
                   isDragging && "relative z-50",
@@ -218,7 +213,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
                     className="rounded-md object-contain object-center size-12"
                   />
                   <AvatarFallback className="size-12">
-                    {data.title
+                    {(data.title || "")
                       .replace(/[^a-zA-Z ]/g, "")
                       .trim()
                       .toLowerCase()
@@ -245,7 +240,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
                 }
               }}
               className={cn(
-                "flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-accent/10 overflow-hidden w-full",
+                "flex items-center gap-2 p-2 rounded-lg hover:bg-accent/10 overflow-hidden w-full cursor-pointer disabled:cursor-default transition-all",
                 isOver && "bg-accent/10",
                 isDragging && "bg-destructive/20",
                 isDragging && "relative z-50",
@@ -267,7 +262,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
                   className="rounded-md object-contain object-center size-12"
                 />
                 <AvatarFallback className="size-12">
-                  {data.title
+                  {(data.title || "")
                     .replace(/[^a-zA-Z ]/g, "")
                     .trim()
                     .toLowerCase()
@@ -292,7 +287,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
               <ExternalLinkIcon className="size-4" />
             </ContextMenuShortcut>
           </ContextMenuItem>
-          <ContextMenuSeparator />
+          <ContextMenuSeparator className="bg-border/50" />
           <ContextMenuItem
             onClick={() => setTimeout(() => setEditDialogOpen(true), 100)}
           >
@@ -311,7 +306,7 @@ const BookmarkUrl = ({ disableContextMenu = false, ...props }: Props) => {
           </ContextMenuItem>
           <ContextMenuItem
             onClick={() => setIsDeleteDialogOpen(true)}
-            className="text-destructive"
+            className="text-red-500"
           >
             Delete
             <ContextMenuShortcut>

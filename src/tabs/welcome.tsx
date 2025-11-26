@@ -4,7 +4,7 @@ import { Welcome } from "@/components/screens/tabs/welcome"
 
 const WelcomeTab = () => {
   return (
-    <RootProvider>
+    <RootProvider theme="dark">
       <WelcomeContextProvider>
         <Welcome />
       </WelcomeContextProvider>

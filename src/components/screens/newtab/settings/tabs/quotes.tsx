@@ -36,7 +36,7 @@ const QuotesSettings = () => {
 
   useAsyncEffect(async () => {
     const [err, data] = await tryCatchAsync(async () => {
-      const response = await fetch("http://api.quotable.io/tags")
+      const response = await fetch("https://api.quotable.io/tags")
 
       return (await response.json()) as CategoriesResponse[]
     })

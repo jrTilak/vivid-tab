@@ -52,6 +52,16 @@ export const SettingsSchema = z
           .nullable()
           .nullish(),
         images: z.array(z.string()).default(DEFAULT_SETTINGS.wallpapers.images),
+        onlineImages: z
+          .object({
+            enabled: z
+              .boolean()
+              .default(DEFAULT_SETTINGS.wallpapers.onlineImages.enabled),
+            keywords: z
+              .string()
+              .default(DEFAULT_SETTINGS.wallpapers.onlineImages.keywords),
+          })
+          .default(DEFAULT_SETTINGS.wallpapers.onlineImages),
       })
       .default(DEFAULT_SETTINGS.wallpapers),
     layout: z.record(z.string(), z.string()).default(DEFAULT_SETTINGS.layout),
@@ -134,6 +144,10 @@ export const SettingsSchemaForImport = z.object({
   wallpapers: z.object({
     selectedImageId: z.string().nullable().nullish(),
     images: z.array(z.string()),
+    onlineImages: z.object({
+      enabled: z.boolean(),
+      keywords: z.string(),
+    }),
   }),
   layout: z.record(z.string(), z.string()),
   general: z.object({

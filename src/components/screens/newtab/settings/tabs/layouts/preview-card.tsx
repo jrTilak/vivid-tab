@@ -1,4 +1,4 @@
-import { Card, CardHeader } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/cn"
 import { useDraggable, useDroppable } from "@dnd-kit/core"
 import { GripIcon } from "lucide-react"
@@ -44,13 +44,13 @@ const PreviewCard = ({
       onClick={() => console.log(index, id)}
       ref={setNodeRef}
       className={cn(
-        "relative w-full flex items-center justify-center text-center border-solid border border-muted-foreground/45 text-foreground bg-muted z-[9999]",
+        "relative w-full flex items-center justify-center text-center border-solid border border-muted-foreground/45 text-foreground bg-muted z-9999",
         isOver && "bg-muted-foreground/40 dark:bg-muted-foreground z-0",
         className,
       )}
       style={style}
     >
-      <CardHeader>{label}</CardHeader>
+      <p>{label}</p>
 
       {/* Drag button */}
       <button

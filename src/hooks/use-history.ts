@@ -26,7 +26,7 @@ const useHistory = () => {
         setHistory(
           historyItems?.map((item) => ({
             id: item.id,
-            title: item.title,
+            title: item.title || item.url || "Untitled",
             url: item.url,
             lastVisitTime: item.lastVisitTime,
             visitCount: item.visitCount,

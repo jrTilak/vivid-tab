@@ -4,15 +4,17 @@ import { AnimatePresence } from "motion/react"
 import { cn } from "@/lib/cn"
 import { SearchIcon } from "lucide-react"
 import { useSettings } from "@/providers/settings-provider"
-import chatgpt from "data-base64:@/assets/openai.png"
-import claude from "data-base64:@/assets/claude.png"
-import { Badge } from "@/components/ui/badge"
+import { Badge, badgeVariants } from "@/components/ui/badge"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 import { useDebouncedValue } from "@/hooks/use-debounced-value"
 import { useSearchSuggestions } from "@/hooks/use-search-suggestions"
 import { BACKGROUND_ACTIONS } from "@/constants/background-actions"
 import { useHotkeys } from "react-hotkeys-hook"
+
+import chatgpt from "data-base64:@/assets/openai.png"
+import claude from "data-base64:@/assets/claude.png"
+import youtube from "data-base64:@/assets/svg/youtube-color.svg"
+import search from "data-base64:@/assets/svg/search-search.svg"
 
 type Props = {
   open?: boolean
@@ -85,7 +87,7 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
         {
           name: "Open Youtube",
           available: true,
-          icon: "https://www.svgrepo.com/show/475700/youtube-color.svg",
+          icon: youtube,
           id: "youtube",
           onQuery: (query: string) => {
             handleSearchQuery(`https://youtube.com/search?q=${query}`)
@@ -94,7 +96,7 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
         {
           name: "Search Online",
           available: true,
-          icon: "https://www.svgrepo.com/show/178981/search-search.svg",
+          icon: search,
           id: "search-online",
           onQuery: (query: string) => {
             handleSearchQuery(query)
@@ -111,15 +113,7 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className={cn(
-          "shadow-none w-fit !border-none !outline-none",
-          searchbar.dialogBackground === "transparent"
-            ? "bg-transparent"
-            : "bg-background/40",
-        )}
-        overlayClassName="bg-black/40 backdrop-blur-sm"
-      >
+      <DialogContent className="w-fit">
         <div className="flex flex-col items-center justify-center gap-4">
           {/* search form */}
           <motion.div
@@ -160,7 +154,7 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
                 }
               }}
               className={cn(
-                "flex-grow flex h-10 w-full text-base bg-transparent gap-1",
+                "grow flex h-10 w-full text-base bg-transparent gap-1",
               )}
             >
               <input
@@ -168,16 +162,16 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
                 type="text"
                 id="vivid-search-bar"
                 placeholder="Search the web..."
-                className="w-full h-full !outline-none rounded-l-md bg-background/80 px-3 py-2 placeholder:text-muted-foreground flex-grow border border-input"
+                className="w-full h-full outline-hidden! rounded-l-md bg-background/80 px-3 py-2 placeholder:text-muted-foreground grow border border-input"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               <button
                 disabled={!searchQuery}
                 type="submit"
-                className="h-full !outline-none rounded-r-md bg-accent px-3 py-2 disabled:opacity-50 border border-input"
+                className="h-full outline-hidden! rounded-r-md bg-accent px-3 py-2 disabled:opacity-50 border border-input"
               >
-                <SearchIcon className="text-muted-foreground size-4" />
+                <SearchIcon className="text-foreground size-4" />
               </button>
             </form>
           </motion.div>
@@ -203,9 +197,8 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
                       }}
                       className={cn("w-full aspect-square")}
                     >
-                      <Button
+                      <button
                         disabled={!engine.available}
-                        variant="none"
                         className={cn(
                           "w-full h-full flex flex-col gap-1 items-center border border-transparent justify-center p-2 py-5 rounded-md relative hover:border hover:border-input focus-visible:ring-destructive",
                           searchbar.dialogBackground === "transparent"
@@ -228,7 +221,7 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
                             Coming Soon
                           </Badge>
                         )}
-                      </Button>
+                      </button>
                     </motion.div>
                   </AnimatePresence>
                 )
@@ -250,19 +243,16 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
                 )}
               >
                 {searchSuggestions.slice(0, 5).map((result, i) => (
-                  <Button
-                    variant="none"
+                  <button
                     key={i}
-                    className="h-fit w-auto focus-visible:ring-destructive !px-0 !py-0"
                     onClick={() => handleSearchQuery(result)}
+                    className={cn(
+                      badgeVariants({ variant: "secondary" }),
+                      "text-xs truncate font-normal  cursor-pointer",
+                    )}
                   >
-                    <Badge
-                      variant="secondary"
-                      className="text-xs truncate font-normal"
-                    >
-                      {result}
-                    </Badge>
-                  </Button>
+                    {result}
+                  </button>
                 ))}
               </motion.div>
             </AnimatePresence>

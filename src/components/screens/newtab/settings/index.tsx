@@ -38,12 +38,21 @@ import Background from "./tabs/background"
 import BackupAndExportSettings from "./tabs/backup-and-export"
 import Support from "./tabs/support"
 
-export function Settings() {
+type SettingsProps = {
+  onOpenReviewDialog: () => void
+}
+
+export function Settings({ onOpenReviewDialog }: SettingsProps) {
   const { setSettings, settings } = useSettings()
   const [prevSettings, setPrevSettings] = useState(settings)
 
   const [activeTabIndex, setActiveTabIndex] = useState(0)
   const [open, setOpen] = useState(false)
+
+  const handleOpenReviewDialog = () => {
+    setOpen(false)
+    onOpenReviewDialog()
+  }
 
   const TABS = [
     {
@@ -94,7 +103,7 @@ export function Settings() {
     {
       label: "Support",
       icon: HandCoinsIcon,
-      component: Support,
+      component: () => <Support onOpenReviewDialog={handleOpenReviewDialog} />,
     },
     {
       label: "Backup & Export",
@@ -111,10 +120,10 @@ export function Settings() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="aspect-square rounded-full !inline size-fit text-background dark:text-foreground">
+      <DialogTrigger className="aspect-square rounded-full inline! size-fit text-background dark:text-foreground cursor-pointer">
         <SettingsIcon size={20} opacity={0.9} />
       </DialogTrigger>
-      <DialogContent className="flex max-w-4xl gap-0 p-0 z-50 bg-background max-h-[632px] h-full">
+      <DialogContent className="flex max-w-4xl gap-0 p-0 z-50 max-h-[632px] h-full">
         <div className="w-60 border-r">
           <nav className="flex flex-col gap-1 p-1">
             {TABS.map((tab, index) => {
@@ -125,9 +134,9 @@ export function Settings() {
                   key={index}
                   variant="ghost"
                   className={cn(
-                    "justify-start gap-2 rounded-sm border-b border-border/50",
+                    "justify-start gap-2 rounded-sm border-b border-border/50 hover:bg-primary dark:hover:bg-primary hover:text-primary-foreground",
                     activeTabIndex === index &&
-                      "bg-primary hover:bg-primary text-primary-foreground hover:text-primary-foreground",
+                      "bg-primary hover:bg-primary text-primary-foreground ",
                   )}
                   onClick={() => setActiveTabIndex(index)}
                 >

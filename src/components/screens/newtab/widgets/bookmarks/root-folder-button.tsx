@@ -90,7 +90,7 @@ const RootFolderButton = ({
               className={cn(
                 "text-xs px-2.5 py-1 h-fit rounded-sm",
                 activeRootFolder !== item.id &&
-                  "bg-muted/20 hover:bg-muted/30 text-accent-foreground",
+                  "dark:bg-muted/20 hover:bg-muted/30 text-white",
                 isOver && "bg-destructive",
                 isDragging && "scale-110",
               )}
@@ -127,7 +127,7 @@ const RootFolderButton = ({
             onClick={() => {
               setTimeout(() => setIsDeleteDialogOpen(true), 100)
             }}
-            className="text-destructive"
+            className="text-red-500"
           >
             Delete
             <ContextMenuShortcut>
