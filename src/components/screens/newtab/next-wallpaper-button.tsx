@@ -19,7 +19,7 @@ export const NextWallpaperButton = () => {
         "p-3 rounded-full",
         "transition-all duration-200",
         "shadow-lg hover:shadow-xl",
-        "cursor-pointer disabled:cursor-default"
+        "cursor-pointer disabled:cursor-default",
       )}
       aria-label="Next wallpaper"
       title="Next wallpaper"

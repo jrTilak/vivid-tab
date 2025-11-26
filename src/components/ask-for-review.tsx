@@ -102,9 +102,12 @@ const AskForReview = ({ open, onOpenChange }: AskForReviewProps) => {
   }
 
   const handleFeedbackRedirect = () => {
-    chrome.tabs.update({ url: process.env.PLASMO_PUBLIC_FEEDBACK_URL, active: true })
+    chrome.tabs.update({
+      url: process.env.PLASMO_PUBLIC_FEEDBACK_URL,
+      active: true,
+    })
     onOpenChange(false)
-     setTimeout(() => {
+    setTimeout(() => {
       setDialogStep("initial")
     }, 200)
   }
@@ -116,7 +119,7 @@ const AskForReview = ({ open, onOpenChange }: AskForReviewProps) => {
         : process.env.PLASMO_PUBLIC_CHROME_WEBSTORE_URL
     chrome.tabs.update({ url: url, active: true })
     onOpenChange(false)
-     setTimeout(() => {
+    setTimeout(() => {
       setDialogStep("initial")
     }, 200)
   }
@@ -138,7 +141,9 @@ const AskForReview = ({ open, onOpenChange }: AskForReviewProps) => {
         {dialogStep === "initial" && (
           <>
             <DialogHeader>
-              <DialogTitle className="text-2xl">Enjoying Vivid Tab?</DialogTitle>
+              <DialogTitle className="text-2xl">
+                Enjoying Vivid Tab?
+              </DialogTitle>
               <DialogDescription className="text-base pt-2">
                 Leave a review so we can improve and provide better user
                 experience.
@@ -181,7 +186,9 @@ const AskForReview = ({ open, onOpenChange }: AskForReviewProps) => {
         {dialogStep === "feedback" && (
           <>
             <DialogHeader>
-              <DialogTitle className="text-2xl">We&apos;d Love Your Feedback!</DialogTitle>
+              <DialogTitle className="text-2xl">
+                We&apos;d Love Your Feedback!
+              </DialogTitle>
               <DialogDescription className="text-base pt-2">
                 Your feedback helps us improve Vivid Tab and make it better for
                 everyone. Please share your thoughts with us!
@@ -204,8 +211,8 @@ const AskForReview = ({ open, onOpenChange }: AskForReviewProps) => {
             <DialogHeader>
               <DialogTitle className="text-2xl">Thank You!</DialogTitle>
               <DialogDescription className="text-base pt-2">
-                We&apos;re thrilled you&apos;re enjoying Vivid Tab! Please rate us on
-                the{" "}
+                We&apos;re thrilled you&apos;re enjoying Vivid Tab! Please rate
+                us on the{" "}
                 {process.env.PLASMO_PUBLIC_BROWSER_NAME === "firefox"
                   ? "Firefox Add-ons"
                   : "Chrome Web Store"}{" "}
