@@ -34,7 +34,7 @@ const Support = ({ onOpenReviewDialog }: SupportProps) => {
       <Card className="overflow-hidden transition-all bg-muted border-solid border shadow-none">
         <button
           onClick={onOpenReviewDialog}
-          className="block w-full text-left"
+          className="block w-full text-left cursor-pointer"
           type="button"
         >
           <CardContent className="flex items-center justify-between p-6">
