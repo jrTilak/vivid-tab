@@ -21,8 +21,6 @@ type AskForReviewProps = {
 
 const AskForReview = ({ open, onOpenChange }: AskForReviewProps) => {
   const [hasAutoTriggered, setHasAutoTriggered] = useState(false)
-const AskForReview = () => {
-  const [isOpen, setIsOpen] = useState(false)
   const [dialogStep, setDialogStep] = useState<DialogStep>("initial")
 
   // Check whether to show the dialog or not!
@@ -104,9 +102,11 @@ const AskForReview = () => {
   }
 
   const handleFeedbackRedirect = () => {
-    window.open(process.env.PLASMO_PUBLIC_FEEDBACK_URL, "_blank")
-    setIsOpen(false)
-    setDialogStep("initial")
+    chrome.tabs.update({ url: process.env.PLASMO_PUBLIC_FEEDBACK_URL, active: true })
+    onOpenChange(false)
+     setTimeout(() => {
+      setDialogStep("initial")
+    }, 200)
   }
 
   const handleRatingRedirect = () => {
@@ -114,14 +114,18 @@ const AskForReview = () => {
       process.env.PLASMO_PUBLIC_BROWSER_NAME === "firefox"
         ? process.env.PLASMO_PUBLIC_FIREFOX_ADDON_URL
         : process.env.PLASMO_PUBLIC_CHROME_WEBSTORE_URL
-    window.open(url, "_blank")
-    setIsOpen(false)
-    setDialogStep("initial")
+    chrome.tabs.update({ url: url, active: true })
+    onOpenChange(false)
+     setTimeout(() => {
+      setDialogStep("initial")
+    }, 200)
   }
 
   const handleClose = () => {
-    setIsOpen(false)
-    setDialogStep("initial")
+    onOpenChange(false)
+    setTimeout(() => {
+      setDialogStep("initial")
+    }, 200)
   }
 
   return (
@@ -184,11 +188,11 @@ const AskForReview = () => {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="flex items-center gap-3 pt-6 justify-center">
+            <div className="flex items-center gap-3 pt-6 justify-center w-full">
               <Button variant="outline" onClick={handleClose}>
                 Maybe Later
               </Button>
-              <Button onClick={handleFeedbackRedirect}>
+              <Button className="flex-1" onClick={handleFeedbackRedirect}>
                 Leave Feedback
               </Button>
             </div>
@@ -213,7 +217,7 @@ const AskForReview = () => {
               <Button variant="outline" onClick={handleClose}>
                 Maybe Later
               </Button>
-              <Button onClick={handleRatingRedirect}>
+              <Button className="flex-1" onClick={handleRatingRedirect}>
                 Rate Now
               </Button>
             </div>
