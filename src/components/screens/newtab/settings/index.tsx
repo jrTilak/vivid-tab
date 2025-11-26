@@ -38,12 +38,21 @@ import Background from "./tabs/background"
 import BackupAndExportSettings from "./tabs/backup-and-export"
 import Support from "./tabs/support"
 
-export function Settings() {
+type SettingsProps = {
+  onOpenReviewDialog: () => void
+}
+
+export function Settings({ onOpenReviewDialog }: SettingsProps) {
   const { setSettings, settings } = useSettings()
   const [prevSettings, setPrevSettings] = useState(settings)
 
   const [activeTabIndex, setActiveTabIndex] = useState(0)
   const [open, setOpen] = useState(false)
+
+  const handleOpenReviewDialog = () => {
+    setOpen(false)
+    onOpenReviewDialog()
+  }
 
   const TABS = [
     {
@@ -94,7 +103,7 @@ export function Settings() {
     {
       label: "Support",
       icon: HandCoinsIcon,
-      component: Support,
+      component: () => <Support onOpenReviewDialog={handleOpenReviewDialog} />,
     },
     {
       label: "Backup & Export",
@@ -143,9 +152,7 @@ export function Settings() {
             <DialogTitle>Settings</DialogTitle>
           </DialogHeader>
           <div className="mb-20 max-h-[500px] overflow-y-scroll h-full">
-            {React.createElement(TABS[activeTabIndex].component, {
-              onCloseSettings: () => setOpen(false),
-            })}
+            {React.createElement(TABS[activeTabIndex].component)}
           </div>
           <DialogFooter className="border-t p-4 absolute bottom-0 right-0 w-full">
             <Button

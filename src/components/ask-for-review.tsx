@@ -1,6 +1,6 @@
 import sadEmoji from "data-base64:@/assets/sad.png"
 import happyEmoji from "data-base64:@/assets/happy.png"
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -13,38 +13,16 @@ import { cn } from "@/lib/cn"
 import { LOCAL_STORAGE } from "@/constants/keys"
 
 type AskForReviewProps = {
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-  skipAutoTrigger?: boolean
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-const AskForReview = ({
-  open: controlledOpen,
-  onOpenChange,
-  skipAutoTrigger = false,
-}: AskForReviewProps = {}) => {
-  const [internalOpen, setInternalOpen] = useState(false)
-
-  const isControlled = controlledOpen !== undefined
-  const isOpen = isControlled ? controlledOpen : internalOpen
-
-  const handleOpenChange = useCallback(
-    (open: boolean) => {
-      if (isControlled) {
-        onOpenChange?.(open)
-      } else {
-        setInternalOpen(open)
-      }
-    },
-    [isControlled, onOpenChange],
-  )
+const AskForReview = ({ open, onOpenChange }: AskForReviewProps) => {
+  const [hasAutoTriggered, setHasAutoTriggered] = useState(false)
 
   // Check whether to show the dialog or not!
   useEffect(() => {
-    // Skip automatic triggering if controlled externally or skipAutoTrigger is true
-    if (isControlled || skipAutoTrigger) {
-      return
-    }
+    if (hasAutoTriggered) return
 
     const checkAndShowReview = async () => {
       try {
@@ -76,7 +54,8 @@ const AskForReview = ({
 
         // First time: show on 7th day
         if (timesAsked === 0 && daysSinceInstall >= 7) {
-          handleOpenChange(true)
+          onOpenChange(true)
+          setHasAutoTriggered(true)
           // Save the timestamp and increment count
           await chrome.storage.local.set({
             [LOCAL_STORAGE.reviewLastAskedAt]: now.toString(),
@@ -94,7 +73,8 @@ const AskForReview = ({
           )
 
           if (daysSinceLastAsk >= 90) {
-            handleOpenChange(true)
+            onOpenChange(true)
+            setHasAutoTriggered(true)
             // Save the timestamp and increment count
             await chrome.storage.local.set({
               [LOCAL_STORAGE.reviewLastAskedAt]: now.toString(),
@@ -108,24 +88,14 @@ const AskForReview = ({
     }
 
     checkAndShowReview()
-  }, [isControlled, skipAutoTrigger, handleOpenChange])
+  }, [hasAutoTriggered, onOpenChange])
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="sm:max-w-md"
-        onInteractOutside={(e) => {
-          // Allow closing when manually triggered (controlled)
-          if (!isControlled) {
-            e.preventDefault()
-          }
-        }}
-        onEscapeKeyDown={(e) => {
-          // Allow closing when manually triggered (controlled)
-          if (!isControlled) {
-            e.preventDefault()
-          }
-        }}
+        onInteractOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <DialogHeader>
           <DialogTitle className="text-2xl">Enjoying Vivid Tab?</DialogTitle>
