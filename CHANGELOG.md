@@ -2,6 +2,12 @@
 
 ## [1.2.0] - ........
 
+- Added **Firefox support** with major cross-browser fixes
+- Support automatic wallpaper from wallhaven.
+- Better **bookmark handling** and local file support
+- New icons, UI polish, and welcome tab improvements
+- Added review dialog, uninstall URL, legal links, and credits
+- Multiple stability fixes
 - FIX: Newline characters in notes not rendering correctly. (#78)
 - FIX: Show terms and conditions and privacy policy on welcome page. (#81)
 - FIX: Upgrade tailwind to v4. (#79)
