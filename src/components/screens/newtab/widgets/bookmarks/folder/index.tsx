@@ -8,7 +8,6 @@ import {
 
 import type { BookmarkFolderNode } from "@/types/bookmark"
 import React, { useState, useEffect } from "react"
-import folderIcon from "data-base64:@/assets/folder-svgrepo-com.png"
 import { DeleteDialog } from "../delete-dialog"
 import { DeleteIcon, EditIcon, MoveIcon } from "lucide-react"
 import { CreateAFolder } from "../create-a-folder"
@@ -53,8 +52,8 @@ const BookmarkFolder = (props: Props) => {
 
   const style = transform
     ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-      }
+      transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+    }
     : undefined
 
   return (
@@ -103,7 +102,7 @@ const BookmarkFolder = (props: Props) => {
                     isDragging && "scale-105",
                   )}
                 >
-                  <img src={folderIcon} />
+                  <img src={chrome.runtime.getURL("assets/folder-svgrepo-com.png")} />
                   <img
                     src={icon}
                     alt=""
@@ -115,7 +114,7 @@ const BookmarkFolder = (props: Props) => {
                   ref={draggableRef}
                   {...attributes}
                   {...listeners}
-                  src={folderIcon}
+                  src={chrome.runtime.getURL("assets/folder-svgrepo-com.png")}
                   alt=""
                   className={cn(
                     "size-12 mx-auto rounded-md object-contain object-center",
@@ -149,7 +148,7 @@ const BookmarkFolder = (props: Props) => {
                     isDragging && "scale-105",
                   )}
                 >
-                  <img src={folderIcon} className="size-12 min-w-12" />
+                  <img src={chrome.runtime.getURL("assets/folder-svgrepo-com.png")} className="size-12 min-w-12" />
                   <img
                     src={icon}
                     alt=""
@@ -161,7 +160,7 @@ const BookmarkFolder = (props: Props) => {
                   ref={draggableRef}
                   {...attributes}
                   {...listeners}
-                  src={folderIcon}
+                  src={chrome.runtime.getURL("assets/folder-svgrepo-com.png")}
                   alt=""
                   className={cn(
                     "size-12 mx-auto rounded-md object-contain object-center",

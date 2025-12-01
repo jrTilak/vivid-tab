@@ -1,5 +1,3 @@
-import sadEmoji from "data-base64:@/assets/sad.png"
-import happyEmoji from "data-base64:@/assets/happy.png"
 import { useEffect, useState } from "react"
 import {
   Dialog,
@@ -159,7 +157,7 @@ const AskForReview = ({ open, onOpenChange }: AskForReviewProps) => {
                 onClick={handleNotReally}
               >
                 <img
-                  src={sadEmoji}
+                  src={chrome.runtime.getURL("assets/sag.png")}
                   className="h-[100px] w-[100px]"
                   alt="Sad emoji"
                 />
@@ -173,7 +171,7 @@ const AskForReview = ({ open, onOpenChange }: AskForReviewProps) => {
                 onClick={handleLikeIt}
               >
                 <img
-                  src={happyEmoji}
+                  src={chrome.runtime.getURL("assets/happy.png")}
                   className="h-[100px] w-[100px]"
                   alt="Happy emoji"
                 />

@@ -11,11 +11,6 @@ import { useSearchSuggestions } from "@/hooks/use-search-suggestions"
 import { BACKGROUND_ACTIONS } from "@/constants/background-actions"
 import { useHotkeys } from "react-hotkeys-hook"
 
-import chatgpt from "data-base64:@/assets/openai.png"
-import claude from "data-base64:@/assets/claude.png"
-import youtube from "data-base64:@/assets/svg/youtube-color.svg"
-import search from "data-base64:@/assets/svg/search-search.svg"
-
 type Props = {
   open?: boolean
   onOpenChange?: (open: boolean) => void
@@ -48,7 +43,7 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
     setSearchQuery("")
   }, [open])
 
-  useEffect(() => {}, [debouncedSearchQuery])
+  useEffect(() => { }, [debouncedSearchQuery])
 
   const handleSearchQuery = useCallback(
     (query: string) => {
@@ -70,7 +65,7 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
           name: "Ask ChatGPT",
           id: "chatgpt",
           available: true,
-          icon: chatgpt,
+          icon: chrome.runtime.getURL("assets/openai.png"),
           onQuery: (query: string) => {
             handleSearchQuery(`https://chatgpt.com/?q=${query}`)
           },
@@ -78,8 +73,8 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
         {
           name: "Ask Claude",
           available: true,
+          icon: chrome.runtime.getURL("assets/claude.png"),
           id: "claude",
-          icon: claude,
           onQuery: (query: string) => {
             handleSearchQuery(`https://claude.ai/new?q=${query}`)
           },
@@ -87,8 +82,8 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
         {
           name: "Open Youtube",
           available: true,
-          icon: youtube,
           id: "youtube",
+          icon: chrome.runtime.getURL("assets/svg/youtube-color.svg"),
           onQuery: (query: string) => {
             handleSearchQuery(`https://youtube.com/search?q=${query}`)
           },
@@ -96,8 +91,8 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
         {
           name: "Search Online",
           available: true,
-          icon: search,
           id: "search-online",
+          icon: chrome.runtime.getURL("assets/svg/search-search.svg"),
           onQuery: (query: string) => {
             handleSearchQuery(query)
           },

@@ -1,7 +1,6 @@
 import { Badge } from "@/components/ui/badge"
 import { useImage } from "@/hooks/use-image"
 import { useSettings } from "@/providers/settings-provider"
-import defaultImage from "data-base64:@/assets/scene.jpg"
 import { TrashIcon } from "lucide-react"
 
 const ImageCard = ({
@@ -58,7 +57,7 @@ const ImageCard = ({
       onClick={isSelected ? null : onSelect}
     >
       <img
-        src={imageId === null ? defaultImage : imageData?.src}
+        src={imageId === null ? chrome.runtime.getURL("assets/scene.jpg") : imageData?.src}
         width={200}
         height={200}
         className="w-full h-48 object-cover rounded-lg transition-transform group-hover:group-disabled:scale-100 group-hover:scale-105 brightness-75"

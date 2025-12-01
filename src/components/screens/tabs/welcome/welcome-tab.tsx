@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import icon from "data-base64:@/assets/icon.png"
+
 import { ArrowRightIcon } from "lucide-react"
 import { motion } from "motion/react"
 import React from "react"
@@ -17,7 +17,7 @@ const WelcomeTab = () => {
     >
       <Card className="text-center px-9 py-5 w-fit min-w-lg  gap-4">
         <CardContent className="space-y-6 pt-4">
-          <img src={icon} alt="icon" className="size-20 mx-auto" />
+          <img src={chrome.runtime.getURL("assets/icon.png")} alt="icon" className="size-20 mx-auto" />
           <div className="space-y-2">
             <h2 className="text-2xl font-semibold">Hi, I&apos;m Vivid!</h2>
             <p className="text-base">

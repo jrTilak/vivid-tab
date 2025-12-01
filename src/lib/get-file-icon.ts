@@ -1,13 +1,3 @@
-import pdf from "data-base64:@/assets/svg/pdf-file.svg"
-import doc from "data-base64:@/assets/svg/doc-document-docx.svg"
-import xls from "data-base64:@/assets/svg/xls.svg"
-import ppt from "data-base64:@/assets/svg/ppt.svg"
-import image from "data-base64:@/assets/svg/image.svg"
-import svg from "data-base64:@/assets/svg/svg.svg"
-import audio from "data-base64:@/assets/svg/audio-file.svg"
-import video from "data-base64:@/assets/svg/video-file.svg"
-import fileBroken from "data-base64:@/assets/svg/file-broken.svg"
-
 export const getFileIcon = (fileUrl: string) => {
   if (!fileUrl.startsWith("file://")) {
     return null
@@ -20,33 +10,34 @@ export const getFileIcon = (fileUrl: string) => {
 
   switch (fileExtension) {
     case "pdf":
-      return pdf
+      return chrome.runtime.getURL("assets/svg/pdf-file.svg")
     case "doc":
     case "docx":
-      return doc
+      return chrome.runtime.getURL("assets/svg/doc-document-docx.svg")
     case "xls":
     case "xlsx":
-      return xls
+      return chrome.runtime.getURL("assets/svg/xls.svg")
     case "ppt":
     case "pptx":
-      return ppt
+      return chrome.runtime.getURL("assets/svg/ppt.svg")
     case "jpg":
     case "jpeg":
     case "png":
     case "gif":
     case "bmp":
-      return image
+      return chrome.runtime.getURL("assets/svg/image.svg")
     case "svg":
-      return svg
+      return chrome.runtime.getURL("assets/svg/svg.svg")
     case "mp3":
     case "wav":
     case "aac":
     case "flac":
-      return audio
+      return chrome.runtime.getURL("assets/svg/audio-file.svg")
     case "mp4":
     case "avi":
-      return video
+      return chrome.runtime.getURL("assets/svg/video-file.svg")
     default:
-      return fileBroken
+      return chrome.runtime.getURL("assets/svg/file-broken.svg")
   }
 }
+

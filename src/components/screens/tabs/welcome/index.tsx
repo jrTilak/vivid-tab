@@ -2,7 +2,7 @@ import { WelcomeTab } from "./welcome-tab"
 import { ImportTab } from "./import-tab"
 import { CreateNewBookmarkFolder } from "./create-new-bookmark-folder"
 import { ImportFromBrowserBookmarks } from "./import-from-browser-bookmarks"
-import background from "data-base64:@/assets/scene.jpg"
+
 import { useWelcomeContext } from "./_context"
 
 const TABS = {
@@ -20,7 +20,7 @@ const Welcome = () => {
   return (
     <main className="h-screen w-screen relative">
       <img
-        src={background}
+        src={chrome.runtime.getURL("assets/scene.jpg")}
         alt="background"
         className="absolute inset-0 w-full h-full object-cover"
       />

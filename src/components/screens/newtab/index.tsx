@@ -1,5 +1,4 @@
 import { useSettings } from "@/providers/settings-provider"
-import background from "data-base64:@/assets/scene.jpg"
 import { useEffect, useMemo, useState } from "react"
 import { Clock } from "./widgets/clock"
 import { Notes } from "./widgets/notes"
@@ -75,6 +74,8 @@ export default function Homepage() {
       setLayoutType("large")
     }
   }, [bookmarksCanTakeExtraSpaceIfAvailable, layout])
+
+  const background = chrome.runtime.getURL("assets/scene.jpg")
 
   // Determine which background to use
   const backgroundToUse =

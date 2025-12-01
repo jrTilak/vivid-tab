@@ -7,81 +7,67 @@ import {
 import { LayoutGridIcon } from "lucide-react"
 import { useSettings } from "@/providers/settings-provider"
 
-import x from "data-base64:@/assets/x.png"
-import xLight from "data-base64:@/assets/x-twitter-light.png"
-import chatgpt from "data-base64:@/assets/openai.png"
-import notionLight from "data-base64:@/assets/notion-light.png"
-import notionDark from "data-base64:@/assets/svg/notion.svg"
-import whatsapp from "data-base64:@/assets/svg/whatsapp-color.svg"
-import linkedin from "data-base64:@/assets/svg//linkedin-color.svg"
-import gmail from "data-base64:@/assets/svg/gmail.svg"
-import youtube from "data-base64:@/assets/svg/youtube-color.svg"
-import drive from "data-base64:@/assets/svg/drive-color.svg"
-import maps from "data-base64:@/assets/svg/maps-gps.svg"
-import news from "data-base64:@/assets/svg/news.svg"
-import pinterest from "data-base64:@/assets/svg/pinterest-color.svg"
-
 const POPULAR_APPS = [
   {
     title: "ChatGPT",
     url: "https://chatgpt.com/",
-    icon: chatgpt,
+    icon: "assets/openai.png",
   },
   {
     title: "Notion",
     url: "https://www.notion.so/",
     icon: {
-      dark: notionLight,
-      light: notionDark,
+      dark: "assets/notion-light.png",
+      light: "assets/svg/notion.svg",
     },
   },
   {
     title: "X (Twitter)",
     url: "https://x.com",
     icon: {
-      dark: xLight,
-      light: x,
+      dark: "assets/x-twitter-light.png",
+      light: "assets/x.png",
     },
   },
   {
     title: "Whatsapp",
     url: "https://web.whatsapp.com/",
-    icon: whatsapp,
+    icon: "assets/svg/whatsapp-color.svg",
   },
   {
     title: "Linkedin",
     url: "https://www.linkedin.com/",
-    icon: linkedin,
+    icon: "assets/svg//linkedin-color.svg",
   },
   {
     title: "Gmail",
     url: "https://mail.google.com/mail/",
-    icon: gmail,
+    icon: "assets/svg/gmail.svg",
   },
   {
     title: "Youtube",
     url: "https://www.youtube.com/",
-    icon: youtube,
+    icon: "assets/svg/youtube-color.svg",
   },
   {
     title: "Drive",
     url: "https://drive.google.com/",
-    icon: drive,
+    icon: "assets/svg/drive-color.svg",
   },
   {
     title: "Maps",
     url: "https://maps.google.com/",
-    icon: maps,
+    icon: "assets/svg/maps-gps.svg",
   },
   {
     title: "News",
     url: "https://news.google.com/",
-    icon: news,
+    icon: "assets/svg/news.svg"
   },
   {
     title: "Pinterest",
     url: "https://www.pinterest.com/",
-    icon: pinterest,
+    icon: "pinterest-color.svg",
   },
 ]
 

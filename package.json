@@ -66,6 +66,16 @@
     "typescript-eslint": "^8.46.4"
   },
   "manifest": {
+    "web_accessible_resources": [
+      {
+        "resources": [
+          "assets/*"
+        ],
+        "matches": [
+          "<all_urls>"
+        ]
+      }
+    ],
     "host_permissions": [
       "https://*/*"
     ],
@@ -83,7 +93,12 @@
     ],
     "browser_specific_settings": {
       "gecko": {
-        "id": "vividtab@jrtilak.dev"
+        "id": "vividtab@jrtilak.dev",
+        "data_collection_permissions": {
+          "required": [
+            "none"
+          ]
+        }
       }
     }
   },
