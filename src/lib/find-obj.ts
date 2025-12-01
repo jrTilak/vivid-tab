@@ -22,4 +22,4 @@ const findObjValue = <T extends Record<string, unknown>>(
   return { result, objKey }
 }
 
-export default findObjValue
+export { findObjValue }

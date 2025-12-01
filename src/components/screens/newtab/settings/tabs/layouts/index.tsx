@@ -5,9 +5,9 @@ import PreviewCard from "./preview-card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import filterObj from "@/lib/filter-obj"
+import { filterObj } from "@/lib/filter-obj"
 import { DndContext, type DragEndEvent } from "@dnd-kit/core"
-import findObjValue from "@/lib/find-obj"
+import { findObjValue } from "@/lib/find-obj"
 
 const LayoutsSettings = () => {
   const {
@@ -196,7 +196,7 @@ const LayoutsSettings = () => {
                     <PreviewCard index={"0"} className="h-9 mx-auto " />
                   )}
                 </div>
-                <div className="flex-grow">{COMPONENTS[layout[4]]}</div>
+                <div className="grow">{COMPONENTS[layout[4]]}</div>
                 <div className="mt-6 flex items-center justify-center">
                   {COMPONENTS[layout[8]] || (
                     <PreviewCard index={"8"} className="h-9 mx-auto" />

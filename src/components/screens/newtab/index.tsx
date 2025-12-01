@@ -10,11 +10,13 @@ import { cn } from "@/lib/cn"
 import { Searchbar } from "./widgets/searchbar"
 import { useWallpaper } from "@/hooks/use-wallpaper"
 import { Bookmarks } from "./widgets/bookmarks"
+import { NextWallpaperButton } from "./next-wallpaper-button"
 
 type Layout = "small" | "mid" | "large"
 
 export default function Homepage() {
   const [layoutType, setLayoutType] = useState<Layout>("small")
+  const [imageLoadError, setImageLoadError] = useState(false)
   const {
     settings: {
       layout,
@@ -24,7 +26,12 @@ export default function Homepage() {
     },
   } = useSettings()
 
-  const imageSrc = useWallpaper()
+  const imageData = useWallpaper()
+
+  // Reset error state when imageData changes
+  useEffect(() => {
+    setImageLoadError(false)
+  }, [imageData?.src])
 
   const COMPONENTS = useMemo(() => {
     return {
@@ -69,12 +76,27 @@ export default function Homepage() {
     }
   }, [bookmarksCanTakeExtraSpaceIfAvailable, layout])
 
+  // Determine which background to use
+  const backgroundToUse =
+    !wallpapers.selectedImageId || imageLoadError
+      ? background
+      : imageData?.src || background
+
   return (
     <>
       <div className="min-h-screen w-full bg-cover bg-center p-6 relative select-none transition-all">
+        {/* Hidden img element to detect load errors */}
+        {wallpapers.selectedImageId && imageData?.src && !imageLoadError && (
+          <img
+            src={imageData.src}
+            alt=""
+            onError={() => setImageLoadError(true)}
+            className="hidden"
+          />
+        )}
         <div
           style={{
-            backgroundImage: `url(${!wallpapers.selectedImageId ? background : imageSrc})`,
+            backgroundImage: `url(${backgroundToUse})`,
           }}
           className={cn(
             "h-full w-full bg-cover bg-center bg-no-repeat absolute inset-0",
@@ -88,7 +110,7 @@ export default function Homepage() {
           className={cn(`h-full w-full absolute inset-0`)}
         />
 
-        <div className="mx-auto max-w-[1400px] relative mt-20">
+        <div className="mx-auto max-w-[1500px] relative mt-20">
           {/* Tabs */}
 
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-x-14">
@@ -142,6 +164,17 @@ export default function Homepage() {
             )}
           </div>
         </div>
+
+        {/* Image Credits */}
+        {imageData?.source && imageData?.source !== "local" && (
+          <div className="fixed bottom-4 left-4 z-50">
+            <div className="bg-black/50 backdrop-blur-sm text-white text-xs px-2 py-1 rounded">
+              Images powered by {imageData?.source}
+            </div>
+          </div>
+        )}
+
+        <NextWallpaperButton />
       </div>
     </>
   )

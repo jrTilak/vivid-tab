@@ -15,7 +15,7 @@ const WelcomeTab = () => {
       {...ANIMATION_PROPS[animationName]}
       className="__vivid-container"
     >
-      <Card className="text-center px-9 py-5 w-fit min-w-[512px] text-foreground">
+      <Card className="text-center px-9 py-5 w-fit min-w-lg  gap-4">
         <CardContent className="space-y-6 pt-4">
           <img src={icon} alt="icon" className="size-20 mx-auto" />
           <div className="space-y-2">
@@ -25,7 +25,7 @@ const WelcomeTab = () => {
             </p>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-center pt-4">
+        <CardFooter className="flex justify-center pt-4 flex-col items-center">
           <Button
             onClick={() => {
               scrollToTab("IMPORT")
@@ -37,6 +37,27 @@ const WelcomeTab = () => {
           >
             START <ArrowRightIcon className="size-4" />
           </Button>
+          <p className="text-muted-foreground mt-2 text-sm">
+            By installing Vivid Tab, you agree to our{" "}
+            <a
+              href="https://vividtab.jrtilak.dev/terms"
+              className="underline"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Privacy Policy
+            </a>{" "}
+            and{" "}
+            <a
+              href="https://vividtab.jrtilak.dev/terms"
+              className="underline"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Terms of Service
+            </a>{" "}
+            .
+          </p>
         </CardFooter>
       </Card>
     </motion.div>
