@@ -1,4 +1,5 @@
 import { type StoredImage } from "@/lib/wallpapers"
+import { openImageDB } from "@/lib/db/indexeddb"
 import { useEffect, useState } from "react"
 
 /**
@@ -16,42 +17,39 @@ const useImage = (imageId: string | null) => {
       return
     }
 
-    const request = indexedDB.open("ImageDB", 1)
+    openImageDB()
+      .then((db) => {
+        const transaction = db.transaction("images", "readonly")
+        const store = transaction.objectStore("images")
+        const getRequest = store.get(imageId)
 
-    request.onsuccess = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result
-      const transaction = db.transaction("images", "readonly")
-      const store = transaction.objectStore("images")
-      const getRequest = store.get(imageId)
+        getRequest.onsuccess = () => {
+          if (getRequest.result) {
+            const result = getRequest.result as StoredImage
+            setImageData(result)
 
-      getRequest.onsuccess = () => {
-        if (getRequest.result) {
-          const result = getRequest.result as StoredImage
-          setImageData(result)
-
-          // If the image is not yet downloaded, trigger background download
-          if (!result.downloaded && result.source !== "local") {
-            // Import wallpaper dynamically to avoid circular dependencies
-            import("@/lib/wallpapers").then(({ wallpaper }) => {
-              wallpaper.downloadPendingImages().catch(console.error)
-            })
+            // If the image is not yet downloaded, trigger background download
+            if (!result.downloaded && result.source !== "local") {
+              // Import wallpaper dynamically to avoid circular dependencies
+              import("@/lib/wallpapers").then(({ wallpaper }) => {
+                wallpaper.downloadPendingImages().catch(console.error)
+              })
+            }
+          } else {
+            console.warn("No image found with ID:", imageId)
+            setImageData(null)
           }
-        } else {
-          console.warn("No image found with ID:", imageId)
+        }
+
+        getRequest.onerror = () => {
+          console.error("Error retrieving image from IndexedDB")
           setImageData(null)
         }
-      }
-
-      getRequest.onerror = () => {
-        console.error("Error retrieving image from IndexedDB")
+      })
+      .catch(() => {
+        console.error("Failed to open IndexedDB")
         setImageData(null)
-      }
-    }
-
-    request.onerror = () => {
-      console.error("Failed to open IndexedDB")
-      setImageData(null)
-    }
+      })
   }, [imageId]) // Runs when imageId changes
 
   return imageData
