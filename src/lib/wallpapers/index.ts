@@ -272,8 +272,7 @@ class Wallpaper {
       })
     } catch (error) {
       console.error("Failed to delete old images:", error)
-
-      return Promise.resolve()
+      // Silently continue - deletion failure is not critical
     }
   }
 
