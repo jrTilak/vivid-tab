@@ -131,7 +131,9 @@ class Wallpaper {
         tx.oncomplete = () => resolve(id)
         tx.onerror = () => reject(new Error("Failed to store image"))
       })
-    } catch {
+    } catch (error) {
+      console.error("Failed to store image URL to IndexedDB:", error)
+
       return null
     }
   }
@@ -204,7 +206,9 @@ class Wallpaper {
         getRequest.onsuccess = () => resolve(getRequest.result || null)
         getRequest.onerror = () => reject(new Error("Failed to get image"))
       })
-    } catch {
+    } catch (error) {
+      console.error("Failed to get image from IndexedDB:", error)
+
       return null
     }
   }
@@ -224,7 +228,9 @@ class Wallpaper {
         getAll.onsuccess = () => resolve(getAll.result as StoredImage[])
         getAll.onerror = () => reject(new Error("Failed to get images"))
       })
-    } catch {
+    } catch (error) {
+      console.error("Failed to get all images from IndexedDB:", error)
+
       return []
     }
   }
@@ -266,6 +272,8 @@ class Wallpaper {
       })
     } catch (error) {
       console.error("Failed to delete old images:", error)
+
+      return Promise.resolve()
     }
   }
 
