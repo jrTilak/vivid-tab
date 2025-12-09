@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge"
 import { useImage } from "@/hooks/use-image"
+import { openImageDB } from "@/lib/db/indexeddb"
 import { useSettings } from "@/providers/settings-provider"
 import { TrashIcon } from "lucide-react"
 
@@ -16,46 +17,35 @@ const ImageCard = ({
   const { setSettings } = useSettings()
 
   const deleteImageById = (imageId: string) => {
-    const request = indexedDB.open("ImageDB", 1)
+    openImageDB()
+      .then((db) => {
+        const transaction = db.transaction("images", "readwrite")
+        const store = transaction.objectStore("images")
 
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result
+        const deleteRequest = store.delete(imageId)
 
-      if (!db.objectStoreNames.contains("images")) {
-        db.createObjectStore("images", { keyPath: "id" })
-      }
-    }
+        deleteRequest.onsuccess = () => {
+          console.log(`Image with ID ${imageId} deleted successfully.`)
+          setSettings((prev) => ({
+            ...prev,
+            wallpapers: {
+              ...prev.wallpapers,
+              images: prev.wallpapers.images.filter((id) => id !== imageId),
+              selectedImageId:
+                prev.wallpapers.selectedImageId === imageId
+                  ? null
+                  : prev.wallpapers.selectedImageId,
+            },
+          }))
+        }
 
-    request.onsuccess = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result
-      const transaction = db.transaction("images", "readwrite")
-      const store = transaction.objectStore("images")
-
-      const deleteRequest = store.delete(imageId)
-
-      deleteRequest.onsuccess = () => {
-        console.log(`Image with ID ${imageId} deleted successfully.`)
-        setSettings((prev) => ({
-          ...prev,
-          wallpapers: {
-            ...prev.wallpapers,
-            images: prev.wallpapers.images.filter((id) => id !== imageId),
-            selectedImageId:
-              prev.wallpapers.selectedImageId === imageId
-                ? null
-                : prev.wallpapers.selectedImageId,
-          },
-        }))
-      }
-
-      deleteRequest.onerror = () => {
-        console.error(`Failed to delete image with ID ${imageId}`)
-      }
-    }
-
-    request.onerror = () => {
-      console.error("Failed to open IndexedDB")
-    }
+        deleteRequest.onerror = () => {
+          console.error(`Failed to delete image with ID ${imageId}`)
+        }
+      })
+      .catch(() => {
+        console.error("Failed to open IndexedDB")
+      })
   }
 
   return (
