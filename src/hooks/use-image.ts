@@ -18,6 +18,14 @@ const useImage = (imageId: string | null) => {
 
     const request = indexedDB.open("ImageDB", 1)
 
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result
+
+      if (!db.objectStoreNames.contains("images")) {
+        db.createObjectStore("images", { keyPath: "id" })
+      }
+    }
+
     request.onsuccess = (event) => {
       const db = (event.target as IDBOpenDBRequest).result
       const transaction = db.transaction("images", "readonly")
