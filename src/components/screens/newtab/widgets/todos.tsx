@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { useSettings } from "@/providers/settings-provider"
 import { PlusIcon, TrashIcon } from "lucide-react"
 import type React from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Label } from "../../../ui/label"
 
 interface Todo {
@@ -17,48 +17,45 @@ interface Todo {
 const Todos = () => {
   const [todos, setTodos] = useState<Todo[]>([])
   const [newTodo, setNewTodo] = useState("")
+  const expireTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([])
   const {
     settings: {
       todos: { expireAfterCompleted },
     },
   } = useSettings()
 
+  const updateTodosInStorage = (nextTodos: Todo[]) => {
+    chrome.storage.sync.set({ todos: JSON.stringify(nextTodos) })
+  }
+
   // get todos from local storage
   useEffect(() => {
     chrome.storage.sync.get("todos", (data) => {
       if (data.todos) {
         try {
-          let todos = JSON.parse(data.todos)
-
-          // remove expired todos
+          const raw = JSON.parse(data.todos) as Todo[]
           const now = Date.now()
-          todos = todos.filter((todo: Todo) => {
+          const filtered = raw.filter((todo: Todo) => {
             if (todo.completed && expireAfterCompleted.enabled) {
               const expireTime =
                 todo.id + expireAfterCompleted.durationInMinutes * 60 * 1000
-              const shouldDelete = expireTime < now
-
-              if (shouldDelete) {
-                deleteTodo(todo.id)
-              }
-
-              return !shouldDelete
+              
+                return expireTime >= now
             }
 
             return true
           })
+          setTodos(filtered)
 
-          setTodos(todos)
+          if (filtered.length !== raw.length) {
+            updateTodosInStorage(filtered)
+          }
         } catch (e) {
           console.error(e)
         }
       }
     })
-  }, [])
-
-  const updateTodosInStorage = (todos: Todo[]) => {
-    chrome.storage.sync.set({ todos: JSON.stringify(todos) })
-  }
+  }, [expireAfterCompleted.enabled, expireAfterCompleted.durationInMinutes])
 
   const addTodo = (e: React.FormEvent) => {
     e.preventDefault()
@@ -74,31 +71,48 @@ const Todos = () => {
     }
   }
 
+  const deleteTodo = (id: number) => {
+    setTodos((prev) => {
+      const next = prev.filter((todo) => todo.id !== id)
+      updateTodosInStorage(next)
+
+      return next
+    })
+  }
+
   const toggleTodo = (id: number) => {
-    const newTodo = todos.map((todo) =>
+    const nextTodos = todos.map((todo) =>
       todo.id === id ? { ...todo, completed: !todo.completed } : todo,
     )
 
-    newTodo.forEach((todo) => {
+    nextTodos.forEach((todo) => {
       if (todo.completed && expireAfterCompleted.enabled) {
-        setTimeout(
+        const timeoutId = setTimeout(
           () => {
-            deleteTodo(todo.id)
+            setTodos((prev) => {
+              const after = prev.filter((t) => t.id !== todo.id)
+              updateTodosInStorage(after)
+              
+              return after
+            })
           },
           expireAfterCompleted.durationInMinutes * 60 * 1000,
-        ) // convert minutes to milliseconds
+        )
+        expireTimeoutsRef.current.push(timeoutId)
       }
     })
 
-    setTodos(newTodo)
-    updateTodosInStorage(newTodo)
+    setTodos(nextTodos)
+    updateTodosInStorage(nextTodos)
   }
 
-  const deleteTodo = (id: number) => {
-    const newTodo = todos.filter((todo) => todo.id !== id)
-    setTodos(newTodo)
-    updateTodosInStorage(newTodo)
-  }
+  // Clear expiry timeouts on unmount
+  useEffect(() => {
+    return () => {
+      expireTimeoutsRef.current.forEach(clearTimeout)
+      expireTimeoutsRef.current = []
+    }
+  }, [])
 
   return (
     <Card className="p-6">
@@ -107,7 +121,7 @@ const Todos = () => {
         {
           // sort the todos by latest at the top and then put the completed todos at the bottom
 
-          todos
+          [...todos]
             .sort((a, b) => {
               if (a.completed && !b.completed) return 1
               if (!a.completed && b.completed) return -1

@@ -71,17 +71,16 @@ const LayoutsSettings = () => {
     }
   }, [layout])
 
-  const onDragEnd = ({
-    active: {
-      id: from,
-      data: { current: activeCurrent },
-    },
-    over: {
-      id: to,
-      data: { current },
-    },
-  }: DragEndEvent) => {
-    console.log("from", from, "-> to", to)
+  const onDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over) return
+
+    const from = active.id
+    const to = over.id
+    const activeCurrent = active.data?.current
+    const current = over.data?.current
+
+    if (!activeCurrent || !current) return
 
     if (from === to) {
       console.log("Same item, returning")

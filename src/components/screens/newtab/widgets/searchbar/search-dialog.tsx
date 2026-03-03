@@ -43,7 +43,7 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
     setSearchQuery("")
   }, [open])
 
-  useEffect(() => { }, [debouncedSearchQuery])
+  useEffect(() => {}, [debouncedSearchQuery])
 
   const handleSearchQuery = useCallback(
     (query: string) => {
@@ -52,10 +52,10 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
         query,
         openIn: general.openUrlIn,
       })
-      onOpenChange(false)
+      onOpenChange?.(false)
       setSearchQuery("")
     },
-    [general.openUrlIn],
+    [general.openUrlIn, onOpenChange],
   )
 
   const SHORTCUTS = useMemo(
@@ -98,12 +98,12 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
           },
         },
       ] as const,
-    [],
+    [handleSearchQuery],
   )
 
-  useHotkeys("Escape", () => onOpenChange(false))
+  useHotkeys("Escape", () => onOpenChange?.(false))
   useHotkeys(["ctrl+comma", "cmd+comma", "ctrl+,", "cmd+,"], () =>
-    onOpenChange(!open),
+    onOpenChange?.(!open),
   )
 
   return (

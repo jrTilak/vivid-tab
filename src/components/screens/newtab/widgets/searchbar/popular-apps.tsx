@@ -62,7 +62,7 @@ const POPULAR_APPS = [
   {
     title: "News",
     url: "https://news.google.com/",
-    icon: "assets/svg/news.svg"
+    icon: "assets/svg/news.svg",
   },
   {
     title: "Pinterest",

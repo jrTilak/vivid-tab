@@ -13,15 +13,17 @@ export const useWallpaper = () => {
     let selectedImageId = wallpapers.selectedImageId
     let shouldUpdateSettings = false
 
-    const newImage = () => {
-      if (wallpapers.images.length === 0) return selectedImageId
+    const newImage = (): string | null => {
+      if (wallpapers.images.length === 0) return selectedImageId ?? null
 
-      const currentImageIndex = wallpapers.images.indexOf(selectedImageId)
+      const currentImageIndex = wallpapers.images.indexOf(
+        selectedImageId ?? undefined,
+      )
+      const maxIndex = wallpapers.images.length - 1
+      const excludeIndices = currentImageIndex >= 0 ? [currentImageIndex] : []
+      const idx = randomInt(0, maxIndex < 0 ? 0 : maxIndex, excludeIndices)
 
-      // generating from 0 - length ie one more than acutal images so that we can also show the default wallpaper at last index
-      return wallpapers.images[
-        randomInt(0, wallpapers.images.length, [currentImageIndex])
-      ]
+      return wallpapers.images[idx] ?? wallpapers.images[0] ?? null
     }
 
     switch (background.randomizeWallpaper) {

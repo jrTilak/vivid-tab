@@ -153,6 +153,7 @@ export const SettingsSchemaForImport = z.object({
   general: z.object({
     rootFolder: z.string(),
     showHistory: z.boolean(),
+    showTopSites: z.boolean().optional(),
     layout: z.enum(["grid", "list"]),
     openUrlIn: z.enum(["new-tab", "current-tab"]),
     bookmarksCanTakeExtraSpaceIfAvailable: z.boolean(),
@@ -160,18 +161,22 @@ export const SettingsSchemaForImport = z.object({
   searchbar: z.object({
     dialogBackground: z.enum(["default", "transparent"]),
     shortcuts: z.array(
-      z.enum(["chatgpt", "gemini", "deepseek", "claude", "youtube"]),
+      z.enum(["chatgpt", "claude", "youtube", "search-online"]),
     ),
     submitDefaultAction: z.enum([
       "default",
       "ask-chatgpt",
       "ask-claude",
       "search-on-youtube",
+      "search-online",
     ]),
     searchSuggestions: z.boolean(),
   }),
   background: z.object({
     blurIntensity: z.number(),
     brightness: z.number(),
+    randomizeWallpaper: z
+      .enum(["off", "on-each-tab", "hourly", "daily"])
+      .optional(),
   }),
 })

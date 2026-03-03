@@ -1,13 +1,7 @@
 {
   "extends": "plasmo/templates/tsconfig.base",
   "exclude": ["node_modules"],
-  "include": [
-    ".plasmo/index.d.ts",
-    "./**/*.ts",
-    "./**/*.tsx",
-    "src/components/welcome/import-from-browser-bookmarks.tsx",
-    "knip.js",
-  ],
+  "include": [".plasmo/index.d.ts", "./**/*.ts", "./**/*.tsx", "knip.js"],
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"],

@@ -5,9 +5,12 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from "react"
+
+const SYNC_DEBOUNCE_MS = 400
 
 interface SettingsContextState {
   settings: Settings
@@ -27,16 +30,11 @@ const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   )
 
   const resetSettings = useCallback(async () => {
-    // clear synced + local storage
     chrome.storage.sync.clear()
     chrome.storage.local.clear()
 
-    // clear indexdb
-    const databases = await indexedDB.databases()
-
-    for (const db of databases) {
-      if (db.name) indexedDB.deleteDatabase(db.name)
-    }
+    // Only clear extension's wallpaper DB (do not wipe other origin DBs)
+    indexedDB.deleteDatabase("ImageDB")
 
     setSettings(DEFAULT_SETTINGS as unknown as Settings)
   }, [])
@@ -91,11 +89,25 @@ const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
   }, [])
 
+  const syncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   useEffect(() => {
-    if (isLoaded) {
+    if (!isLoaded) return
+
+    if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current)
+
+    syncTimeoutRef.current = setTimeout(() => {
+      syncTimeoutRef.current = null
       chrome.storage.sync.set({
         settings: JSON.stringify(settings),
       })
+    }, SYNC_DEBOUNCE_MS)
+
+    return () => {
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current)
+        syncTimeoutRef.current = null
+      }
     }
   }, [settings, isLoaded])
 

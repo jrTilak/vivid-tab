@@ -9,7 +9,7 @@ import { RefreshCwIcon } from "lucide-react"
 
 import ImageCard from "./components/image-card"
 import UploadButton from "./components/upload-button"
-import { wallpaper } from "@/lib/wallpapers"
+import { openImageDB, wallpaper } from "@/lib/wallpapers"
 
 export default function WallpaperSettings() {
   const {
@@ -34,47 +34,43 @@ export default function WallpaperSettings() {
     const reader = new FileReader()
 
     reader.onload = (e: ProgressEvent<FileReader>) => {
-      const imageSrc = e.target?.result as string // Explicitly cast e.target as FileReader
-      const imageId = String(Date.now()) // Generate a unique ID
+      const imageSrc = e.target?.result as string
+      const imageId = String(Date.now())
 
-      const request = indexedDB.open("ImageDB", 1)
+      openImageDB()
+        .then((db) => {
+          const transaction = db.transaction("images", "readwrite")
+          const store = transaction.objectStore("images")
 
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result
+          const imageObject = {
+            id: imageId,
+            src: imageSrc,
+            source: "local",
+            downloaded: true,
+            fetchedAt: Date.now(),
+          }
 
-        if (!db.objectStoreNames.contains("images")) {
-          db.createObjectStore("images", { keyPath: "id" })
-        }
-      }
+          store.put(imageObject)
 
-      request.onsuccess = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result
-        const transaction = db.transaction("images", "readwrite")
-        const store = transaction.objectStore("images")
+          transaction.oncomplete = () => {
+            db.close()
+            setSettings((prev) => ({
+              ...prev,
+              wallpapers: {
+                ...prev.wallpapers,
+                images: [...prev.wallpapers.images, imageId],
+              },
+            }))
+          }
 
-        const imageObject = {
-          id: imageId,
-          src: imageSrc,
-          source: "local",
-          downloaded: true,
-          fetchedAt: Date.now(),
-        }
-
-        store.put(imageObject)
-        console.log("Image stored with ID:", imageId)
-
-        setSettings((prev) => ({
-          ...prev,
-          wallpapers: {
-            ...prev.wallpapers,
-            images: [...prev.wallpapers.images, imageId],
-          },
-        }))
-      }
-
-      request.onerror = () => {
-        console.error("IndexedDB error: Failed to open database")
-      }
+          transaction.onerror = () => {
+            db.close()
+            console.error("IndexedDB error: Failed to store image")
+          }
+        })
+        .catch(() => {
+          console.error("IndexedDB error: Failed to open database")
+        })
     }
 
     reader.readAsDataURL(file)

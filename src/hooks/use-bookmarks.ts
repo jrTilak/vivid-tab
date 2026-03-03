@@ -40,7 +40,7 @@ const useBookmarks = (id?: string) => {
       chrome.bookmarks.onChanged.removeListener(fn)
       chrome.bookmarks.onMoved.removeListener(fn)
     }
-  }, [])
+  }, [fn])
 
   return bookmarks
 }

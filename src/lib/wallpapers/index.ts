@@ -2,6 +2,35 @@ import { LAST_ONLINE_IMAGES_FETCHED_AT } from "@/constants/keys"
 import { Pixabay } from "./extensions/pixabay"
 import { Wallhaven } from "./extensions/wallhaven"
 
+const IMAGE_DB_NAME = "ImageDB"
+const IMAGE_DB_VERSION = 2
+
+/**
+ * Open ImageDB and ensure the "images" object store exists.
+ * Use version 2 so onupgradeneeded runs for DBs created without the store (browser quirks).
+ * Caller should call db.close() when done to avoid connection leaks.
+ */
+export function openImageDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(IMAGE_DB_NAME, IMAGE_DB_VERSION)
+
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result
+
+      if (!db.objectStoreNames.contains("images")) {
+        db.createObjectStore("images", { keyPath: "id" })
+      }
+    }
+
+    request.onsuccess = () => {
+      resolve((request as IDBOpenDBRequest).result)
+    }
+
+    request.onerror = () =>
+      reject(new Error("Failed to open ImageDB: " + request.error?.message))
+  })
+}
+
 /**
  * What IndexedDB actually stores
  */
@@ -108,40 +137,34 @@ class Wallpaper {
     imageUrl: string
     source: string
   }): Promise<string | null> {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open("ImageDB", 1)
+    const db = await openImageDB()
+    
+return new Promise((resolve, reject) => {
+      const tx = db.transaction("images", "readwrite")
+      const store = tx.objectStore("images")
 
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result
+      const id = `${source}_${Date.now()}_${Math.random().toString(36).substring(7)}`
 
-        if (!db.objectStoreNames.contains("images")) {
-          db.createObjectStore("images", { keyPath: "id" })
-        }
+      const imageObject: StoredImage = {
+        id,
+        src: imageUrl,
+        source,
+        fetchedAt: Date.now(),
+        downloaded: false,
+        originalUrl: imageUrl,
       }
 
-      request.onsuccess = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result
-        const tx = db.transaction("images", "readwrite")
-        const store = tx.objectStore("images")
+      store.put(imageObject)
 
-        const id = `${source}_${Date.now()}_${Math.random().toString(36).substring(7)}`
-
-        const imageObject: StoredImage = {
-          id,
-          src: imageUrl, // Store URL initially
-          source,
-          fetchedAt: Date.now(),
-          downloaded: false, // Mark as not downloaded yet
-          originalUrl: imageUrl,
-        }
-
-        store.put(imageObject)
-
-        tx.oncomplete = () => resolve(id)
-        tx.onerror = () => reject(new Error("Failed to store image"))
+      tx.oncomplete = () => {
+        db.close()
+        resolve(id)
       }
 
-      request.onerror = () => reject(new Error("Failed to open IndexedDB"))
+      tx.onerror = () => {
+        db.close()
+        reject(new Error("Failed to store image"))
+      }
     })
   }
 
@@ -167,36 +190,36 @@ class Wallpaper {
       )
 
       // Update in IndexedDB
-      return new Promise((resolve, reject) => {
-        const request = indexedDB.open("ImageDB", 1)
+      const db = await openImageDB()
+      
+return new Promise((resolve, reject) => {
+        const tx = db.transaction("images", "readwrite")
+        const store = tx.objectStore("images")
 
-        request.onsuccess = (event) => {
-          const db = (event.target as IDBOpenDBRequest).result
-          const tx = db.transaction("images", "readwrite")
-          const store = tx.objectStore("images")
+        const updatedImage: StoredImage = base64
+          ? {
+              ...image,
+              src: base64,
+              downloaded: true,
+              downloadAttempts: attempts,
+            }
+          : {
+              ...image,
+              downloadAttempts: attempts,
+              downloadFailed: attempts >= MAX_DOWNLOAD_ATTEMPTS,
+            }
 
-          const updatedImage: StoredImage = base64
-            ? {
-                // Successfully downloaded
-                ...image,
-                src: base64,
-                downloaded: true,
-                downloadAttempts: attempts,
-              }
-            : {
-                // Download failed
-                ...image,
-                downloadAttempts: attempts,
-                downloadFailed: attempts >= MAX_DOWNLOAD_ATTEMPTS,
-              }
+        store.put(updatedImage)
 
-          store.put(updatedImage)
-
-          tx.oncomplete = () => resolve(!!base64)
-          tx.onerror = () => reject(new Error("Failed to update image"))
+        tx.oncomplete = () => {
+          db.close()
+          resolve(!!base64)
         }
 
-        request.onerror = () => reject(new Error("Failed to open IndexedDB"))
+        tx.onerror = () => {
+          db.close()
+          reject(new Error("Failed to update image"))
+        }
       })
     } catch (error) {
       console.error("Error downloading image:", error)
@@ -209,20 +232,22 @@ class Wallpaper {
    * Get a single image by ID
    */
   private async _getImageById(imageId: string): Promise<StoredImage | null> {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open("ImageDB", 1)
+    const db = await openImageDB()
+    
+return new Promise((resolve, reject) => {
+      const tx = db.transaction("images", "readonly")
+      const store = tx.objectStore("images")
+      const getRequest = store.get(imageId)
 
-      request.onsuccess = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result
-        const tx = db.transaction("images", "readonly")
-        const store = tx.objectStore("images")
-        const getRequest = store.get(imageId)
-
-        getRequest.onsuccess = () => resolve(getRequest.result || null)
-        getRequest.onerror = () => reject(new Error("Failed to get image"))
+      getRequest.onsuccess = () => {
+        db.close()
+        resolve(getRequest.result || null)
       }
 
-      request.onerror = () => reject(new Error("Failed to open IndexedDB"))
+      getRequest.onerror = () => {
+        db.close()
+        reject(new Error("Failed to get image"))
+      }
     })
   }
 
@@ -230,20 +255,23 @@ class Wallpaper {
    * Read all stored images
    */
   private async _getAllStoredImages(): Promise<StoredImage[]> {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open("ImageDB", 1)
+    const db = await openImageDB()
+    
+return new Promise((resolve, reject) => {
+      const tx = db.transaction("images", "readonly")
+      const store = tx.objectStore("images")
 
-      request.onsuccess = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result
-        const tx = db.transaction("images", "readonly")
-        const store = tx.objectStore("images")
+      const getAll = store.getAll()
 
-        const getAll = store.getAll()
-        getAll.onsuccess = () => resolve(getAll.result as StoredImage[])
-        getAll.onerror = () => reject(new Error("Failed to get images"))
+      getAll.onsuccess = () => {
+        db.close()
+        resolve(getAll.result as StoredImage[])
       }
 
-      request.onerror = () => reject(new Error("Failed to open DB"))
+      getAll.onerror = () => {
+        db.close()
+        reject(new Error("Failed to get images"))
+      }
     })
   }
 
@@ -251,56 +279,47 @@ class Wallpaper {
    * Delete all online images for a source
    */
   private async _deleteOldImages(source: string): Promise<void> {
+    const db = await openImageDB()
+
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open("ImageDB", 1)
+      const tx = db.transaction("images", "readwrite")
+      const store = tx.objectStore("images")
+      const getAllReq = store.getAll()
 
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result
+      getAllReq.onsuccess = () => {
+        const allImages = getAllReq.result as StoredImage[]
+        const toDelete = allImages.filter((img) => img.source === source)
 
-        if (!db.objectStoreNames.contains("images")) {
-          db.createObjectStore("images", { keyPath: "id" })
+        if (toDelete.length === 0) {
+          db.close()
+          
+return resolve()
         }
-      }
 
-      request.onsuccess = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result
+        let deleted = 0
+        toDelete.forEach((img) => {
+          const delReq = store.delete(img.id)
 
-        if (!db) resolve()
+          delReq.onsuccess = () => {
+            deleted++
 
-        const tx = db.transaction("images", "readwrite")
-
-        if (!tx) resolve()
-
-        const store = tx.objectStore("images")
-
-        const getAllReq = store.getAll()
-
-        getAllReq.onsuccess = () => {
-          const allImages = getAllReq.result as StoredImage[]
-          const toDelete = allImages.filter((img) => img.source === source)
-
-          if (toDelete.length === 0) return resolve()
-
-          let deleted = 0
-
-          toDelete.forEach((img) => {
-            const delReq = store.delete(img.id)
-
-            delReq.onsuccess = () => {
-              deleted++
-              if (deleted === toDelete.length) resolve()
+            if (deleted === toDelete.length) {
+              db.close()
+              resolve()
             }
+          }
 
-            delReq.onerror = () =>
-              reject(new Error(`Failed to delete ${img.id}`))
-          })
-        }
-
-        getAllReq.onerror = () =>
-          reject(new Error("Failed to get images from IndexedDB"))
+          delReq.onerror = () => {
+            db.close()
+            reject(new Error(`Failed to delete ${img.id}`))
+          }
+        })
       }
 
-      request.onerror = () => reject(new Error("Failed to open IndexedDB"))
+      getAllReq.onerror = () => {
+        db.close()
+        reject(new Error("Failed to get images from IndexedDB"))
+      }
     })
   }
 
@@ -368,8 +387,22 @@ class Wallpaper {
       const result = await chrome.storage.sync.get("settings")
       if (!result.settings) return
 
-      const settings = JSON.parse(result.settings)
-      const { wallpapers, background } = settings
+      let settings: Record<string, unknown>
+
+      try {
+        settings = JSON.parse(result.settings) as Record<string, unknown>
+      } catch {
+        console.error("Failed to parse settings in fetchOnlineImages")
+        
+return
+      }
+
+      const wallpapers = settings.wallpapers as
+        | { onlineImages?: { enabled?: boolean; keywords?: string } }
+        | undefined
+      const background = settings.background as
+        | { randomizeWallpaper?: string }
+        | undefined
 
       if (!wallpapers?.onlineImages?.enabled) return
       if (background?.randomizeWallpaper === "off") return
@@ -429,7 +462,10 @@ class Wallpaper {
       const updatedSettings = {
         ...settings,
         wallpapers: {
-          ...settings.wallpapers,
+          ...(typeof settings.wallpapers === "object" &&
+          settings.wallpapers !== null
+            ? settings.wallpapers
+            : {}),
           images: [...localIds, ...ids],
         },
       }

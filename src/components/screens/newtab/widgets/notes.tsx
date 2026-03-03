@@ -76,8 +76,8 @@ const Notes = () => {
       </Button>
       <div className="mt-4 space-y-2">
         {
-          // sort notes by createdAt
-          notes
+          // sort notes by createdAt (immutable sort)
+          [...notes]
             .sort((a, b) => b.createdAt - a.createdAt)
             .map((note, index) => (
               <div

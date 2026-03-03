@@ -1,4 +1,8 @@
-import type { BookmarkFolderNode, Bookmarks } from "@/types/bookmark"
+import type {
+  BookmarkFolderNode,
+  BookmarkTreeNode,
+  Bookmarks,
+} from "@/types/bookmark"
 
 /**
  * Finds a specific bookmark folder by ID within nested bookmark structure
@@ -10,16 +14,16 @@ const getBookmarkFolder = (
   id: string,
 ): BookmarkFolderNode | null => {
   const findNode = (
-    nodes: BookmarkFolderNode[],
+    nodes: BookmarkTreeNode[],
     id: string,
   ): BookmarkFolderNode | null => {
     for (const node of nodes) {
       if (node.id === id) {
-        return node
+        return node as BookmarkFolderNode
       }
 
-      if (node.children) {
-        const foundNode = findNode(node.children as BookmarkFolderNode[], id)
+      if ("children" in node && node.children) {
+        const foundNode = findNode(node.children, id)
 
         if (foundNode) {
           return foundNode

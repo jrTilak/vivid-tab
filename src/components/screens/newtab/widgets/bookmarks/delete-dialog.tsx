@@ -24,12 +24,27 @@ type Props = {
 const DeleteDialog = ({ open, onOpenChange, id, label, url }: Props) => {
   const deleteUrl = () => {
     chrome.bookmarks.getChildren(id, (children) => {
+      if (chrome.runtime.lastError) {
+        console.error(
+          "Failed to get bookmark children:",
+          chrome.runtime.lastError,
+        )
+        
+        return
+      }
+
+      const done = () => {
+        if (!chrome.runtime.lastError) {
+          onOpenChange(false)
+        } else {
+          console.error("Failed to remove bookmark:", chrome.runtime.lastError)
+        }
+      }
+
       if (children.length > 0) {
-        // It's a folder with items, remove it recursively
-        chrome.bookmarks.removeTree(id, () => onOpenChange(false))
+        chrome.bookmarks.removeTree(id, done)
       } else {
-        // It's a single bookmark, remove it normally
-        chrome.bookmarks.remove(id, () => onOpenChange(false))
+        chrome.bookmarks.remove(id, done)
       }
     })
 

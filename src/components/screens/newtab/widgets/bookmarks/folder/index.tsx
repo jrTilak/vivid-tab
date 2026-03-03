@@ -52,8 +52,8 @@ const BookmarkFolder = (props: Props) => {
 
   const style = transform
     ? {
-      transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-    }
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
     : undefined
 
   return (
@@ -102,7 +102,9 @@ const BookmarkFolder = (props: Props) => {
                     isDragging && "scale-105",
                   )}
                 >
-                  <img src={chrome.runtime.getURL("assets/folder-svgrepo-com.png")} />
+                  <img
+                    src={chrome.runtime.getURL("assets/folder-svgrepo-com.png")}
+                  />
                   <img
                     src={icon}
                     alt=""
@@ -148,7 +150,10 @@ const BookmarkFolder = (props: Props) => {
                     isDragging && "scale-105",
                   )}
                 >
-                  <img src={chrome.runtime.getURL("assets/folder-svgrepo-com.png")} className="size-12 min-w-12" />
+                  <img
+                    src={chrome.runtime.getURL("assets/folder-svgrepo-com.png")}
+                    className="size-12 min-w-12"
+                  />
                   <img
                     src={icon}
                     alt=""

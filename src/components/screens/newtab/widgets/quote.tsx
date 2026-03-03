@@ -25,56 +25,74 @@ const Quote = () => {
     },
   } = useSettings()
 
-  useAsyncEffect(async () => {
-    const [err, data] = await tryCatchAsync(async () => {
-      const baseUrl = "https://api.quotable.io/quotes/random"
-      const urlWithTags =
-        categories.length > 0
-          ? `${baseUrl}?tags=${categories.join("|")}&maxLength=80`
-          : baseUrl
-      const response = await fetch(urlWithTags)
-      const json = (await response.json()) as QuoteResponse[]
+  useAsyncEffect(
+    async (isMounted) => {
+      const [err, data] = await tryCatchAsync(async () => {
+        const baseUrl = "https://api.quotable.io/quotes/random"
+        const urlWithTags =
+          categories.length > 0
+            ? `${baseUrl}?tags=${categories.join("|")}&maxLength=80`
+            : baseUrl
+        const response = await fetch(urlWithTags)
+        const json = (await response.json()) as QuoteResponse[]
 
-      return json[0]
-    })
+        return json[0]
+      })
 
-    if (err || !data) {
-      const [err, cachedQuote] = await tryCatchAsync<Error, QuoteResponse>(
-        () => {
-          return new Promise((resolve, reject) => {
-            chrome.storage.local.get(LOCAL_STORAGE.quote, (data) => {
-              try {
-                const w = JSON.parse(data[LOCAL_STORAGE.quote])
+      if (err || !data) {
+        const [err, cachedQuote] = await tryCatchAsync<Error, QuoteResponse>(
+          () => {
+            return new Promise((resolve, reject) => {
+              chrome.storage.local.get(LOCAL_STORAGE.quote, (storageData) => {
+                try {
+                  const raw = storageData?.[LOCAL_STORAGE.quote]
 
-                if (w) {
-                  resolve(w)
-                } else {
-                  reject(false)
+                  if (raw == null || typeof raw !== "string") {
+                    reject(new Error("No cached quote"))
+
+                    return
+                  }
+
+                  const w = JSON.parse(raw) as QuoteResponse
+
+                  if (w) {
+                    resolve(w)
+                  } else {
+                    reject(false)
+                  }
+                } catch (e) {
+                  reject(e)
                 }
-              } catch (e) {
-                reject(e)
-              }
+              })
             })
-          })
-        },
-      )
+          },
+        )
 
-      if (err) {
-        setErr({
-          err: true,
-          message: err.message,
-        })
-        setIsLoaded(true)
-      } else {
-        setQuote(cachedQuote)
+        if (err) {
+          if (isMounted?.()) {
+            setErr({
+              err: true,
+              message: err.message,
+            })
+            setIsLoaded(true)
+          }
+        } else if (cachedQuote && isMounted?.()) {
+          setQuote(cachedQuote)
+          setIsLoaded(true)
+        }
+
+        return
       }
 
-      return
-    }
-
-    chrome.storage.local.set({ [LOCAL_STORAGE.quote]: JSON.stringify(data) })
-    setQuote(data)
-  }, [])
+      chrome.storage.local.set({ [LOCAL_STORAGE.quote]: JSON.stringify(data) })
+      
+      if (isMounted?.()) {
+        setQuote(data)
+        setIsLoaded(true)
+      }
+    },
+    [categories],
+  )
 
   if (!quote && !isLoaded) {
     return <Skeleton className="h-24" />

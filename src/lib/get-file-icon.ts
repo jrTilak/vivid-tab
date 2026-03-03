@@ -40,4 +40,3 @@ export const getFileIcon = (fileUrl: string) => {
       return chrome.runtime.getURL("assets/svg/file-broken.svg")
   }
 }
-
