@@ -85,9 +85,9 @@ const Notes = () => {
 								className="text-sm bg-white/10 p-2 rounded relative group"
 							>
 								<div className="flex flex-col">
-									{note.text.split("\n").map((line) => (
-										<p key={line}>{line}</p>
-									))}
+								{note.text.split("\n").map((line, index) => (
+									<p key={`${note.id}-${index}`}>{line}</p>
+								))}
 								</div>
 								<button
 									type="button"
