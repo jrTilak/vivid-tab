@@ -69,10 +69,11 @@ const ImportTab = () => {
 					</Button>
 					<Button
 						onClick={() => {
-							chrome.tabs.create({}, () => {
+						chrome.tabs.create({}, () => {
+							if (activeTabId != null) {
 								chrome.tabs.remove(activeTabId);
-							});
-						}}
+							}
+						});
 						variant="ghost"
 						size="sm"
 					>
