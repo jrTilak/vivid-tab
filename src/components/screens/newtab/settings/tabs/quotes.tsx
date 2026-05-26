@@ -89,12 +89,12 @@ const QuotesSettings = () => {
 									<Label htmlFor={slug}>{name}</Label>
 								</div>
 							))
-						: Array.from({ length: 8 }).map((v: number) => (
-								<Skeleton
-									key={v}
-									className="h-4 bg-muted-foreground/20 rounded-sm"
-								/>
-							))}
+					: Array.from({ length: 8 }).map((_, index) => (
+							<Skeleton
+								key={index}
+								className="h-4 bg-muted-foreground/20 rounded-sm"
+							/>
+						))}
 				</div>
 			</div>
 		</div>
