@@ -3,16 +3,16 @@
  * If all attempts fail, returns the last generated number (even if excluded).
  */
 function randomInt(min: number, max: number, exclude: number[] = []) {
-  const excluded = new Set(exclude)
+	const excluded = new Set(exclude);
 
-  let num: number
+	let num: number;
 
-  for (let i = 0; i < 5; i++) {
-    num = Math.floor(Math.random() * (max - min + 1)) + min
-    if (!excluded.has(num)) return num
-  }
+	for (let i = 0; i < 5; i++) {
+		num = Math.floor(Math.random() * (max - min + 1)) + min;
+		if (!excluded.has(num)) return num;
+	}
 
-  return num!
+	return num;
 }
 
-export { randomInt }
+export { randomInt };

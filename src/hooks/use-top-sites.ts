@@ -1,18 +1,20 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 
 /**
  * Custom hook to fetch and manage browser top sites items.
  */
 const useTopSites = () => {
-  const [topSites, setTopSites] = useState<chrome.topSites.MostVisitedURL[]>([])
+	const [topSites, setTopSites] = useState<chrome.topSites.MostVisitedURL[]>(
+		[],
+	);
 
-  useEffect(() => {
-    chrome.topSites.get((topSitesItems) => {
-      setTopSites(topSitesItems?.slice(0, 30) || [])
-    })
-  }, [])
+	useEffect(() => {
+		chrome.topSites.get((topSitesItems) => {
+			setTopSites(topSitesItems?.slice(0, 30) || []);
+		});
+	}, []);
 
-  return topSites
-}
+	return topSites;
+};
 
-export { useTopSites }
+export { useTopSites };

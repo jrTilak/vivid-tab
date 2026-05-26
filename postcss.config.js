@@ -2,7 +2,7 @@
  * @type {import('postcss').ProcessOptions}
  */
 module.exports = {
-  plugins: {
-    "@tailwindcss/postcss": {},
-  },
-}
+	plugins: {
+		"@tailwindcss/postcss": {},
+	},
+};

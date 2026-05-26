@@ -1,5 +1,5 @@
-import { openImageDB, type StoredImage } from "@/lib/wallpapers"
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
+import { openImageDB, type StoredImage } from "@/lib/wallpapers";
 
 /**
  * Retrieves an image from IndexedDB using its ID
@@ -7,53 +7,53 @@ import { useEffect, useState } from "react"
  * Returns: object with image data including source metadata
  */
 const useImage = (imageId: string | null) => {
-  const [imageData, setImageData] = useState<StoredImage | null>(null)
+	const [imageData, setImageData] = useState<StoredImage | null>(null);
 
-  useEffect(() => {
-    if (!imageId) {
-      setImageData(null)
+	useEffect(() => {
+		if (!imageId) {
+			setImageData(null);
 
-      return
-    }
+			return;
+		}
 
-    let db: IDBDatabase | null = null
+		let db: IDBDatabase | null = null;
 
-    openImageDB()
-      .then((database) => {
-        db = database
-        const transaction = database.transaction("images", "readonly")
-        const store = transaction.objectStore("images")
-        const getRequest = store.get(imageId)
+		openImageDB()
+			.then((database) => {
+				db = database;
+				const transaction = database.transaction("images", "readonly");
+				const store = transaction.objectStore("images");
+				const getRequest = store.get(imageId);
 
-        getRequest.onsuccess = () => {
-          db?.close()
-          
-          if (getRequest.result) {
-            const result = getRequest.result as StoredImage
-            setImageData(result)
+				getRequest.onsuccess = () => {
+					db?.close();
 
-            if (!result.downloaded && result.source !== "local") {
-              import("@/lib/wallpapers").then(({ wallpaper }) => {
-                wallpaper.downloadPendingImages().catch(console.error)
-              })
-            }
-          } else {
-            setImageData(null)
-          }
-        }
+					if (getRequest.result) {
+						const result = getRequest.result as StoredImage;
+						setImageData(result);
 
-        getRequest.onerror = () => {
-          db?.close()
-          setImageData(null)
-        }
-      })
-      .catch(() => {
-        db?.close()
-        setImageData(null)
-      })
-  }, [imageId])
+						if (!result.downloaded && result.source !== "local") {
+							import("@/lib/wallpapers").then(({ wallpaper }) => {
+								wallpaper.downloadPendingImages().catch(console.error);
+							});
+						}
+					} else {
+						setImageData(null);
+					}
+				};
 
-  return imageData
-}
+				getRequest.onerror = () => {
+					db?.close();
+					setImageData(null);
+				};
+			})
+			.catch(() => {
+				db?.close();
+				setImageData(null);
+			});
+	}, [imageId]);
 
-export { useImage }
+	return imageData;
+};
+
+export { useImage };

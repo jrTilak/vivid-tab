@@ -3,7 +3,7 @@
  * See more about this method: https://lazykit.jrtilak.dev/docs/react-hooks/effect/useAsyncEffect
  */
 
-import { useEffect } from "react"
+import { useEffect } from "react";
 
 /**
  * A custom hook that handles async operations inside `useEffect`.
@@ -11,23 +11,24 @@ import { useEffect } from "react"
  * useAsyncEffect(async (isMounted) => { const d = await fetch(); if (!isMounted()) return; setData(d); }, [])
  */
 const useAsyncEffect = (
-  effect: (isMounted?: () => boolean) => Promise<void>,
-  deps?: unknown[],
+	effect: (isMounted?: () => boolean) => Promise<void>,
+	deps?: unknown[],
 ) => {
-  useEffect(() => {
-    let mounted = true
-    const isMounted = () => mounted
+	useEffect(() => {
+		let mounted = true;
+		const isMounted = () => mounted;
 
-    const runEffect = async () => {
-      await effect(isMounted)
-    }
+		const runEffect = async () => {
+			await effect(isMounted);
+		};
 
-    runEffect()
+		runEffect();
 
-    return () => {
-      mounted = false
-    }
-  }, deps)
-}
+		return () => {
+			mounted = false;
+		};
+		//biome-ignore lint/correctness/useExhaustiveDependencies : biomeignore
+	}, deps);
+};
 
-export { useAsyncEffect }
+export { useAsyncEffect };

@@ -1,30 +1,30 @@
-import { useState } from "react"
+import { useState } from "react";
 
-import { useAsyncEffect } from "./use-async-effect"
+import { useAsyncEffect } from "./use-async-effect";
 
 /**
  * Gets the active tab ID from the current browser window
  * Useful for tracking which tab the user is currently viewing
  */
 const useBrowserActiveTab = () => {
-  const [activeTabId, setActiveTabId] = useState<number>()
+	const [activeTabId, setActiveTabId] = useState<number>();
 
-  useAsyncEffect(async () => {
-    try {
-      const [tab] = await chrome.tabs.query({
-        active: true,
-        currentWindow: true,
-      })
+	useAsyncEffect(async () => {
+		try {
+			const [tab] = await chrome.tabs.query({
+				active: true,
+				currentWindow: true,
+			});
 
-      if (tab && tab.id) {
-        setActiveTabId(tab.id)
-      }
-    } catch (error) {
-      console.error("Error fetching active tab:", error)
-    }
-  }, [])
+			if (tab?.id) {
+				setActiveTabId(tab.id);
+			}
+		} catch (error) {
+			console.error("Error fetching active tab:", error);
+		}
+	}, []);
 
-  return activeTabId
-}
+	return activeTabId;
+};
 
-export { useBrowserActiveTab }
+export { useBrowserActiveTab };
