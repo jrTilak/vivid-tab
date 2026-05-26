@@ -52,7 +52,7 @@ const ImageCard = ({
 		<button
 			type="button"
 			className="relative group"
-			onClick={isSelected ? null : onSelect}
+			onClick={isSelected ? undefined : onSelect}
 		>
 			<img
 				alt=""
