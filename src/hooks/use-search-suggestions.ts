@@ -12,11 +12,15 @@ type Props = {
 const useSearchSuggestions = ({ query, enabled = true }: Props) => {
 	const [suggestions, setSuggestions] = useState<string[]>([]);
 
-	useAsyncEffect(async () => {
+	useAsyncEffect(async (isMounted) => {
+		if (!enabled || !query.trim()) return;
+
 		const results = await fetch(
 			`https://suggestqueries.google.com/complete/search?client=firefox&q=${query}`,
 		);
 		const data = await results.json();
+
+		if (isMounted && !isMounted()) return;
 
 		setSuggestions(data[1]);
 	}, [query, enabled]);
