@@ -110,7 +110,9 @@ const ImportFromBrowserBookmarks = () => {
 
 							setTimeout(() => {
 								chrome.tabs.create({}, () => {
-									chrome.tabs.remove(activeTabId);
+									if (activeTabId != null) {
+										chrome.tabs.remove(activeTabId);
+									}
 								});
 							}, 100);
 						}}
