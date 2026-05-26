@@ -5,7 +5,7 @@
 function randomInt(min: number, max: number, exclude: number[] = []) {
 	const excluded = new Set(exclude);
 
-	let num: number;
+	let num = min;
 
 	for (let i = 0; i < 5; i++) {
 		num = Math.floor(Math.random() * (max - min + 1)) + min;
