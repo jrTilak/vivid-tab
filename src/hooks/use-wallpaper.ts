@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LAST_WALLPAPER_CHANGED_AT } from "@/constants/keys";
 import { randomInt } from "@/lib/random";
 import { useSettings } from "@/providers/settings-provider";
@@ -28,10 +28,14 @@ export const useWallpaper = () => {
 
 		return getRandomImageId(wallpapers.selectedImageId ?? null);
 	});
+	const lastSelectedImageIdRef = useRef<string | null>(
+		wallpapers.selectedImageId ?? null,
+	);
 
 	useEffect(() => {
 		if (background.randomizeWallpaper !== "on-each-tab") {
 			setSessionImageId(wallpapers.selectedImageId ?? null);
+			lastSelectedImageIdRef.current = wallpapers.selectedImageId ?? null;
 
 			return;
 		}
@@ -42,8 +46,10 @@ export const useWallpaper = () => {
 			return;
 		}
 
-		if (wallpapers.selectedImageId !== sessionImageId) {
-			if (wallpapers.selectedImageId === null) {
+		if (wallpapers.selectedImageId !== lastSelectedImageIdRef.current) {
+			lastSelectedImageIdRef.current = wallpapers.selectedImageId ?? null;
+
+			if (!wallpapers.selectedImageId) {
 				setSessionImageId(null);
 
 				return;
