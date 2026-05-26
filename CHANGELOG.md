@@ -1,13 +1,10 @@
 # Changelog
 
-## [1.2.1] - 2025-03-03
 
-### Fixed
+## [1.3.0] - 2026-05-26
 
-- Bookmarks folder refresh, todos expiry and cleanup, search shortcuts and layout drag-and-drop guards.
-- Import/export: import works with current export format and partial files; corrected button icons and export filename.
-- Random wallpapers: IndexedDB "object store not found" fix (shared openImageDB with version bump), safe settings parse and random selection.
-- Misc: background message response on error, settings sync debounce and reset scope, notes/todos immutable sort, quote and useAsyncEffect fixes.
+- Wallpaper switching improvements.
+- Minor bug fixes, performance improvements, refactor.
 
 ## [1.2.0] - ........
 

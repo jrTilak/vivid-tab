@@ -62,6 +62,10 @@ Vivid Tab is developed using **Plasmo**, a powerful framework for building Chrom
 
 ---
 
+> **Note:** `dev` is the default branch. For the latest stable release code, use `master`: https://github.com/jrTilak/vivid-tab/tree/master
+
+---
+
 ## 🤝 Contributing
 
 Vivid Tab is an evolving project with room for enhancements. If you have ideas or improvements, feel free to contribute!
