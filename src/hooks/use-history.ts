@@ -1,42 +1,42 @@
-import type { HistoryItem } from "@/types/history"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react";
+import type { HistoryItem } from "@/types/history";
 
 const useHistory = () => {
-  const [history, setHistory] = useState<HistoryItem[]>([])
-  const [hasPermission, setHasPermission] = useState(false)
+	const [history, setHistory] = useState<HistoryItem[]>([]);
+	const [hasPermission, setHasPermission] = useState(false);
 
-  useEffect(() => {
-    chrome.permissions.contains({ permissions: ["history"] }, (granted) => {
-      setHasPermission(granted)
-      if (granted) fetchHistory()
-    })
-  }, [])
+	const fetchHistory = useCallback(() => {
+		chrome.history.search(
+			{ text: "", maxResults: 30, startTime: 0, endTime: Date.now() },
+			(historyItems) => {
+				setHistory(
+					historyItems?.map((item) => ({
+						id: item.id,
+						title: item.title || item.url || "Untitled",
+						url: item.url,
+						lastVisitTime: item.lastVisitTime,
+						visitCount: item.visitCount,
+					})) || [],
+				);
+			},
+		);
+	}, []);
 
-  const requestPermission = () => {
-    chrome.permissions.request({ permissions: ["history"] }, (granted) => {
-      setHasPermission(granted)
-      if (granted) fetchHistory()
-    })
-  }
+	useEffect(() => {
+		chrome.permissions.contains({ permissions: ["history"] }, (granted) => {
+			setHasPermission(granted);
+			if (granted) fetchHistory();
+		});
+	}, [fetchHistory]);
 
-  const fetchHistory = () => {
-    chrome.history.search(
-      { text: "", maxResults: 30, startTime: 0, endTime: Date.now() },
-      (historyItems) => {
-        setHistory(
-          historyItems?.map((item) => ({
-            id: item.id,
-            title: item.title || item.url || "Untitled",
-            url: item.url,
-            lastVisitTime: item.lastVisitTime,
-            visitCount: item.visitCount,
-          })) || [],
-        )
-      },
-    )
-  }
+	const requestPermission = () => {
+		chrome.permissions.request({ permissions: ["history"] }, (granted) => {
+			setHasPermission(granted);
+			if (granted) fetchHistory();
+		});
+	};
 
-  return { history, hasPermission, requestPermission }
-}
+	return { history, hasPermission, requestPermission };
+};
 
-export { useHistory }
+export { useHistory };

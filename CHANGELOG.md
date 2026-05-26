@@ -1,5 +1,11 @@
 # Changelog
 
+
+## [1.3.0] - 2026-05-26
+
+- Wallpaper switching improvements.
+- Minor bug fixes, performance improvements, refactor.
+
 ## [1.2.0] - ........
 
 - Added **Firefox support** with major cross-browser fixes

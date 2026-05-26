@@ -1,125 +1,137 @@
-import { DEFAULT_SETTINGS } from "@/constants/settings"
-import { SettingsSchema, type Settings } from "@/zod/settings"
 import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react"
+	createContext,
+	type ReactNode,
+	useCallback,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
+import { DEFAULT_SETTINGS } from "@/constants/settings";
+import { type Settings, SettingsSchema } from "@/zod/settings";
+
+const SYNC_DEBOUNCE_MS = 400;
 
 interface SettingsContextState {
-  settings: Settings
-  setSettings: React.Dispatch<React.SetStateAction<Settings>>
-  resetSettings: () => void
+	settings: Settings;
+	setSettings: React.Dispatch<React.SetStateAction<Settings>>;
+	resetSettings: () => void;
 }
 
 const SettingsContext = createContext<SettingsContextState | undefined>(
-  undefined,
-)
+	undefined,
+);
 
 const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isLoaded, setIsLoaded] = useState(false)
+	const [isLoaded, setIsLoaded] = useState(false);
 
-  const [settings, setSettings] = useState<Settings>(
-    DEFAULT_SETTINGS as unknown as Settings,
-  )
+	const [settings, setSettings] = useState<Settings>(
+		DEFAULT_SETTINGS as unknown as Settings,
+	);
 
-  const resetSettings = useCallback(async () => {
-    // clear synced + local storage
-    chrome.storage.sync.clear()
-    chrome.storage.local.clear()
+	const resetSettings = useCallback(async () => {
+		chrome.storage.sync.clear();
+		chrome.storage.local.clear();
 
-    // clear indexdb
-    const databases = await indexedDB.databases()
+		// Only clear extension's wallpaper DB (do not wipe other origin DBs)
+		indexedDB.deleteDatabase("ImageDB");
 
-    for (const db of databases) {
-      if (db.name) indexedDB.deleteDatabase(db.name)
-    }
+		setSettings(DEFAULT_SETTINGS as unknown as Settings);
+	}, []);
 
-    setSettings(DEFAULT_SETTINGS as unknown as Settings)
-  }, [])
+	useEffect(() => {
+		chrome.storage.sync.get("settings", (result) => {
+			const raw = result?.settings;
+			let parsed: Settings = DEFAULT_SETTINGS as unknown as Settings;
 
-  useEffect(() => {
-    chrome.storage.sync.get("settings", (result) => {
-      const raw = result?.settings
-      let parsed: Settings = DEFAULT_SETTINGS as unknown as Settings
+			if (raw) {
+				try {
+					parsed = SettingsSchema.parse(JSON.parse(raw));
+				} catch (err) {
+					console.error("Failed to parse settings:", err);
+				}
+			}
 
-      if (raw) {
-        try {
-          parsed = SettingsSchema.parse(JSON.parse(raw))
-        } catch (err) {
-          console.error("Failed to parse settings:", err)
-        }
-      }
+			setSettings(parsed);
+			setIsLoaded(true);
+		});
 
-      setSettings(parsed)
-      setIsLoaded(true)
-    })
+		// Listen for changes to settings in Chrome storage
+		const handleStorageChange = (
+			changes: { [key: string]: chrome.storage.StorageChange },
+			areaName: string,
+		) => {
+			if (areaName === "sync" && changes.settings) {
+				const raw = changes.settings.newValue;
 
-    // Listen for changes to settings in Chrome storage
-    const handleStorageChange = (
-      changes: { [key: string]: chrome.storage.StorageChange },
-      areaName: string,
-    ) => {
-      if (areaName === "sync" && changes.settings) {
-        const raw = changes.settings.newValue
+				if (raw) {
+					try {
+						const parsed = SettingsSchema.parse(JSON.parse(raw));
+						// Only update if the new value is different from current settings
+						setSettings((prev) => {
+							if (JSON.stringify(prev) !== raw) {
+								return parsed;
+							}
 
-        if (raw) {
-          try {
-            const parsed = SettingsSchema.parse(JSON.parse(raw))
-            // Only update if the new value is different from current settings
-            setSettings((prev) => {
-              if (JSON.stringify(prev) !== raw) {
-                return parsed
-              }
+							return prev;
+						});
+					} catch (err) {
+						console.error("Failed to parse settings from storage change:", err);
+					}
+				}
+			}
+		};
 
-              return prev
-            })
-          } catch (err) {
-            console.error("Failed to parse settings from storage change:", err)
-          }
-        }
-      }
-    }
+		chrome.storage.onChanged.addListener(handleStorageChange);
 
-    chrome.storage.onChanged.addListener(handleStorageChange)
+		return () => {
+			chrome.storage.onChanged.removeListener(handleStorageChange);
+		};
+	}, []);
 
-    return () => {
-      chrome.storage.onChanged.removeListener(handleStorageChange)
-    }
-  }, [])
+	const syncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    if (isLoaded) {
-      chrome.storage.sync.set({
-        settings: JSON.stringify(settings),
-      })
-    }
-  }, [settings, isLoaded])
+	useEffect(() => {
+		if (!isLoaded) return;
 
-  const value: SettingsContextState = {
-    settings,
-    setSettings,
-    resetSettings,
-  }
+		if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
 
-  return (
-    <SettingsContext.Provider value={value}>
-      {isLoaded && children}
-    </SettingsContext.Provider>
-  )
-}
+		syncTimeoutRef.current = setTimeout(() => {
+			syncTimeoutRef.current = null;
+			chrome.storage.sync.set({
+				settings: JSON.stringify(settings),
+			});
+		}, SYNC_DEBOUNCE_MS);
+
+		return () => {
+			if (syncTimeoutRef.current) {
+				clearTimeout(syncTimeoutRef.current);
+				syncTimeoutRef.current = null;
+			}
+		};
+	}, [settings, isLoaded]);
+
+	const value: SettingsContextState = {
+		settings,
+		setSettings,
+		resetSettings,
+	};
+
+	return (
+		<SettingsContext.Provider value={value}>
+			{isLoaded && children}
+		</SettingsContext.Provider>
+	);
+};
 
 const useSettings = () => {
-  const context = useContext(SettingsContext)
+	const context = useContext(SettingsContext);
 
-  if (!context) {
-    throw new Error("useSettings must be used within a SettingsProvider")
-  }
+	if (!context) {
+		throw new Error("useSettings must be used within a SettingsProvider");
+	}
 
-  return context
-}
+	return context;
+};
 
-export { SettingsProvider, useSettings }
+export { SettingsProvider, useSettings };

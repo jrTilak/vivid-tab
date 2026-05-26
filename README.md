@@ -15,6 +15,7 @@ Vivid Tab is an open-source Chrome extension that transforms your new tab into a
 - ☁️ **Weather & Location-based Insights** - Get real-time weather updates and relevant local information.
 - 🌍 **Forever Free & Open Source** - Vivid Tab is completely free and welcomes community contributions.
 - ☁️ Random Wallpaper Support using wallhaven API
+
 ---
 
 ## 📌 Preview
@@ -58,6 +59,10 @@ Vivid Tab is developed using **Plasmo**, a powerful framework for building Chrom
 4. Navigate to `chrome://extensions/` in your browser.
 5. Enable **Developer Mode** (toggle in the top right corner).
 6. Click **Load Unpacked** and select the `build` folder.
+
+---
+
+> **Note:** `dev` is the default branch. For the latest stable release code, use `master`: https://github.com/jrTilak/vivid-tab/tree/master
 
 ---
 

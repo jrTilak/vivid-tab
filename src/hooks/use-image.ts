@@ -1,5 +1,5 @@
-import { type StoredImage } from "@/lib/wallpapers"
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
+import { openImageDB, type StoredImage } from "@/lib/wallpapers";
 
 /**
  * Retrieves an image from IndexedDB using its ID
@@ -7,54 +7,53 @@ import { useEffect, useState } from "react"
  * Returns: object with image data including source metadata
  */
 const useImage = (imageId: string | null) => {
-  const [imageData, setImageData] = useState<StoredImage | null>(null)
+	const [imageData, setImageData] = useState<StoredImage | null>(null);
 
-  useEffect(() => {
-    if (!imageId) {
-      setImageData(null)
+	useEffect(() => {
+		if (!imageId) {
+			setImageData(null);
 
-      return
-    }
+			return;
+		}
 
-    const request = indexedDB.open("ImageDB", 1)
+		let db: IDBDatabase | null = null;
 
-    request.onsuccess = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result
-      const transaction = db.transaction("images", "readonly")
-      const store = transaction.objectStore("images")
-      const getRequest = store.get(imageId)
+		openImageDB()
+			.then((database) => {
+				db = database;
+				const transaction = database.transaction("images", "readonly");
+				const store = transaction.objectStore("images");
+				const getRequest = store.get(imageId);
 
-      getRequest.onsuccess = () => {
-        if (getRequest.result) {
-          const result = getRequest.result as StoredImage
-          setImageData(result)
+				getRequest.onsuccess = () => {
+					db?.close();
 
-          // If the image is not yet downloaded, trigger background download
-          if (!result.downloaded && result.source !== "local") {
-            // Import wallpaper dynamically to avoid circular dependencies
-            import("@/lib/wallpapers").then(({ wallpaper }) => {
-              wallpaper.downloadPendingImages().catch(console.error)
-            })
-          }
-        } else {
-          console.warn("No image found with ID:", imageId)
-          setImageData(null)
-        }
-      }
+					if (getRequest.result) {
+						const result = getRequest.result as StoredImage;
+						setImageData(result);
 
-      getRequest.onerror = () => {
-        console.error("Error retrieving image from IndexedDB")
-        setImageData(null)
-      }
-    }
+						if (!result.downloaded && result.source !== "local") {
+							import("@/lib/wallpapers").then(({ wallpaper }) => {
+								wallpaper.downloadPendingImages().catch(console.error);
+							});
+						}
+					} else {
+						setImageData(null);
+					}
+				};
 
-    request.onerror = () => {
-      console.error("Failed to open IndexedDB")
-      setImageData(null)
-    }
-  }, [imageId]) // Runs when imageId changes
+				getRequest.onerror = () => {
+					db?.close();
+					setImageData(null);
+				};
+			})
+			.catch(() => {
+				db?.close();
+				setImageData(null);
+			});
+	}, [imageId]);
 
-  return imageData
-}
+	return imageData;
+};
 
-export { useImage }
+export { useImage };

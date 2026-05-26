@@ -1,90 +1,97 @@
-import { Badge } from "@/components/ui/badge"
-import { useImage } from "@/hooks/use-image"
-import { useSettings } from "@/providers/settings-provider"
-import { TrashIcon } from "lucide-react"
+import { TrashIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { useImage } from "@/hooks/use-image";
+import { openImageDB } from "@/lib/wallpapers";
+import { useSettings } from "@/providers/settings-provider";
 
 const ImageCard = ({
-  imageId,
-  isSelected,
-  onSelect,
+	imageId,
+	isSelected,
+	onSelect,
 }: {
-  imageId: string | null
-  isSelected: boolean
-  onSelect: () => void
+	imageId: string | null;
+	isSelected: boolean;
+	onSelect: () => void;
 }) => {
-  const imageData = useImage(imageId)
-  const { setSettings } = useSettings()
+	const imageData = useImage(imageId);
+	const { setSettings } = useSettings();
 
-  const deleteImageById = (imageId: string) => {
-    const request = indexedDB.open("ImageDB", 1)
+	const deleteImageById = (id: string) => {
+		openImageDB()
+			.then((db) => {
+				const transaction = db.transaction("images", "readwrite");
+				const store = transaction.objectStore("images");
+				const deleteRequest = store.delete(id);
 
-    request.onsuccess = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result
-      const transaction = db.transaction("images", "readwrite")
-      const store = transaction.objectStore("images")
+				deleteRequest.onsuccess = () => {
+					db.close();
+					setSettings((prev) => ({
+						...prev,
+						wallpapers: {
+							...prev.wallpapers,
+							images: prev.wallpapers.images.filter((i) => i !== id),
+							selectedImageId:
+								prev.wallpapers.selectedImageId === id
+									? null
+									: prev.wallpapers.selectedImageId,
+						},
+					}));
+				};
 
-      const deleteRequest = store.delete(imageId)
+				deleteRequest.onerror = () => {
+					db.close();
+					console.error(`Failed to delete image with ID ${id}`);
+				};
+			})
+			.catch(() => {
+				console.error("Failed to open IndexedDB");
+			});
+	};
 
-      deleteRequest.onsuccess = () => {
-        console.log(`Image with ID ${imageId} deleted successfully.`)
-        setSettings((prev) => ({
-          ...prev,
-          wallpapers: {
-            ...prev.wallpapers,
-            images: prev.wallpapers.images.filter((id) => id !== imageId),
-            selectedImageId:
-              prev.wallpapers.selectedImageId === imageId
-                ? null
-                : prev.wallpapers.selectedImageId,
-          },
-        }))
-      }
+	return (
+		<button
+			type="button"
+			className="relative group"
+			onClick={isSelected ? undefined : onSelect}
+		>
+			<img
+				alt=""
+				src={
+					imageId === null
+						? chrome.runtime.getURL("assets/scene.jpg")
+						: imageData?.src
+				}
+				width={200}
+				height={200}
+				className="w-full h-48 object-cover rounded-lg transition-transform group-hover:group-disabled:scale-100 group-hover:scale-105 brightness-75"
+			/>
+			{isSelected && (
+				<Badge
+					className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+					variant="secondary"
+				>
+					Selected
+				</Badge>
+			)}
+			{imageData?.source === "pixabay" && (
+				<Badge className="absolute top-2 left-2 text-xs" variant="outline">
+					Pixabay
+				</Badge>
+			)}
+			{imageId !== null && (
+				<button
+					type="button"
+					className="absolute top-0 right-0 text-destructive scale-0 group-hover:scale-100 transition-transform"
+					onClick={(e) => {
+						e.stopPropagation();
+						deleteImageById(imageId);
+					}}
+				>
+					<TrashIcon className="size-4 text-red-500" />
+				</button>
+			)}
+		</button>
+	);
+};
 
-      deleteRequest.onerror = () => {
-        console.error(`Failed to delete image with ID ${imageId}`)
-      }
-    }
-
-    request.onerror = () => {
-      console.error("Failed to open IndexedDB")
-    }
-  }
-
-  return (
-    <div
-      role="button"
-      className="relative group"
-      onClick={isSelected ? null : onSelect}
-    >
-      <img
-        src={imageId === null ? chrome.runtime.getURL("assets/scene.jpg") : imageData?.src}
-        width={200}
-        height={200}
-        className="w-full h-48 object-cover rounded-lg transition-transform group-hover:group-disabled:scale-100 group-hover:scale-105 brightness-75"
-      />
-      {isSelected && (
-        <Badge
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-          variant="secondary"
-        >
-          Selected
-        </Badge>
-      )}
-      {imageData?.source === "pixabay" && (
-        <Badge className="absolute top-2 left-2 text-xs" variant="outline">
-          Pixabay
-        </Badge>
-      )}
-      {imageId !== null && (
-        <button
-          className="absolute top-0 right-0 text-destructive scale-0 group-hover:scale-100 transition-transform"
-          onClick={() => deleteImageById(imageId)}
-        >
-          <TrashIcon className="size-4 text-red-500" />
-        </button>
-      )}
-    </div>
-  )
-}
-
-export default ImageCard
+export default ImageCard;

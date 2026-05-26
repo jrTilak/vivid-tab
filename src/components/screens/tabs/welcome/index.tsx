@@ -1,40 +1,39 @@
-import { WelcomeTab } from "./welcome-tab"
-import { ImportTab } from "./import-tab"
-import { CreateNewBookmarkFolder } from "./create-new-bookmark-folder"
-import { ImportFromBrowserBookmarks } from "./import-from-browser-bookmarks"
-
-import { useWelcomeContext } from "./_context"
+import { useWelcomeContext } from "./_context";
+import { CreateNewBookmarkFolder } from "./create-new-bookmark-folder";
+import { ImportFromBrowserBookmarks } from "./import-from-browser-bookmarks";
+import { ImportTab } from "./import-tab";
+import { WelcomeTab } from "./welcome-tab";
 
 const TABS = {
-  WELCOME: WelcomeTab,
-  IMPORT: ImportTab,
-  CREATE_NEW_BOOKMARK_FOLDER: CreateNewBookmarkFolder,
-  IMPORT_FROM_BROWSER_BOOKMARKS: ImportFromBrowserBookmarks,
-} as const
+	WELCOME: WelcomeTab,
+	IMPORT: ImportTab,
+	CREATE_NEW_BOOKMARK_FOLDER: CreateNewBookmarkFolder,
+	IMPORT_FROM_BROWSER_BOOKMARKS: ImportFromBrowserBookmarks,
+} as const;
 
-export type TabName = keyof typeof TABS
+export type TabName = keyof typeof TABS;
 
 const Welcome = () => {
-  const { currentTab } = useWelcomeContext()
+	const { currentTab } = useWelcomeContext();
 
-  return (
-    <main className="h-screen w-screen relative">
-      <img
-        src={chrome.runtime.getURL("assets/scene.jpg")}
-        alt="background"
-        className="absolute inset-0 w-full h-full object-cover"
-      />
-      <div className="relative z-10 h-screen w-screen backdrop-blur-md bg-black/20 flex items-center justify-center">
-        <div className="w-screen h-screen flex items-center justify-center">
-          {(() => {
-            const Comp = TABS[currentTab]
+	return (
+		<main className="h-screen w-screen relative">
+			<img
+				src={chrome.runtime.getURL("assets/scene.jpg")}
+				alt="background"
+				className="absolute inset-0 w-full h-full object-cover"
+			/>
+			<div className="relative z-10 h-screen w-screen backdrop-blur-md bg-black/20 flex items-center justify-center">
+				<div className="w-screen h-screen flex items-center justify-center">
+					{(() => {
+						const Comp = TABS[currentTab];
 
-            return <Comp />
-          })()}
-        </div>
-      </div>
-    </main>
-  )
-}
+						return <Comp />;
+					})()}
+				</div>
+			</div>
+		</main>
+	);
+};
 
-export { Welcome }
+export { Welcome };
