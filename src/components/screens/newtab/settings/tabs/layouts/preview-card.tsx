@@ -40,7 +40,6 @@ const PreviewCard = ({
 
 	return (
 		<Card
-			onClick={() => console.log(index, id)}
 			ref={setNodeRef}
 			className={cn(
 				"relative w-full flex items-center justify-center text-center border-solid border border-muted-foreground/45 text-foreground bg-muted z-9999",
