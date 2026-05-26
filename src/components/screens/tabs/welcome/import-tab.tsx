@@ -74,6 +74,7 @@ const ImportTab = () => {
 								chrome.tabs.remove(activeTabId);
 							}
 						});
+						}}
 						variant="ghost"
 						size="sm"
 					>
