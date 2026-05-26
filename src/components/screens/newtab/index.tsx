@@ -17,9 +17,10 @@ type Layout = "small" | "mid" | "large";
 export default function Homepage() {
 	const [layoutType, setLayoutType] = useState<Layout>("small");
 	const [imageLoadError, setImageLoadError] = useState(false);
-	const [displayImage, setDisplayImage] = useState<
-		Pick<StoredImage, "id" | "src" | "source"> | null
-	>(null);
+	const [displayImage, setDisplayImage] = useState<Pick<
+		StoredImage,
+		"id" | "src" | "source"
+	> | null>(null);
 	const {
 		settings: {
 			layout,

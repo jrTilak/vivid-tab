@@ -13,7 +13,9 @@ export const useWallpaper = () => {
 	const getRandomImageId = (currentImageId: string | null) => {
 		if (wallpapers.images.length === 0) return currentImageId ?? null;
 
-		const currentImageIndex = wallpapers.images.indexOf(currentImageId ?? undefined);
+		const currentImageIndex = wallpapers.images.indexOf(
+			currentImageId ?? undefined,
+		);
 		const maxIndex = wallpapers.images.length - 1;
 		const excludeIndices = currentImageIndex >= 0 ? [currentImageIndex] : [];
 		const idx = randomInt(0, maxIndex < 0 ? 0 : maxIndex, excludeIndices);
