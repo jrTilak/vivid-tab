@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useWallpaper } from "@/hooks/use-wallpaper";
 import { cn } from "@/lib/cn";
+import type { StoredImage } from "@/lib/wallpapers";
 import { useSettings } from "@/providers/settings-provider";
 import { NextWallpaperButton } from "./next-wallpaper-button";
 import { Bookmarks } from "./widgets/bookmarks";
@@ -16,21 +17,61 @@ type Layout = "small" | "mid" | "large";
 export default function Homepage() {
 	const [layoutType, setLayoutType] = useState<Layout>("small");
 	const [imageLoadError, setImageLoadError] = useState(false);
+	const [displayImage, setDisplayImage] = useState<
+		Pick<StoredImage, "id" | "src" | "source"> | null
+	>(null);
 	const {
 		settings: {
 			layout,
-			wallpapers,
 			general: { bookmarksCanTakeExtraSpaceIfAvailable },
 			background: backgroundSettings,
 		},
 	} = useSettings();
 
-	const imageData = useWallpaper();
+	const { imageData, activeImageId } = useWallpaper();
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies :  Reset error state when imageData changes
+	// biome-ignore lint/correctness/useExhaustiveDependencies :  Reset error state when image changes
 	useEffect(() => {
 		setImageLoadError(false);
-	}, [imageData?.src]);
+	}, [activeImageId]);
+
+	useEffect(() => {
+		if (!activeImageId) {
+			setDisplayImage(null);
+		}
+	}, [activeImageId]);
+
+	useEffect(() => {
+		if (!imageData?.src || imageData.id !== activeImageId) {
+			return;
+		}
+
+		let cancelled = false;
+		const img = new Image();
+
+		img.onload = () => {
+			if (cancelled) return;
+
+			setImageLoadError(false);
+			setDisplayImage({
+				id: imageData.id,
+				src: imageData.src,
+				source: imageData.source,
+			});
+		};
+
+		img.onerror = () => {
+			if (cancelled) return;
+
+			setImageLoadError(true);
+		};
+
+		img.src = imageData.src;
+
+		return () => {
+			cancelled = true;
+		};
+	}, [activeImageId, imageData?.id, imageData?.source, imageData?.src]);
 
 	const COMPONENTS = useMemo(() => {
 		return {
@@ -79,24 +120,13 @@ export default function Homepage() {
 
 	// Determine which background to use
 	const backgroundToUse =
-		!wallpapers.selectedImageId || imageLoadError
-			? background
-			: imageData?.src || background;
+		displayImage?.src ?? (imageLoadError || !activeImageId ? background : null);
 
 	return (
 		<div className="min-h-screen w-full bg-cover bg-center p-6 relative select-none transition-all">
-			{/* Hidden img element to detect load errors */}
-			{wallpapers.selectedImageId && imageData?.src && !imageLoadError && (
-				<img
-					src={imageData.src}
-					alt=""
-					onError={() => setImageLoadError(true)}
-					className="hidden"
-				/>
-			)}
 			<div
 				style={{
-					backgroundImage: `url(${backgroundToUse})`,
+					backgroundImage: backgroundToUse ? `url(${backgroundToUse})` : "none",
 				}}
 				className={cn(
 					"h-full w-full bg-cover bg-center bg-no-repeat absolute inset-0",
@@ -166,10 +196,10 @@ export default function Homepage() {
 			</div>
 
 			{/* Image Credits */}
-			{imageData?.source && imageData?.source !== "local" && (
+			{displayImage?.source && displayImage.source !== "local" && (
 				<div className="fixed bottom-4 left-4 z-50">
 					<div className="bg-black/50 backdrop-blur-sm text-white text-xs px-2 py-1 rounded">
-						Images powered by {imageData?.source}
+						Images powered by {displayImage.source}
 					</div>
 				</div>
 			)}
