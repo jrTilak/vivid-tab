@@ -32,7 +32,6 @@ chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
 
 		case BACKGROUND_ACTIONS.SEARCH_QUERY:
 			{
-				// eslint-disable-next-line prefer-const
 				let { query, openIn } = message as {
 					query: string;
 					openIn: "new-tab" | "current-tab";

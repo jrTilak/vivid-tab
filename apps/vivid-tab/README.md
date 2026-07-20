@@ -46,15 +46,15 @@ Vivid Tab is developed using **Plasmo**, a powerful framework for building Chrom
    ```
 2. Install dependencies:
    ```sh
-   pnpm install
+   bun install
    ```
 3. Start development mode:
    ```sh
-   pnpm dev
+   bun run --cwd apps/vivid-tab dev
    ```
    or build the project:
    ```sh
-   pnpm build
+   bun run --cwd apps/vivid-tab build
    ```
 4. Navigate to `chrome://extensions/` in your browser.
 5. Enable **Developer Mode** (toggle in the top right corner).

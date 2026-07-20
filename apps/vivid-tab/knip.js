@@ -10,7 +10,6 @@ const config = {
 		"src/background.ts",
 		"src/tabs/*.tsx",
 		"src/styles/index.css",
-		"eslint.*",
 	],
 	ignoreDependencies: ["@types/chrome", "data-base64"],
 	ignoreIssues: {

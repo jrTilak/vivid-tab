@@ -33,16 +33,6 @@ const findPackageFiles = () => {
 	if (!fs.existsSync(nodeModules)) return [];
 
 	const files = [];
-	const pnpmPath = path.join(nodeModules, ".pnpm");
-
-	// Helper to safely read directory
-	const readDir = (dir) => {
-		try {
-			return fs.existsSync(dir) ? fs.readdirSync(dir) : [];
-		} catch {
-			return [];
-		}
-	};
 
 	// Helper to check file exists
 	const fileExists = (filePath) => {
@@ -71,25 +61,7 @@ const findPackageFiles = () => {
 		return fileExists(oxidePath) ? [oxidePath] : [];
 	};
 
-	// Search pnpm structure
-	if (fileExists(pnpmPath)) {
-		readDir(pnpmPath).forEach((entry) => {
-			if (entry.startsWith("jiti@")) {
-				const packagePath = path.join(pnpmPath, entry, "node_modules");
-				files.push(...findJitiFiles(packagePath));
-			}
-
-			if (
-				entry.startsWith("@tailwindcss+oxide@") ||
-				entry.startsWith("%40tailwindcss+oxide@")
-			) {
-				const packagePath = path.join(pnpmPath, entry, "node_modules");
-				files.push(...findOxideFiles(packagePath));
-			}
-		});
-	}
-
-	// Search regular node_modules
+	// Search Bun's node_modules structure
 	files.push(...findJitiFiles(nodeModules));
 	files.push(...findOxideFiles(nodeModules));
 
@@ -161,7 +133,7 @@ const main = () => {
 	}
 
 	if (successful === 0) {
-		log("💡 Try running: pnpm install && node scripts/patch-jiti.js", "blue");
+		log("💡 Try running: bun install && bun run postinstall", "blue");
 	}
 };
 
