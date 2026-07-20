@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { openImageDB, type StoredImage } from "@/lib/wallpapers";
+import { openImageDB, type StoredImage } from "@/lib/wallpaper-database";
 
 /**
  * Retrieves an image from IndexedDB using its ID
@@ -16,6 +16,8 @@ const useImage = (imageId: string | null) => {
 			return;
 		}
 
+		setImageData(null);
+		let cancelled = false;
 		let db: IDBDatabase | null = null;
 
 		openImageDB()
@@ -26,31 +28,27 @@ const useImage = (imageId: string | null) => {
 				const getRequest = store.get(imageId);
 
 				getRequest.onsuccess = () => {
-					db?.close();
+					if (cancelled) return;
 
-					if (getRequest.result) {
-						const result = getRequest.result as StoredImage;
-						setImageData(result);
-
-						if (!result.downloaded && result.source !== "local") {
-							import("@/lib/wallpapers").then(({ wallpaper }) => {
-								wallpaper.downloadPendingImages().catch(console.error);
-							});
-						}
-					} else {
-						setImageData(null);
-					}
+					setImageData((getRequest.result as StoredImage | undefined) ?? null);
 				};
 
 				getRequest.onerror = () => {
-					db?.close();
-					setImageData(null);
+					if (!cancelled) setImageData(null);
 				};
+
+				transaction.oncomplete = () => database.close();
+				transaction.onabort = () => database.close();
+				transaction.onerror = () => database.close();
 			})
 			.catch(() => {
 				db?.close();
-				setImageData(null);
+				if (!cancelled) setImageData(null);
 			});
+
+		return () => {
+			cancelled = true;
+		};
 	}, [imageId]);
 
 	return imageData;

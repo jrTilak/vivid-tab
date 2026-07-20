@@ -5,6 +5,7 @@
 	"private": true,
 	"packageManager": "bun@1.3.14",
 	"scripts": {
+		"postinstall": "bun run --cwd apps/vivid-tab postinstall",
 		"prepare": "bunx --bun --no-install husky",
 		"lint": "biome lint .",
 		"format": "biome format --write .",

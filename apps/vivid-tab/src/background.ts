@@ -1,32 +1,127 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 import { ALARMS, BACKGROUND_ACTIONS } from "./constants/background-actions";
-import { LOCAL_STORAGE } from "./constants/keys";
+import {
+	DEFAULT_BOOKMARK_FOLDER_NAME,
+	LEGACY_BOOKMARK_FOLDER_NAME,
+	LOCAL_STORAGE,
+} from "./constants/keys";
 import { wallpaper } from "./lib/wallpapers";
+
+const URL_SCHEMA = z.url();
+
+const getBookmarkTree = () =>
+	new Promise<chrome.bookmarks.BookmarkTreeNode[]>((resolve, reject) => {
+		chrome.bookmarks.getTree((bookmarkTree) => {
+			const runtimeError = chrome.runtime.lastError;
+
+			if (runtimeError) {
+				reject(new Error(runtimeError.message));
+				return;
+			}
+
+			resolve(bookmarkTree);
+		});
+	});
+
+const getBookmarkById = (bookmarkId: string) =>
+	new Promise<chrome.bookmarks.BookmarkTreeNode | undefined>((resolve) => {
+		chrome.bookmarks.get(bookmarkId, (bookmarks) => {
+			if (chrome.runtime.lastError) {
+				resolve(undefined);
+				return;
+			}
+
+			resolve(bookmarks[0]);
+		});
+	});
+
+const findBookmarkFolder = (
+	bookmarkTree: chrome.bookmarks.BookmarkTreeNode[],
+	predicate: (node: chrome.bookmarks.BookmarkTreeNode) => boolean,
+): chrome.bookmarks.BookmarkTreeNode | undefined => {
+	for (const node of bookmarkTree) {
+		if (
+			node.url === undefined &&
+			node.parentId !== undefined &&
+			predicate(node)
+		) {
+			return node;
+		}
+
+		const nestedMatch = node.children
+			? findBookmarkFolder(node.children, predicate)
+			: undefined;
+
+		if (nestedMatch) return nestedMatch;
+	}
+
+	return undefined;
+};
+
+const createBookmarkFolder = () =>
+	new Promise<chrome.bookmarks.BookmarkTreeNode>((resolve, reject) => {
+		chrome.bookmarks.create(
+			{ title: DEFAULT_BOOKMARK_FOLDER_NAME },
+			(bookmarkFolder) => {
+				const runtimeError = chrome.runtime.lastError;
+
+				if (runtimeError) {
+					reject(new Error(runtimeError.message));
+					return;
+				}
+
+				resolve(bookmarkFolder);
+			},
+		);
+	});
+
+let rootFolderCreationPromise:
+	| Promise<chrome.bookmarks.BookmarkTreeNode>
+	| undefined;
+
+/** Validates the configured folder, reuses the default, or creates it once. */
+const ensureRootBookmarkFolder = async (rootFolderId: string) => {
+	if (rootFolderId) {
+		const configuredFolder = await getBookmarkById(rootFolderId);
+		if (configuredFolder && configuredFolder.url === undefined) {
+			return configuredFolder.id;
+		}
+	}
+
+	const bookmarkTree = await getBookmarkTree();
+
+	const defaultFolder = findBookmarkFolder(
+		bookmarkTree,
+		(node) =>
+			node.title === DEFAULT_BOOKMARK_FOLDER_NAME ||
+			node.title === LEGACY_BOOKMARK_FOLDER_NAME,
+	);
+
+	if (defaultFolder) return defaultFolder.id;
+
+	rootFolderCreationPromise ??= createBookmarkFolder().finally(() => {
+		rootFolderCreationPromise = undefined;
+	});
+
+	return (await rootFolderCreationPromise).id;
+};
 
 /**
  * Handles background communication
  */
 chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
 	switch (message.action) {
-		case BACKGROUND_ACTIONS.GET_BOOKMARKS:
-			chrome.bookmarks.getTree((bookmarkTree) => {
-				if (chrome.runtime.lastError) {
-					sendResponse([]);
-				} else {
-					sendResponse(bookmarkTree);
-				}
-			});
-
-			return true;
-
-		case BACKGROUND_ACTIONS.GET_HISTORY:
-			chrome.history.search({ text: "" }, (historyItems) => {
-				if (chrome.runtime.lastError) {
-					sendResponse([]);
-				} else {
-					sendResponse(historyItems?.slice(0, 30) || []);
-				}
-			});
+		case BACKGROUND_ACTIONS.ENSURE_ROOT_BOOKMARK_FOLDER:
+			void ensureRootBookmarkFolder(
+				typeof message.rootFolderId === "string" ? message.rootFolderId : "",
+			).then(
+				(folderId) => sendResponse({ folderId, ok: true }),
+				(error: unknown) =>
+					sendResponse({
+						error: error instanceof Error ? error.message : String(error),
+						ok: false,
+					}),
+			);
 
 			return true;
 
@@ -37,7 +132,7 @@ chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
 					openIn: "new-tab" | "current-tab";
 				};
 
-				let { success: isValidUrl } = z.string().url().safeParse(query);
+				let { success: isValidUrl } = z.safeParse(URL_SCHEMA, query);
 
 				// for example, google.com is a valid url
 				if (
@@ -82,36 +177,26 @@ chrome.runtime.onInstalled.addListener((details) => {
 			[LOCAL_STORAGE.installedDate]: new Date().toString(),
 		});
 
-		// Also fetch images when extension starts
-		wallpaper.fetchOnlineImages(true);
+		void wallpaper.fetchOnlineImages(true);
 	}
 
-	// Set up alarm for hourly image fetching
+	// Refresh remote choices periodically; displayed URLs use the browser cache.
 	chrome.alarms.create(ALARMS.FETCH_ONLINE_IMAGES, { periodInMinutes: 60 * 3 });
 
-	// Set up alarm for downloading pending images (every 5 minutes)
-	chrome.alarms.create(ALARMS.DOWNLOAD_PENDING_IMAGES, { periodInMinutes: 5 });
+	// Remove the obsolete base64-download job left by older installations.
+	void chrome.alarms.clear("DOWNLOAD_PENDING_IMAGES");
 });
 
 // Handle alarm for periodic image fetching
 chrome.alarms.onAlarm.addListener((alarm) => {
 	switch (alarm.name) {
 		case ALARMS.FETCH_ONLINE_IMAGES:
-			wallpaper.fetchOnlineImages();
-			break;
-
-		case ALARMS.DOWNLOAD_PENDING_IMAGES:
-			wallpaper.downloadPendingImages();
+			void wallpaper.fetchOnlineImages();
 			break;
 
 		default:
 			break;
 	}
-});
-
-// Also download pending images on startup
-chrome.runtime.onStartup.addListener(() => {
-	wallpaper.downloadPendingImages();
 });
 
 if (process.env.PLASMO_PUBLIC_UNINSTALL_URL) {

@@ -1,14 +1,14 @@
 import { useState } from "react";
-import Homepage from "@/components/screens/newtab";
-import { AskForReview } from "./components/ask-for-review";
-import { Settings } from "./components/screens/newtab/settings";
-import { RootProvider } from "./providers/root-provider";
+import { AskForReview } from "@/components/ask-for-review";
+import Homepage from "@/features/newtab";
+import { Settings } from "@/features/settings";
+import { RootProvider } from "@/providers/root-provider";
 
 function NewtabPage() {
 	const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
 
 	return (
-		<RootProvider>
+		<RootProvider ensureRootFolder>
 			<AskForReview
 				open={isReviewDialogOpen}
 				onOpenChange={setIsReviewDialogOpen}

@@ -1,46 +1,44 @@
+import { useCallback } from "react";
 import { LAST_WALLPAPER_CHANGED_AT } from "@/constants/keys";
-import { randomInt } from "@/lib/random";
+import { selectRandomWallpaperId } from "@/lib/wallpaper-selection";
 import { useSettings } from "@/providers/settings-provider";
 
-/**
- * Hook to manage next wallpaper functionality
- */
 export const useNextWallpaper = () => {
 	const {
-		settings: { wallpapers },
+		settings: {
+			appearance: { wallpapers },
+		},
 		setSettings,
 	} = useSettings();
 
-	const nextWallpaper = () => {
-		if (wallpapers.images.length === 0) return;
-
-		const currentImageIndex = wallpapers.images.indexOf(
-			wallpapers.selectedImageId ?? undefined,
+	const nextWallpaper = useCallback(() => {
+		const nextImageId = selectRandomWallpaperId(
+			wallpapers.images,
+			wallpapers.selectedImageId,
 		);
 
-		const excludeIndices = currentImageIndex >= 0 ? [currentImageIndex] : [];
-		const maxIndex = wallpapers.images.length - 1;
-		const randomIndex = randomInt(
-			0,
-			maxIndex < 0 ? 0 : maxIndex,
-			excludeIndices,
-		);
-		const newImageId =
-			wallpapers.images[randomIndex] ?? wallpapers.images[0] ?? null;
+		if (!nextImageId) return;
 
-		setSettings((prev) => ({
-			...prev,
-			wallpapers: {
-				...prev.wallpapers,
-				selectedImageId: newImageId,
-			},
-		}));
-
-		// Update last changed timestamp
-		chrome.storage.local.set({
-			[LAST_WALLPAPER_CHANGED_AT]: Date.now().toString(),
-		});
-	};
+		void chrome.storage.local
+			.set({
+				[LAST_WALLPAPER_CHANGED_AT]: Date.now().toString(),
+			})
+			.then(() => {
+				setSettings((previous) => ({
+					...previous,
+					appearance: {
+						...previous.appearance,
+						wallpapers: {
+							...previous.appearance.wallpapers,
+							selectedImageId: nextImageId,
+						},
+					},
+				}));
+			})
+			.catch((error) => {
+				console.error("Failed to select the next wallpaper:", error);
+			});
+	}, [setSettings, wallpapers.images, wallpapers.selectedImageId]);
 
 	return {
 		nextWallpaper,

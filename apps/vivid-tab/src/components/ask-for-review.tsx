@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { LOCAL_STORAGE } from "@/constants/keys";
 import { cn } from "@/lib/cn";
+import { checkAndRecordReviewPrompt } from "@/lib/review-prompt";
 import { Button, buttonVariants } from "./ui/button";
 import {
 	Dialog,
@@ -25,70 +25,22 @@ const AskForReview = ({ open, onOpenChange }: AskForReviewProps) => {
 	useEffect(() => {
 		if (hasAutoTriggered) return;
 
-		const checkAndShowReview = async () => {
-			try {
-				const result = await chrome.storage.local.get([
-					LOCAL_STORAGE.installedDate,
-					LOCAL_STORAGE.reviewLastAskedAt,
-					LOCAL_STORAGE.reviewTimesAsked,
-				]);
+		let cancelled = false;
 
-				const installedDate = result[LOCAL_STORAGE.installedDate];
-				const lastAskedAt = result[LOCAL_STORAGE.reviewLastAskedAt];
-				const timesAsked = result[LOCAL_STORAGE.reviewTimesAsked] || 0;
+		void checkAndRecordReviewPrompt()
+			.then((shouldOpen) => {
+				if (!shouldOpen || cancelled) return;
 
-				// Don't show if already asked 4 times
-				if (timesAsked >= 4) {
-					return;
-				}
-
-				// Don't show if no install date
-				if (!installedDate) {
-					return;
-				}
-
-				const now = new Date();
-				const installed = new Date(installedDate);
-				const daysSinceInstall = Math.floor(
-					(now.getTime() - installed.getTime()) / (1000 * 60 * 60 * 24),
-				);
-
-				// First time: show on 7th day
-				if (timesAsked === 0 && daysSinceInstall >= 7) {
-					onOpenChange(true);
-					setHasAutoTriggered(true);
-					// Save the timestamp and increment count
-					await chrome.storage.local.set({
-						[LOCAL_STORAGE.reviewLastAskedAt]: now.toString(),
-						[LOCAL_STORAGE.reviewTimesAsked]: 1,
-					});
-
-					return;
-				}
-
-				// Subsequent times: show every 3 months (90 days)
-				if (timesAsked > 0 && lastAskedAt) {
-					const lastAsked = new Date(lastAskedAt);
-					const daysSinceLastAsk = Math.floor(
-						(now.getTime() - lastAsked.getTime()) / (1000 * 60 * 60 * 24),
-					);
-
-					if (daysSinceLastAsk >= 90) {
-						onOpenChange(true);
-						setHasAutoTriggered(true);
-						// Save the timestamp and increment count
-						await chrome.storage.local.set({
-							[LOCAL_STORAGE.reviewLastAskedAt]: now.toString(),
-							[LOCAL_STORAGE.reviewTimesAsked]: timesAsked + 1,
-						});
-					}
-				}
-			} catch (error) {
+				onOpenChange(true);
+				setHasAutoTriggered(true);
+			})
+			.catch((error) => {
 				console.error("Error checking review status:", error);
-			}
-		};
+			});
 
-		checkAndShowReview();
+		return () => {
+			cancelled = true;
+		};
 	}, [hasAutoTriggered, onOpenChange]);
 
 	const handleNotReally = () => {

@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
-import { BACKGROUND_ACTIONS } from "@/constants/background-actions";
-import { getBookmarkFolder } from "@/lib/get-bookmark-folder";
-import type { BookmarkFolderNode, Bookmarks } from "@/types/bookmark";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { readBookmarks } from "@/lib/bookmark-reader";
+import type { Bookmarks } from "@/types/bookmark";
+
+const BOOKMARK_REFRESH_DELAY_MS = 25;
 
 /**
  * Custom hook to fetch bookmarks from the Chrome extension's bookmarks API.
@@ -10,37 +11,49 @@ import type { BookmarkFolderNode, Bookmarks } from "@/types/bookmark";
 const useBookmarks = (id?: string) => {
 	const [bookmarks, setBookmarks] = useState<Bookmarks>([]);
 
-	const fn = useCallback(() => {
-		chrome.runtime.sendMessage(
-			{ action: BACKGROUND_ACTIONS.GET_BOOKMARKS },
-			(response: Bookmarks = []) => {
-				const data =
-					response[0]?.id === "0"
-						? (response[0] as BookmarkFolderNode).children
-						: response;
+	const requestRevisionRef = useRef(0);
 
-				const folder = id ? getBookmarkFolder(data, id)?.children : data;
+	const refreshBookmarks = useCallback(async () => {
+		const requestRevision = ++requestRevisionRef.current;
 
-				setBookmarks(folder || []);
-			},
-		);
+		try {
+			const nextBookmarks = await readBookmarks(id);
+			if (requestRevision === requestRevisionRef.current) {
+				setBookmarks(nextBookmarks);
+			}
+		} catch (error) {
+			if (requestRevision === requestRevisionRef.current) {
+				console.error("Failed to read bookmarks:", error);
+				setBookmarks([]);
+			}
+		}
 	}, [id]);
 
 	useEffect(() => {
-		fn();
+		let refreshTimeout: ReturnType<typeof setTimeout> | undefined;
+		const scheduleRefresh = () => {
+			if (refreshTimeout) clearTimeout(refreshTimeout);
+			refreshTimeout = setTimeout(
+				() => void refreshBookmarks(),
+				BOOKMARK_REFRESH_DELAY_MS,
+			);
+		};
 
-		chrome.bookmarks.onCreated.addListener(fn);
-		chrome.bookmarks.onRemoved.addListener(fn);
-		chrome.bookmarks.onChanged.addListener(fn);
-		chrome.bookmarks.onMoved.addListener(fn);
+		void refreshBookmarks();
+		chrome.bookmarks.onCreated.addListener(scheduleRefresh);
+		chrome.bookmarks.onRemoved.addListener(scheduleRefresh);
+		chrome.bookmarks.onChanged.addListener(scheduleRefresh);
+		chrome.bookmarks.onMoved.addListener(scheduleRefresh);
 
 		return () => {
-			chrome.bookmarks.onCreated.removeListener(fn);
-			chrome.bookmarks.onRemoved.removeListener(fn);
-			chrome.bookmarks.onChanged.removeListener(fn);
-			chrome.bookmarks.onMoved.removeListener(fn);
+			requestRevisionRef.current += 1;
+			if (refreshTimeout) clearTimeout(refreshTimeout);
+			chrome.bookmarks.onCreated.removeListener(scheduleRefresh);
+			chrome.bookmarks.onRemoved.removeListener(scheduleRefresh);
+			chrome.bookmarks.onChanged.removeListener(scheduleRefresh);
+			chrome.bookmarks.onMoved.removeListener(scheduleRefresh);
 		};
-	}, [fn]);
+	}, [refreshBookmarks]);
 
 	return bookmarks;
 };

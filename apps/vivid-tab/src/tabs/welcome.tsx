@@ -1,5 +1,5 @@
-import { Welcome } from "@/components/screens/tabs/welcome";
-import { WelcomeContextProvider } from "@/components/screens/tabs/welcome/_context";
+import { Welcome } from "@/features/welcome";
+import { WelcomeContextProvider } from "@/features/welcome/_context";
 import { RootProvider } from "@/providers/root-provider";
 
 const WelcomeTab = () => {

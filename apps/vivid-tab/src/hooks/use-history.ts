@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { HistoryItem } from "@/types/history";
 
-const useHistory = () => {
+const useHistory = (enabled = true) => {
 	const [history, setHistory] = useState<HistoryItem[]>([]);
 	const [hasPermission, setHasPermission] = useState(false);
 
@@ -23,11 +23,13 @@ const useHistory = () => {
 	}, []);
 
 	useEffect(() => {
+		if (!enabled) return;
+
 		chrome.permissions.contains({ permissions: ["history"] }, (granted) => {
 			setHasPermission(granted);
 			if (granted) fetchHistory();
 		});
-	}, [fetchHistory]);
+	}, [enabled, fetchHistory]);
 
 	const requestPermission = () => {
 		chrome.permissions.request({ permissions: ["history"] }, (granted) => {

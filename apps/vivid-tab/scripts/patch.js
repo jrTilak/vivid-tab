@@ -26,13 +26,69 @@ const log = (msg, color = "reset") =>
 	console.log(`${c[color]}${msg}${c.reset}`);
 
 /**
+ * TypeScript 7 no longer ships tsserver. Bun can leave the old TypeScript 5
+ * executable symlink behind after an upgrade, and Parcel fails while scanning
+ * that dangling entry. Remove only the broken legacy shim.
+ */
+const removeDanglingTsserverShim = () => {
+	const tsserverPath = path.resolve(
+		__dirname,
+		"..",
+		"node_modules",
+		".bin",
+		"tsserver",
+	);
+
+	try {
+		const file = fs.lstatSync(tsserverPath);
+
+		if (!file.isSymbolicLink() || fs.existsSync(tsserverPath)) {
+			return true;
+		}
+
+		fs.unlinkSync(tsserverPath);
+		log(`✅ ${tsserverPath} - removed dangling legacy shim`, "green");
+
+		return true;
+	} catch (error) {
+		if (error.code === "ENOENT") return true;
+
+		log(`❌ ${tsserverPath} - error: ${error.message}`, "red");
+
+		return false;
+	}
+};
+
+const addNodeModulesFromAncestors = (startPath, directories) => {
+	let currentPath = path.resolve(startPath);
+
+	while (true) {
+		const nodeModules = path.join(currentPath, "node_modules");
+
+		if (fs.existsSync(nodeModules)) {
+			directories.add(nodeModules);
+		}
+
+		const parentPath = path.dirname(currentPath);
+
+		if (parentPath === currentPath) break;
+
+		currentPath = parentPath;
+	}
+};
+
+/**
  * Find package files that need patching
  */
 const findPackageFiles = () => {
-	const nodeModules = path.resolve("node_modules");
-	if (!fs.existsSync(nodeModules)) return [];
+	const nodeModulesDirectories = new Set();
+	addNodeModulesFromAncestors(process.cwd(), nodeModulesDirectories);
+	addNodeModulesFromAncestors(
+		path.resolve(__dirname, ".."),
+		nodeModulesDirectories,
+	);
 
-	const files = [];
+	const files = new Set();
 
 	// Helper to check file exists
 	const fileExists = (filePath) => {
@@ -44,28 +100,58 @@ const findPackageFiles = () => {
 	};
 
 	// Find jiti files
-	const findJitiFiles = (basePath) => {
+	const addJitiFiles = (basePath) => {
 		const jitiPath = path.join(basePath, "jiti");
-		if (!fileExists(jitiPath)) return [];
+		if (!fileExists(jitiPath)) return;
 
 		const targets = ["dist/jiti.cjs", "dist/babel.cjs", "lib/jiti.cjs"];
 
-		return targets
-			.map((target) => path.join(jitiPath, target))
-			.filter(fileExists);
+		for (const target of targets) {
+			const filePath = path.join(jitiPath, target);
+
+			if (fileExists(filePath)) {
+				files.add(fs.realpathSync(filePath));
+			}
+		}
 	};
 
 	// Find oxide files
-	const findOxideFiles = (basePath) => {
+	const addOxideFile = (basePath) => {
 		const oxidePath = path.join(basePath, "@tailwindcss", "oxide", "index.js");
-		return fileExists(oxidePath) ? [oxidePath] : [];
+
+		if (fileExists(oxidePath)) {
+			files.add(fs.realpathSync(oxidePath));
+		}
 	};
 
-	// Search Bun's node_modules structure
-	files.push(...findJitiFiles(nodeModules));
-	files.push(...findOxideFiles(nodeModules));
+	for (const nodeModules of nodeModulesDirectories) {
+		addJitiFiles(nodeModules);
+		addOxideFile(nodeModules);
 
-	return [...new Set(files)]; // Remove duplicates
+		const bunStore = path.join(nodeModules, ".bun");
+
+		if (!fileExists(bunStore)) continue;
+
+		for (const entry of fs.readdirSync(bunStore, { withFileTypes: true })) {
+			if (!entry.isDirectory()) continue;
+
+			const packageNodeModules = path.join(
+				bunStore,
+				entry.name,
+				"node_modules",
+			);
+
+			if (entry.name.startsWith("jiti@")) {
+				addJitiFiles(packageNodeModules);
+			}
+
+			if (entry.name.startsWith("@tailwindcss+oxide@")) {
+				addOxideFile(packageNodeModules);
+			}
+		}
+	}
+
+	return [...files].sort();
 };
 
 /**
@@ -74,7 +160,7 @@ const findPackageFiles = () => {
 const patchFile = (filePath) => {
 	try {
 		if (!fs.existsSync(filePath)) {
-			log(`⚠️  File not found: ${path.basename(filePath)}`, "yellow");
+			log(`⚠️  File not found: ${filePath}`, "yellow");
 			return false;
 		}
 
@@ -83,7 +169,7 @@ const patchFile = (filePath) => {
 			content.includes('require("node:') || content.includes("require('node:");
 
 		if (!hasNodeImports) {
-			log(`✅ ${path.basename(filePath)} - already patched`, "green");
+			log(`✅ ${filePath} - already patched`, "green");
 			return true;
 		}
 
@@ -93,10 +179,10 @@ const patchFile = (filePath) => {
 			.replace(/require\('node:([^']+)'\)/g, "require('$1')");
 
 		fs.writeFileSync(filePath, patched, "utf8");
-		log(`✅ ${path.basename(filePath)} - patched successfully`, "green");
+		log(`✅ ${filePath} - patched successfully`, "green");
 		return true;
 	} catch (error) {
-		log(`❌ ${path.basename(filePath)} - error: ${error.message}`, "red");
+		log(`❌ ${filePath} - error: ${error.message}`, "red");
 		return false;
 	}
 };
@@ -106,6 +192,7 @@ const patchFile = (filePath) => {
  */
 const main = () => {
 	log("🔧 Plasmo + Tailwind v4 compatibility patch", "cyan");
+	const tsserverReady = removeDanglingTsserverShim();
 
 	const files = findPackageFiles();
 
@@ -125,7 +212,7 @@ const main = () => {
 
 	log(""); // Empty line
 
-	if (successful === files.length) {
+	if (successful === files.length && tsserverReady) {
 		log("🎉 All files patched successfully!", "green");
 		log("   Tailwind v4 should now work with Plasmo", "green");
 	} else {
@@ -142,6 +229,11 @@ if (require.main === module) {
 	main();
 }
 
-module.exports = { main, patchFile, findPackageFiles };
+module.exports = {
+	findPackageFiles,
+	main,
+	patchFile,
+	removeDanglingTsserverShim,
+};
 
 // Credit: https://github.com/PlasmoHQ/plasmo/issues/1188#issuecomment-3392816850

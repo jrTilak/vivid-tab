@@ -1,29 +1,26 @@
-import { useState } from "react";
-import { getIconFromLocalStorage } from "@/lib/icons-to-local";
-import { useAsyncEffect } from "./use-async-effect";
+import { useCallback, useSyncExternalStore } from "react";
+import {
+	getBookmarkIconSnapshot,
+	subscribeBookmarkIcon,
+} from "@/lib/bookmark-icon-store";
 
 type Props = {
-	id: string;
+	id?: string;
 	defaultIcon?: string;
 };
 
 const useIcon = (props: Props) => {
-	const [icon, setIcon] = useState(props.defaultIcon || null);
+	const subscribe = useCallback(
+		(listener: () => void) => subscribeBookmarkIcon(props.id, listener),
+		[props.id],
+	);
+	const getSnapshot = useCallback(
+		() => getBookmarkIconSnapshot(props.id, props.defaultIcon),
+		[props.defaultIcon, props.id],
+	);
+	const icon = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
-	const fetchIcon = async () => {
-		const key = `icon-${props.id}`;
-		const icon = await getIconFromLocalStorage<{ icon: string }>(key);
-
-		if (icon?.[key]?.icon) {
-			setIcon(icon[key].icon);
-		} else {
-			setIcon(props.defaultIcon || null);
-		}
-	};
-
-	useAsyncEffect(fetchIcon, [props.id]);
-
-	return { icon, setIcon, fetchIcon };
+	return { icon };
 };
 
 export { useIcon };

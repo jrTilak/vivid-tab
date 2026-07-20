@@ -6,7 +6,7 @@
 - Wallpaper switching improvements.
 - Minor bug fixes, performance improvements, refactor.
 
-## [1.2.0] - ........
+## [1.2.0]
 
 - Added **Firefox support** with major cross-browser fixes
 - Support automatic wallpaper from wallhaven.

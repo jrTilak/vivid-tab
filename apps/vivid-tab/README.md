@@ -14,7 +14,7 @@ Vivid Tab is an open-source Chrome extension that transforms your new tab into a
 - ✅ **To-Dos & Notes** - Stay organized with built-in task lists and quick notes.
 - ☁️ **Weather & Location-based Insights** - Get real-time weather updates and relevant local information.
 - 🌍 **Forever Free & Open Source** - Vivid Tab is completely free and welcomes community contributions.
-- ☁️ Random Wallpaper Support using wallhaven API
+- ☁️ Random wallpaper support using the Wallhaven API
 
 ---
 
@@ -84,7 +84,7 @@ Vivid Tab is built with the help of these amazing resources:
 
 - 🎨 **[SVG Repo](https://www.svgrepo.com/)** - For the beautiful SVG icons used throughout the extension.
 - 😊 **[Brixmoji](https://brixmoji.com/)** - For the awesome emojis that bring personality to the interface.
-- 🖼️ **[Pixabay](https://pixabay.com/)** & **[Wallhaven](https://wallhaven.cc/)** - For providing wallpaper APIs that enhance the visual experience.
+- 🖼️ **[Wallhaven](https://wallhaven.cc/)** - For providing the wallpaper API that enhances the visual experience.
 - 🚀 **[Plasmo](https://www.plasmo.com/)** - For the awesome framework that makes building Chrome extensions a breeze.
 
 ---

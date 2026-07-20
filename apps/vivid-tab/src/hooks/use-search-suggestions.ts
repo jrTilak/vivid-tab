@@ -1,29 +1,48 @@
-import { useState } from "react";
-import { useAsyncEffect } from "./use-async-effect";
+import { useEffect, useState } from "react";
+import {
+	buildSearchSuggestionsUrl,
+	parseSearchSuggestions,
+} from "./search-suggestions";
 
 type Props = {
 	query: string;
 	enabled?: boolean;
 };
 
-/**
- * Custom hook to fetch search suggestions based on the query.
- */
+/** Fetches validated suggestions and cancels stale requests as the query changes. */
 const useSearchSuggestions = ({ query, enabled = true }: Props) => {
 	const [suggestions, setSuggestions] = useState<string[]>([]);
 
-	useAsyncEffect(async (isMounted) => {
-		if (!enabled || !query.trim()) return;
+	useEffect(() => {
+		const normalizedQuery = query.trim();
+		const abortController = new AbortController();
 
-		const results = await fetch(
-			`https://suggestqueries.google.com/complete/search?client=firefox&q=${query}`,
-		);
-		const data = await results.json();
+		setSuggestions([]);
+		if (!enabled || !normalizedQuery) {
+			return () => abortController.abort();
+		}
 
-		if (isMounted && !isMounted()) return;
+		const loadSuggestions = async () => {
+			try {
+				const response = await fetch(
+					buildSearchSuggestionsUrl(normalizedQuery),
+					{ signal: abortController.signal },
+				);
+				if (!response.ok) throw new Error("Search suggestions request failed");
 
-		setSuggestions(data[1]);
-	}, [query, enabled]);
+				const data: unknown = await response.json();
+				if (!abortController.signal.aborted) {
+					setSuggestions(parseSearchSuggestions(data));
+				}
+			} catch {
+				if (!abortController.signal.aborted) setSuggestions([]);
+			}
+		};
+
+		void loadSuggestions();
+
+		return () => abortController.abort();
+	}, [enabled, query]);
 
 	return suggestions;
 };
