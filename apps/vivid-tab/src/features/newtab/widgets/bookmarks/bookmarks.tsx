@@ -185,7 +185,7 @@ const Bookmarks = () => {
 			/>
 			<div className="col-span-6 mb-6 h-[70vh] overflow-scroll __vivid_hide-scrollbar">
 				<div className="flex justify-between gap-6 mb-4">
-					<div className="flex gap-2.5 flex-wrap ">
+					<div className="flex gap-1 flex-wrap ">
 						{sortBookmarksByIndex(
 							[
 								rootChildren.length > 0 && {
@@ -238,7 +238,7 @@ const Bookmarks = () => {
 							<IconPlus className="size-4" />
 						</Button>
 					</div>
-					<div className="flex h-fit gap-1 rounded-md bg-muted/40 p-1 in-data-[visual-effect=opaque]:bg-muted in-data-[visual-effect=translucent]:bg-muted/40">
+					<div className="flex h-fit gap-0.5 rounded-md bg-muted/40  in-data-[visual-effect=opaque]:bg-muted in-data-[visual-effect=translucent]:bg-muted/40">
 						<Button
 							aria-label="Create bookmark folder"
 							onClick={() => {

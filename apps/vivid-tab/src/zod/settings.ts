@@ -1,5 +1,8 @@
 import * as z from "zod/mini";
-import { SETTINGS_VERSION } from "@/constants/settings";
+import {
+	MAX_TODO_EXPIRATION_MINUTES,
+	SETTINGS_VERSION,
+} from "@/constants/settings";
 import { THEMES } from "@/lib/theme";
 
 const LayoutSlotSchema = z.enum(["0", "1", "2", "3", "4", "5", "6", "7", "8"]);
@@ -60,7 +63,9 @@ export const SettingsSchema = z.object({
 		todos: z.object({
 			expireAfterCompleted: z.object({
 				enabled: z.boolean(),
-				durationInMinutes: z.number().check(z.minimum(0), z.maximum(525_600)),
+				durationInMinutes: z
+					.number()
+					.check(z.minimum(0), z.maximum(MAX_TODO_EXPIRATION_MINUTES)),
 			}),
 		}),
 		layout: WidgetLayoutSchema,

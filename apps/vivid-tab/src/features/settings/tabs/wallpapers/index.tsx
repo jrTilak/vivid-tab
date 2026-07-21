@@ -3,9 +3,9 @@ import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { DEFAULT_WALLHAVEN_KEYWORDS } from "@/constants/wallpapers";
+import { DEFAULT_SEARCH_TERMS } from "@/constants/wallpapers";
 import { cn } from "@/lib/cn";
-import { wallpaper } from "@/lib/wallpapers";
+import { wallpaper } from "@/lib/wallpapers/service";
 import { useSettings } from "@/providers/settings-provider";
 import { SettingsPage, SettingsRow, SettingsSection } from "../../settings-ui";
 import ImageCard from "./components/image-card";
@@ -157,7 +157,7 @@ export default function WallpaperSettings() {
 						onChange={(e) =>
 							handleOnlineImagesChange("keywords", e.target.value)
 						}
-						placeholder={DEFAULT_WALLHAVEN_KEYWORDS}
+						placeholder={DEFAULT_SEARCH_TERMS.join(", ")}
 						value={onlineImages.keywords}
 					/>
 				</SettingsRow>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useWallpaper } from "@/hooks/use-wallpaper";
 import { cn } from "@/lib/cn";
-import type { StoredImage } from "@/lib/wallpaper-database";
+import type { StoredImage } from "@/lib/wallpapers/database";
 import { useSettings } from "@/providers/settings-provider";
 
 type WallpaperBackgroundProps = {

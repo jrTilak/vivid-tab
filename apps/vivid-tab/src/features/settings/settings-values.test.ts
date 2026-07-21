@@ -24,4 +24,9 @@ describe("parseNonNegativeInteger", () => {
 	])("rejects invalid integer input %j", (source) => {
 		expect(parseNonNegativeInteger(source)).toBeUndefined();
 	});
+
+	test("accepts an inclusive maximum and rejects larger integers", () => {
+		expect(parseNonNegativeInteger("525600", 525_600)).toBe(525_600);
+		expect(parseNonNegativeInteger("525601", 525_600)).toBeUndefined();
+	});
 });

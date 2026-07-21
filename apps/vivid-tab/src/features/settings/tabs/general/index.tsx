@@ -1,5 +1,16 @@
 import { IconHistory } from "@tabler/icons-react";
 import { useCallback } from "react";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
 	Select,
@@ -158,13 +169,31 @@ const GeneralSettings = () => {
 					description="Restore default preferences and clear wallpapers. Notes and todos are kept."
 					label="Reset settings"
 				>
-					<Button
-						className="min-w-32 text-destructive"
-						onClick={() => void resetSettings()}
-						variant="outline"
-					>
-						Reset <IconHistory />
-					</Button>
+					<AlertDialog>
+						<AlertDialogTrigger asChild>
+							<Button className="min-w-32 text-destructive" variant="outline">
+								Reset <IconHistory />
+							</Button>
+						</AlertDialogTrigger>
+						<AlertDialogContent>
+							<AlertDialogHeader>
+								<AlertDialogTitle>Reset settings?</AlertDialogTitle>
+								<AlertDialogDescription>
+									This restores default preferences and clears saved wallpapers.
+									Your notes and todos will be kept.
+								</AlertDialogDescription>
+							</AlertDialogHeader>
+							<AlertDialogFooter>
+								<AlertDialogCancel>Cancel</AlertDialogCancel>
+								<AlertDialogAction
+									onClick={() => void resetSettings()}
+									variant="destructive"
+								>
+									Reset settings
+								</AlertDialogAction>
+							</AlertDialogFooter>
+						</AlertDialogContent>
+					</AlertDialog>
 				</SettingsRow>
 			</SettingsSection>
 		</SettingsPage>

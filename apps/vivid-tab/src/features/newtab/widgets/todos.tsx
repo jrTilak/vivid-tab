@@ -20,35 +20,40 @@ const Todos = () => {
 		useTodos(expireAfterCompleted);
 
 	return (
-		<Card className="p-6">
-			<h3 className="mb-4 text-lg font-semibold">Todo:</h3>
-			<ul className="space-y-0">
-				{todos.map((todo) => (
-					<li key={todo.id} className="group flex items-center justify-between">
-						<div className="flex items-center space-x-2">
-							<Checkbox
-								id={`todo-${todo.id}`}
-								checked={todo.completed}
-								onCheckedChange={() => toggleTodo(todo.id)}
-							/>
-							<Label
-								htmlFor={`todo-${todo.id}`}
-								className={cn("text-sm", todo.completed && "line-through")}
-							>
-								{todo.text}
-							</Label>
-						</div>
-						<button
-							aria-label={`Delete ${todo.text}`}
-							type="button"
-							onClick={() => removeTodo(todo.id)}
-							className="scale-0 cursor-pointer text-destructive transition-transform group-hover:scale-100 focus-visible:scale-100 disabled:cursor-default"
+		<Card className="p-6 gap-2">
+			<h3 className="text-lg font-semibold">Todo:</h3>
+			{todos.length > 0 && (
+				<ul className="space-y-0">
+					{todos.map((todo) => (
+						<li
+							key={todo.id}
+							className="group flex items-center justify-between"
 						>
-							<IconTrash className="size-4" />
-						</button>
-					</li>
-				))}
-			</ul>
+							<div className="flex items-center space-x-2">
+								<Checkbox
+									id={`todo-${todo.id}`}
+									checked={todo.completed}
+									onCheckedChange={() => toggleTodo(todo.id)}
+								/>
+								<Label
+									htmlFor={`todo-${todo.id}`}
+									className={cn("text-sm", todo.completed && "line-through")}
+								>
+									{todo.text}
+								</Label>
+							</div>
+							<button
+								aria-label={`Delete ${todo.text}`}
+								type="button"
+								onClick={() => removeTodo(todo.id)}
+								className="scale-0 cursor-pointer text-destructive transition-transform group-hover:scale-100 focus-visible:scale-100 disabled:cursor-default"
+							>
+								<IconTrash className="size-4" />
+							</button>
+						</li>
+					))}
+				</ul>
+			)}
 			<form onSubmit={addTodo} className="mt-4 flex items-center">
 				<Input
 					type="text"

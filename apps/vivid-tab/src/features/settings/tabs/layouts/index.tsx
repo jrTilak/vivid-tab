@@ -3,8 +3,7 @@ import { useMemo } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { filterObj } from "@/lib/filter-obj";
-import { findObjValue } from "@/lib/find-obj";
+import { filterObj, findObjValue } from "@/lib/object";
 import { useSettings } from "@/providers/settings-provider";
 import PreviewCard from "./preview-card";
 

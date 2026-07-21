@@ -489,6 +489,21 @@ describe("flattenBookmarkFolders", () => {
 		]);
 	});
 
+	test("recognizes Firefox folders with an explicit undefined URL", () => {
+		const firefoxFolder: Bookmarks[number] = {
+			children: [],
+			dateAdded: 1,
+			id: "firefox-folder",
+			index: 0,
+			title: "Firefox folder",
+			url: undefined,
+		};
+
+		expect(flattenBookmarkFolders([firefoxFolder])).toEqual([
+			{ depth: 0, id: "firefox-folder", title: "Firefox folder" },
+		]);
+	});
+
 	test("returns an empty array for an empty tree", () => {
 		expect(flattenBookmarkFolders([])).toEqual([]);
 	});

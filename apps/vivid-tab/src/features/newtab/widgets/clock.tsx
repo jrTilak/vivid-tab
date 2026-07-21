@@ -13,9 +13,9 @@ const Clock = () => {
 	const time = useClock(timer.showSeconds);
 
 	return (
-		<Card className="p-6">
-			<div className="text-5xl font-light">{formatClockTime(time, timer)}</div>
-			<div className="mt-1 text-sm">{formatDayDate(time)}</div>
+		<Card className="p-6 gap-2">
+			<div className="text-5xl font-medium">{formatClockTime(time, timer)}</div>
+			<div className="text-sm">{formatDayDate(time)}</div>
 		</Card>
 	);
 };

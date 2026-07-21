@@ -50,13 +50,15 @@ describe("bookmark tree", () => {
 	});
 
 	test("derives home and virtual-root views without treating empty folders as URLs", () => {
-		const emptyFolder = {
+		const emptyFolder: Bookmarks[number] = {
 			children: [],
 			dateAdded: 1,
 			id: "empty",
 			index: 2,
 			parentId: "root",
 			title: "Empty",
+			/* Firefox exposes this property on folder objects. */
+			url: undefined,
 		};
 		const source = [...bookmarks, emptyFolder];
 		const home = deriveBookmarkView(source, "root", "home", []);

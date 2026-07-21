@@ -10,6 +10,8 @@ export interface BookmarkBaseNode {
 export interface BookmarkFolderNode extends BookmarkBaseNode {
 	dateGroupModified?: number; // Timestamp when the folder was last modified
 	children?: BookmarkTreeNode[]; // Array of child nodes
+	/** Firefox includes this own property with an undefined value on folders. */
+	url?: undefined;
 }
 
 // Type for bookmarks

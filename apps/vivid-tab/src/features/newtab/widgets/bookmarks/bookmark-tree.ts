@@ -16,7 +16,7 @@ export type BookmarkView = {
 
 export const isBookmarkFolder = (
 	bookmark: Bookmark,
-): bookmark is BookmarkFolderNode => !("url" in bookmark);
+): bookmark is BookmarkFolderNode => bookmark.url === undefined;
 
 /** Rebuilds navigation from live bookmark data, dropping stale path segments. */
 export const deriveBookmarkView = (

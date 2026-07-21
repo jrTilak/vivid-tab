@@ -1,5 +1,4 @@
 import { IconSearch } from "@tabler/icons-react";
-import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { Button } from "@/components/ui/button";
@@ -73,18 +72,15 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
 
 	return (
 		<Dialog onOpenChange={handleOpenChange} open={open}>
-			<DialogContent className="w-[min(90vw,34rem)] max-w-[min(90vw,34rem)]">
+			<DialogContent className="w-[min(90vw,34rem)] max-w-[min(90vw,34rem)] pt-14">
 				<DialogTitle className="sr-only">Search the web</DialogTitle>
 				<DialogDescription className="sr-only">
 					Search directly or use one of your enabled shortcuts.
 				</DialogDescription>
 
 				<div className="flex flex-col items-center justify-center gap-4">
-					<motion.form
-						animate={{ opacity: 1, y: 0 }}
-						className="mx-auto flex h-10 w-full max-w-[500px]"
-						exit={{ opacity: 0, y: 100 }}
-						initial={{ opacity: 0, y: 100 }}
+					<form
+						className="mx-auto flex h-10 w-full max-w-[500px] motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-6 motion-safe:duration-200"
 						onSubmit={(event) => {
 							event.preventDefault();
 							runSearch(
@@ -94,7 +90,6 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
 								),
 							);
 						}}
-						transition={{ duration: 0.2 }}
 					>
 						<Input
 							autoComplete="off"
@@ -115,21 +110,18 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
 						>
 							<IconSearch />
 						</Button>
-					</motion.form>
+					</form>
 
 					<div className="mx-auto grid w-full max-w-[500px] grid-cols-2 gap-2 sm:grid-cols-4">
 						{SEARCH_SHORTCUTS.filter((shortcut) =>
 							searchbar.shortcuts.includes(shortcut.id),
 						).map((shortcut, index) => (
-							<motion.div
-								animate={{ opacity: 1, y: 0 }}
-								className="aspect-square w-full"
-								exit={{ opacity: 0, y: 100 }}
-								initial={{ opacity: 0, y: 100 }}
+							<div
+								className="aspect-square w-full motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-6"
 								key={shortcut.id}
-								transition={{
-									delay: index * 0.1 + 0.1,
-									duration: 0.1,
+								style={{
+									animationDelay: `${index * 100 + 100}ms`,
+									animationFillMode: "backwards",
 								}}
 							>
 								<Button
@@ -151,36 +143,29 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
 									/>
 									<span className="text-sm">{shortcut.name}</span>
 								</Button>
-							</motion.div>
+							</div>
 						))}
 					</div>
 
-					<AnimatePresence>
-						{searchQuery && searchbar.searchSuggestions && (
-							<motion.div
-								animate={{ opacity: 1, y: 0 }}
-								aria-label="Search suggestions"
-								className="mx-auto flex w-full max-w-[500px] flex-wrap gap-2"
-								exit={{ opacity: 0, y: 100 }}
-								initial={{ opacity: 0, y: 100 }}
-								key="search-suggestions"
-								transition={{ duration: 0.2 }}
-							>
-								{searchSuggestions.slice(0, 5).map((result) => (
-									<Button
-										className="max-w-full truncate font-normal"
-										key={result}
-										onClick={() => runSearch(result)}
-										size="xs"
-										type="button"
-										variant="secondary"
-									>
-										{result}
-									</Button>
-								))}
-							</motion.div>
-						)}
-					</AnimatePresence>
+					{searchQuery && searchbar.searchSuggestions && (
+						<section
+							aria-label="Search suggestions"
+							className="mx-auto flex w-full max-w-[500px] flex-wrap gap-2 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-6 motion-safe:duration-200"
+						>
+							{searchSuggestions.slice(0, 5).map((result) => (
+								<Button
+									className="max-w-full truncate font-normal"
+									key={result}
+									onClick={() => runSearch(result)}
+									size="xs"
+									type="button"
+									variant="secondary"
+								>
+									{result}
+								</Button>
+							))}
+						</section>
+					)}
 				</div>
 			</DialogContent>
 		</Dialog>

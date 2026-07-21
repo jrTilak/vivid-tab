@@ -1,6 +1,6 @@
 {
 	"extends": "plasmo/templates/tsconfig.base",
-	"exclude": ["node_modules"],
+	"exclude": ["e2e", "node_modules"],
 	"include": [".plasmo/index.d.ts", "./**/*.ts", "./**/*.tsx", "knip.js"],
 	"compilerOptions": {
 		"moduleResolution": "bundler",

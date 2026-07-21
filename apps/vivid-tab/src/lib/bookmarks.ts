@@ -268,7 +268,7 @@ export const ensureRootBookmarkFolder = (
 
 const isBookmarkFolder = (
 	bookmark: Bookmarks[number],
-): bookmark is BookmarkFolderNode => !("url" in bookmark);
+): bookmark is BookmarkFolderNode => bookmark.url === undefined;
 
 /**
  * Flattens nested bookmark folders in display order while preserving depth.

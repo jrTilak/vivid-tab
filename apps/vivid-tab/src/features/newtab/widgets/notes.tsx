@@ -8,42 +8,39 @@ const Notes = () => {
 	const { addNote, deleteNote, draft, notes, setDraft } = useNotes();
 
 	return (
-		<Card className="p-6">
-			<h3 className="mb-4 text-lg font-semibold">Notes:</h3>
+		<Card className="p-6 gap-2">
+			<h3 className="text-lg font-semibold">Notes:</h3>
 			<Textarea
 				value={draft}
 				onChange={(event) => setDraft(event.target.value)}
 				placeholder="Add a note..."
 				className="mb-2 border-none"
 			/>
-			<Button
-				size="sm"
-				variant="secondary"
-				onClick={addNote}
-				disabled={!draft.trim()}
-			>
+			<Button variant="secondary" onClick={addNote} disabled={!draft.trim()}>
 				Add Note
 			</Button>
-			<div className="mt-4 space-y-2">
-				{notes.map((note) => (
-					<div
-						key={note.id}
-						className="group relative rounded-md bg-background/10 p-2 text-sm in-data-[visual-effect=opaque]:bg-background in-data-[visual-effect=translucent]:bg-background/30"
-					>
-						<p className="whitespace-pre-wrap wrap-break-word">{note.text}</p>
-						<Button
-							aria-label="Delete note"
-							className="absolute top-1 right-1 scale-0 text-destructive transition-transform group-focus-within:scale-100 group-hover:scale-100 focus-visible:scale-100"
-							onClick={() => deleteNote(note.id)}
-							size="icon-xs"
-							type="button"
-							variant="ghost"
+			{notes.length > 0 && (
+				<div className="space-y-2">
+					{notes.map((note) => (
+						<div
+							key={note.id}
+							className="group relative rounded-md bg-background/10 p-2 px-4 text-sm in-data-[visual-effect=opaque]:bg-background in-data-[visual-effect=translucent]:bg-background/30"
 						>
-							<IconTrash />
-						</Button>
-					</div>
-				))}
-			</div>
+							<p className="whitespace-pre-wrap wrap-break-word">{note.text}</p>
+							<Button
+								aria-label="Delete note"
+								className="absolute top-1 right-1 scale-0 text-destructive transition-transform group-focus-within:scale-100 group-hover:scale-100 focus-visible:scale-100"
+								onClick={() => deleteNote(note.id)}
+								size="icon-xs"
+								type="button"
+								variant="ghost"
+							>
+								<IconTrash />
+							</Button>
+						</div>
+					))}
+				</div>
+			)}
 		</Card>
 	);
 };

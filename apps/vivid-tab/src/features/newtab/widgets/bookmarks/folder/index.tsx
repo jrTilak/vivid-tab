@@ -55,7 +55,7 @@ const BookmarkFolder = (props: Props) => {
 						style={style}
 						onClick={() => props.onOpenFolder(props.id)}
 						className={cn(
-							"flex w-24 cursor-pointer flex-col space-y-1 rounded-lg p-2 transition-transform hover:scale-105 hover:bg-accent/70 disabled:cursor-default disabled:opacity-50 in-data-[visual-effect=opaque]:hover:bg-accent in-data-[visual-effect=translucent]:hover:bg-accent/60",
+							"group/bookmark flex w-24 cursor-pointer flex-col space-y-1 rounded-lg p-2 disabled:cursor-default disabled:opacity-50",
 							isOver && "bg-accent/10",
 							isDragging && "bg-destructive/20",
 							isDragging && "relative z-50",
@@ -67,7 +67,7 @@ const BookmarkFolder = (props: Props) => {
 								{...attributes}
 								{...listeners}
 								className={cn(
-									"relative size-12 mx-auto rounded-md object-contain object-center",
+									"relative size-12 mx-auto rounded-md object-contain object-center transition-transform group-hover/bookmark:scale-[1.02]",
 									isDragging && "scale-105",
 								)}
 							>
@@ -89,7 +89,7 @@ const BookmarkFolder = (props: Props) => {
 								src={chrome.runtime.getURL("assets/folder-svgrepo-com.png")}
 								alt=""
 								className={cn(
-									"size-12 mx-auto rounded-md object-contain object-center",
+									"size-12 mx-auto rounded-md object-contain object-center transition-transform group-hover/bookmark:scale-[1.02]",
 									isDragging && "scale-105",
 								)}
 							/>
@@ -105,7 +105,7 @@ const BookmarkFolder = (props: Props) => {
 						style={style}
 						ref={setNodeRef}
 						className={cn(
-							"flex cursor-pointer items-center gap-2 rounded-lg p-2 transition-all hover:bg-accent/70 disabled:cursor-default disabled:opacity-50 in-data-[visual-effect=opaque]:hover:bg-accent in-data-[visual-effect=translucent]:hover:bg-accent/60",
+							"group/bookmark flex cursor-pointer items-center gap-2 rounded-lg p-2 disabled:cursor-default disabled:opacity-50",
 							isOver && "bg-accent/10",
 							isDragging && "scale-110 bg-destructive/20",
 							isDragging && "relative z-50",
@@ -117,7 +117,7 @@ const BookmarkFolder = (props: Props) => {
 								{...attributes}
 								{...listeners}
 								className={cn(
-									"relative min-w-12 size-12 mx-auto rounded-md object-contain object-center",
+									"relative min-w-12 size-12 mx-auto rounded-md object-contain object-center transition-transform group-hover/bookmark:scale-[1.02]",
 									isDragging && "scale-105",
 								)}
 							>
@@ -140,7 +140,7 @@ const BookmarkFolder = (props: Props) => {
 								src={chrome.runtime.getURL("assets/folder-svgrepo-com.png")}
 								alt=""
 								className={cn(
-									"size-12 mx-auto rounded-md object-contain object-center",
+									"size-12 mx-auto rounded-md object-contain object-center transition-transform group-hover/bookmark:scale-[1.02]",
 									isDragging && "scale-105",
 								)}
 							/>

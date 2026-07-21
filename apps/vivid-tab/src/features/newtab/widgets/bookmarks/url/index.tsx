@@ -85,6 +85,7 @@ const BookmarkUrl = ({
 						<button
 							ref={disableContextMenu ? null : draggableRef}
 							style={style}
+							title={props.url}
 							onClick={() => handleClick(props.url)}
 							onAuxClick={(event) => {
 								if (event.button === 1) {
@@ -93,7 +94,7 @@ const BookmarkUrl = ({
 								}
 							}}
 							className={cn(
-								"flex w-24 cursor-pointer flex-col items-center space-y-1 rounded-lg p-2 text-center text-xs transition-transform hover:scale-105 hover:bg-accent/70 disabled:cursor-default in-data-[visual-effect=opaque]:hover:bg-accent in-data-[visual-effect=translucent]:hover:bg-accent/60",
+								"group/bookmark flex w-24 cursor-pointer flex-col items-center space-y-1 rounded-lg p-2 text-center text-xs disabled:cursor-default",
 								isOver && "bg-accent/10",
 								isDragging && "bg-destructive/20",
 								isDragging && "relative z-50",
@@ -102,7 +103,7 @@ const BookmarkUrl = ({
 							{...(disableContextMenu ? {} : listeners)}
 						>
 							<BookmarkIcon
-								className="mx-auto transition-transform"
+								className="mx-auto transition-transform group-hover/bookmark:scale-[1.02]"
 								src={icon ?? faviconUrl}
 								title={props.title}
 							/>
@@ -116,6 +117,7 @@ const BookmarkUrl = ({
 						type="button"
 						ref={disableContextMenu ? null : setListNodeRef}
 						style={style}
+						title={props.url}
 						onClick={() => handleClick(props.url)}
 						onAuxClick={(event) => {
 							if (event.button === 1) {
@@ -124,7 +126,7 @@ const BookmarkUrl = ({
 							}
 						}}
 						className={cn(
-							"flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg p-2 transition-all hover:bg-accent/70 disabled:cursor-default in-data-[visual-effect=opaque]:hover:bg-accent in-data-[visual-effect=translucent]:hover:bg-accent/60",
+							"group/bookmark flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg p-2 disabled:cursor-default",
 							isOver && "bg-accent/10",
 							isDragging && "bg-destructive/20",
 							isDragging && "relative z-50",
@@ -135,7 +137,7 @@ const BookmarkUrl = ({
 					>
 						<BookmarkIcon
 							className={cn(
-								"mx-auto transition-transform",
+								"mx-auto transition-transform group-hover/bookmark:scale-[1.02]",
 								isDragging && "scale-105",
 							)}
 							src={icon ?? faviconUrl}

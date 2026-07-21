@@ -58,12 +58,15 @@ const MoveBookmarkDialog = ({ open, onOpenChange, id, label }: Props) => {
 				<DialogHeader>
 					<DialogTitle>Move {label} to?</DialogTitle>
 				</DialogHeader>
+				<label className="sr-only" htmlFor="move-bookmark-folder">
+					Destination folder
+				</label>
 				<Select
 					disabled={availableFolders.length === 0 || isMoving}
 					onValueChange={setSelectedFolder}
 					value={selectedFolder}
 				>
-					<SelectTrigger className="w-full">
+					<SelectTrigger className="w-full" id="move-bookmark-folder">
 						<SelectValue
 							placeholder={
 								availableFolders.length === 0

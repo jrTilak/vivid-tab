@@ -20,6 +20,7 @@ const FIXED_NOW = new Date("2026-07-21T08:30:00.000Z");
 const UNINSTALL_URL = "https://example.com/uninstalled";
 const UPDATE_URL = "https://example.com/updated";
 const originalChrome = globalThis.chrome;
+const originalNodeEnvironment = process.env.NODE_ENV;
 const originalUninstallUrl = process.env.PLASMO_PUBLIC_UNINSTALL_URL;
 const originalUpdateUrl = process.env.PLASMO_PUBLIC_UPDATE_URL;
 
@@ -133,6 +134,11 @@ beforeEach(async () => {
 afterEach(() => {
 	jest.useRealTimers();
 	globalThis.chrome = originalChrome;
+	if (originalNodeEnvironment === undefined) {
+		delete process.env.NODE_ENV;
+	} else {
+		process.env.NODE_ENV = originalNodeEnvironment;
+	}
 
 	if (originalUninstallUrl === undefined) {
 		delete process.env.PLASMO_PUBLIC_UNINSTALL_URL;
@@ -352,6 +358,26 @@ describe("background messages", () => {
 });
 
 describe("background lifecycle", () => {
+	test("keeps lifecycle redirects disabled during development", async () => {
+		jest.resetModules();
+		process.env.NODE_ENV = "development";
+		setUninstallURL.mockClear();
+		await loadBackground(UNINSTALL_URL);
+
+		installedListener?.({
+			reason: "install",
+		} as chrome.runtime.InstalledDetails);
+		installedListener?.({
+			reason: "update",
+		} as chrome.runtime.InstalledDetails);
+
+		expect(createTab).not.toHaveBeenCalled();
+		expect(setUninstallURL).not.toHaveBeenCalled();
+		expect(setLocalStorage).toHaveBeenCalledTimes(1);
+		expect(mockFetchOnlineImages).toHaveBeenCalledWith(true);
+		expect(createAlarm).toHaveBeenCalledTimes(2);
+	});
+
 	test("runs onboarding, metadata, wallpaper, and alarm setup on install", () => {
 		jest.useFakeTimers();
 		jest.setSystemTime(FIXED_NOW);

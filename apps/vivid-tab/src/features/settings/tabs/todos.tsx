@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { MAX_TODO_EXPIRATION_MINUTES } from "@/constants/settings";
 import { useSettings } from "@/providers/settings-provider";
 import { SettingsPage, SettingsRow, SettingsSection } from "../settings-ui";
 import { parseNonNegativeInteger } from "../settings-values";
@@ -51,10 +52,12 @@ const TodosSettings = () => {
 						className="w-24"
 						disabled={!expireAfterCompleted.enabled}
 						id="settings-todo-expiration"
+						max={MAX_TODO_EXPIRATION_MINUTES}
 						min={0}
 						onChange={(event) => {
 							const durationInMinutes = parseNonNegativeInteger(
 								event.target.value,
+								MAX_TODO_EXPIRATION_MINUTES,
 							);
 
 							if (durationInMinutes !== undefined) {

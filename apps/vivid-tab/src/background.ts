@@ -6,6 +6,7 @@ import { wallpaper } from "@/lib/wallpapers/service";
 
 const WELCOME_PAGE_PATH = "tabs/welcome.html";
 const ONLINE_WALLPAPER_REFRESH_MINUTES = 180;
+const SHOULD_OPEN_LIFECYCLE_PAGES = process.env.NODE_ENV !== "development";
 
 /**
  * @deprecated Kept for one final cleanup cycle and planned for removal in the
@@ -80,9 +81,11 @@ chrome.runtime.onMessage.addListener((message: unknown, _, sendResponse) => {
 chrome.runtime.onInstalled.addListener((details) => {
 	switch (details.reason) {
 		case "install":
-			void chrome.tabs.create({
-				url: chrome.runtime.getURL(WELCOME_PAGE_PATH),
-			});
+			if (SHOULD_OPEN_LIFECYCLE_PAGES) {
+				void chrome.tabs.create({
+					url: chrome.runtime.getURL(WELCOME_PAGE_PATH),
+				});
+			}
 			void chrome.storage.local.set({
 				[LOCAL_STORAGE.installedDate]: new Date().toString(),
 			});
@@ -90,6 +93,8 @@ chrome.runtime.onInstalled.addListener((details) => {
 			break;
 
 		case "update": {
+			if (!SHOULD_OPEN_LIFECYCLE_PAGES) break;
+
 			const updateUrl = process.env.PLASMO_PUBLIC_UPDATE_URL?.trim();
 			if (updateUrl) void chrome.tabs.create({ url: updateUrl });
 			break;
@@ -121,5 +126,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 	}
 });
 
-const uninstallUrl = process.env.PLASMO_PUBLIC_UNINSTALL_URL?.trim();
-if (uninstallUrl) void chrome.runtime.setUninstallURL(uninstallUrl);
+if (SHOULD_OPEN_LIFECYCLE_PAGES) {
+	const uninstallUrl = process.env.PLASMO_PUBLIC_UNINSTALL_URL?.trim();
+	if (uninstallUrl) void chrome.runtime.setUninstallURL(uninstallUrl);
+}

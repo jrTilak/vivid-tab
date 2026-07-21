@@ -110,7 +110,7 @@ const AskForReview = ({ open, onOpenChange }: AskForReviewProps) => {
 								onClick={handleNotReally}
 							>
 								<img
-									src={chrome.runtime.getURL("assets/sag.png")}
+									src={chrome.runtime.getURL("assets/sad.png")}
 									className="h-[100px] w-[100px]"
 									alt="Sad emoji"
 								/>

@@ -28,6 +28,10 @@ const parseQuote = (value: unknown): QuoteData | null => {
 	}
 };
 
+/**
+ * @todo Bundle a curated, licensed quote catalog and select quotes locally so
+ * New Tab no longer depends on the availability of the Quotable API.
+ */
 const buildQuoteUrl = (categories: readonly string[]): string => {
 	const url = new URL("https://api.quotable.io/quotes/random");
 	url.searchParams.set("maxLength", "80");

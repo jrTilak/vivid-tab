@@ -6,6 +6,9 @@ import { DEFAULT_SEARCH_TERMS } from "./wallpapers";
  */
 export const SETTINGS_VERSION = 1 as const;
 
+/** Largest completed-todo retention period accepted by settings storage. */
+export const MAX_TODO_EXPIRATION_MINUTES = 525_600;
+
 export const DEFAULT_SETTINGS = {
 	version: SETTINGS_VERSION,
 	general: {
@@ -58,14 +61,14 @@ export const DEFAULT_SETTINGS = {
 			selectedImageId: null,
 			images: [] as string[],
 			onlineImages: {
-				enabled: true,
+				enabled: false,
 				keywords: DEFAULT_SEARCH_TERMS.join(", "),
 			},
 		},
 		background: {
 			blurIntensity: 5,
 			brightness: 9,
-			randomizeWallpaper: "on-each-tab",
+			randomizeWallpaper: "off",
 		},
 	},
 } as const;
