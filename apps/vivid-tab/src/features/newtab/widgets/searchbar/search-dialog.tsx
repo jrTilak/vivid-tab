@@ -14,6 +14,7 @@ import {
 	InputGroupButton,
 	InputGroupInput,
 } from "@/components/ui/input-group";
+import { Link } from "@/components/ui/link";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useSearchSuggestions } from "@/hooks/use-search-suggestions";
 import { resolveBangSearch } from "@/lib/bang-search";
@@ -116,6 +117,18 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
 							</InputGroupButton>
 						</InputGroup>
 					</form>
+
+					<p className="text-center text-muted-foreground text-xs">
+						Bangs are supported. Try <code>!yt lo-fi</code> or{" "}
+						<code>react !gh</code>.{" "}
+						<Link
+							href="https://github.com/kagisearch/bangs"
+							rel="noopener noreferrer"
+							target="_blank"
+						>
+							See supported bangs
+						</Link>
+					</p>
 
 					{debouncedSearch.query && searchbar.searchSuggestions && (
 						<section

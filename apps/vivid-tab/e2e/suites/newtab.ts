@@ -312,6 +312,10 @@ export const runNewtabSuite = (browserName: BrowserName) => {
 
 			let dialog = $("[role='dialog']");
 			await expect(dialog).toBeDisplayed();
+			await expect(dialog.$("a=See supported bangs")).toHaveAttribute(
+				"href",
+				"https://github.com/kagisearch/bangs",
+			);
 
 			let searchInput = dialog.$("input[placeholder='Search the web…']");
 			await expect(searchInput).toBeFocused();
