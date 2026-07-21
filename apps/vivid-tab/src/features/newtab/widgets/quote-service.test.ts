@@ -1,171 +1,88 @@
-import { beforeEach, describe, expect, mock, spyOn, test } from "@test/jest";
-import { LOCAL_STORAGE } from "@/constants/keys";
-import {
-	buildQuoteUrl,
-	isCachedQuoteFresh,
-	loadQuote,
-	parseCachedQuote,
-	parseQuote,
-} from "./quote-service";
+import { describe, expect, test } from "@test/jest";
+import { QUOTE_CATEGORIES, QUOTES } from "@/data/quotes";
+import { selectQuote } from "./quote-service";
 
-const quote = { _id: "one", author: "Author", content: "Quote" };
-const storageGet = mock(async () => ({}));
-const storageSet = mock(async (_values: Record<string, unknown>) => undefined);
-const fetchMock = mock(
-	async (_input: RequestInfo | URL, _init?: RequestInit) =>
-		new Response(JSON.stringify([quote]), {
-			headers: { "content-type": "application/json" },
-			status: 200,
-		}),
-);
+describe("local quote catalog", () => {
+	test("stays small and contains valid categorized quotes", () => {
+		const supportedCategories = new Set(
+			QUOTE_CATEGORIES.map((category) => category.slug),
+		);
 
-beforeEach(() => {
-	storageGet.mockReset();
-	storageGet.mockResolvedValue({});
-	storageSet.mockReset();
-	storageSet.mockResolvedValue(undefined);
-	fetchMock.mockReset();
-	fetchMock.mockResolvedValue(
-		new Response(JSON.stringify([quote]), {
-			headers: { "content-type": "application/json" },
-			status: 200,
-		}),
-	);
-	globalThis.chrome = {
-		storage: { local: { get: storageGet, set: storageSet } },
-	} as unknown as typeof chrome;
-	globalThis.fetch = fetchMock as unknown as typeof fetch;
-});
+		expect(QUOTE_CATEGORIES).toHaveLength(8);
+		expect(QUOTES.length).toBeGreaterThan(0);
+		expect(QUOTES.length).toBeLessThanOrEqual(48);
+		expect(new Set(QUOTES.map((quote) => quote._id)).size).toBe(QUOTES.length);
 
-describe("quote service", () => {
-	test("validates cached quote data", () => {
-		expect(parseQuote(JSON.stringify(quote))).toEqual(quote);
-		expect(parseQuote("not-json")).toBeNull();
-		expect(parseQuote({ content: "Missing fields" })).toBeNull();
+		for (const category of QUOTE_CATEGORIES) {
+			expect(category.name.trim()).toBe(category.name);
+			expect(category.slug.trim()).toBe(category.slug);
+			expect(
+				QUOTES.some((quote) =>
+					quote.categories.some(
+						(quoteCategory) => quoteCategory === category.slug,
+					),
+				),
+			).toBe(true);
+		}
+
+		for (const quote of QUOTES) {
+			expect(quote.author.trim()).toBe(quote.author);
+			expect(quote.content.trim()).toBe(quote.content);
+			expect(quote.author).not.toBe("");
+			expect(quote.content).not.toBe("");
+			expect(quote.content.length).toBeLessThanOrEqual(80);
+			expect(quote.categories.length).toBeGreaterThan(0);
+			expect(
+				quote.categories.every((category) => supportedCategories.has(category)),
+			).toBe(true);
+		}
 	});
 
-	test("supports legacy cache entries and expires timestamped entries", () => {
-		const legacy = parseCachedQuote(JSON.stringify(quote));
-		const current = parseCachedQuote(
-			JSON.stringify({ ...quote, fetchedAt: 1_000 }),
-		);
-
-		expect(legacy).toEqual({ quote });
-		expect(legacy && isCachedQuoteFresh(legacy, "science", 1_001)).toBe(false);
-		expect(current && isCachedQuoteFresh(current, "science", 2_000)).toBe(
-			false,
-		);
-		expect(parseCachedQuote("not-json")).toBeNull();
+	test("selects across the full catalog at both random boundaries", () => {
+		expect(selectQuote([], () => 0)._id).toBe(QUOTES[0]?._id);
+		expect(selectQuote([], () => 0.999_999)._id).toBe(QUOTES.at(-1)?._id);
 	});
 
-	test("uses a fresh quote only for the same category selection", () => {
-		const cached = parseCachedQuote(
-			JSON.stringify({
-				_id: "one",
-				author: "Author",
-				categoriesKey: "science",
-				content: "Quote",
-				fetchedAt: 1_000,
-			}),
+	test("selects from one supported category", () => {
+		const category = QUOTE_CATEGORIES[0];
+		if (!category) throw new Error("Expected a quote category");
+		const eligible = QUOTES.filter((quote) =>
+			quote.categories.some((quoteCategory) => quoteCategory === category.slug),
 		);
 
-		expect(cached && isCachedQuoteFresh(cached, "science", 2_000)).toBe(true);
-		expect(cached && isCachedQuoteFresh(cached, "history", 2_000)).toBe(false);
-		expect(cached && isCachedQuoteFresh(cached, "science", 3_700_001)).toBe(
-			false,
+		expect(selectQuote([category.slug], () => 0)._id).toBe(eligible[0]?._id);
+		expect(selectQuote([category.slug], () => 0.999_999)._id).toBe(
+			eligible.at(-1)?._id,
 		);
 	});
 
-	test("encodes categories in the request URL", () => {
-		const url = new URL(buildQuoteUrl(["science", "self help"]));
-
-		expect(url.searchParams.get("tags")).toBe("science|self help");
-		expect(url.searchParams.get("maxLength")).toBe("80");
-	});
-
-	test("returns a fresh category-specific cache without fetching", async () => {
-		storageGet.mockResolvedValue({
-			[LOCAL_STORAGE.quote]: JSON.stringify({
-				...quote,
-				categoriesKey: "science|wisdom",
-				fetchedAt: Date.now(),
-			}),
-		});
-
-		await expect(
-			loadQuote(["wisdom", "science"], new AbortController().signal),
-		).resolves.toEqual(quote);
-		expect(fetchMock).not.toHaveBeenCalled();
-	});
-
-	test("fetches, validates, and caches a stale or missing quote", async () => {
-		await expect(
-			loadQuote(["self help"], new AbortController().signal),
-		).resolves.toEqual(quote);
-
-		const requestUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
-		expect(requestUrl.searchParams.get("tags")).toBe("self help");
-		expect(storageSet).toHaveBeenCalledTimes(1);
-		const writtenValue = storageSet.mock.calls[0]?.[0] as Record<
-			string,
-			string
-		>;
-		const cached = JSON.parse(writtenValue[LOCAL_STORAGE.quote]);
-		expect(cached).toMatchObject({ ...quote, categoriesKey: "self help" });
-		expect(typeof cached.fetchedAt).toBe("number");
-	});
-
-	test("falls back to any validated stale cache when refresh fails", async () => {
-		storageGet.mockResolvedValue({
-			[LOCAL_STORAGE.quote]: JSON.stringify(quote),
-		});
-		fetchMock.mockResolvedValueOnce(
-			new Response("unavailable", { status: 503 }),
+	test("combines supported categories with OR semantics", () => {
+		const categories = QUOTE_CATEGORIES.slice(0, 2).map(
+			(category) => category.slug,
+		);
+		const eligible = QUOTES.filter((quote) =>
+			quote.categories.some((category) => categories.includes(category)),
 		);
 
-		await expect(
-			loadQuote(["science"], new AbortController().signal),
-		).resolves.toEqual(quote);
-	});
-
-	test("rejects invalid responses when no fallback exists", async () => {
-		fetchMock.mockResolvedValueOnce(
-			new Response(JSON.stringify([{ content: "missing fields" }]), {
-				status: 200,
-			}),
-		);
-
-		await expect(loadQuote([], new AbortController().signal)).rejects.toThrow(
-			"invalid data",
+		expect(selectQuote(categories, () => 0)._id).toBe(eligible[0]?._id);
+		expect(selectQuote(categories, () => 0.999_999)._id).toBe(
+			eligible.at(-1)?._id,
 		);
 	});
 
-	test("does not hide a fetched quote when cache storage fails", async () => {
-		storageSet.mockRejectedValueOnce(new Error("quota exceeded"));
-		const warn = spyOn(console, "warn").mockImplementation(() => undefined);
-
-		await expect(loadQuote([], new AbortController().signal)).resolves.toEqual(
-			quote,
-		);
-		expect(warn).toHaveBeenCalledTimes(1);
-		warn.mockRestore();
+	test("falls back to all quotes for unsupported persisted categories", () => {
+		expect(selectQuote(["removed-category"], () => 0)._id).toBe(QUOTES[0]?._id);
 	});
 
-	test("continues without a readable cache and honors cancellation", async () => {
-		storageGet.mockRejectedValueOnce(new Error("storage unavailable"));
-		const warn = spyOn(console, "warn").mockImplementation(() => undefined);
-
-		await expect(loadQuote([], new AbortController().signal)).resolves.toEqual(
-			quote,
+	test("ignores unsupported values when a supported category is selected", () => {
+		const category = QUOTE_CATEGORIES[0];
+		if (!category) throw new Error("Expected a quote category");
+		const expected = QUOTES.find((quote) =>
+			quote.categories.some((quoteCategory) => quoteCategory === category.slug),
 		);
-		expect(warn).toHaveBeenCalledTimes(1);
-		warn.mockRestore();
 
-		const controller = new AbortController();
-		controller.abort();
-		await expect(loadQuote([], controller.signal)).rejects.toHaveProperty(
-			"name",
-			"AbortError",
+		expect(selectQuote(["removed-category", category.slug], () => 0)._id).toBe(
+			expected?._id,
 		);
 	});
 });

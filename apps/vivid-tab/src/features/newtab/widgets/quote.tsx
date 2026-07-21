@@ -1,5 +1,4 @@
 import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useSettings } from "@/providers/settings-provider";
 import { useQuote } from "./use-quote";
 
@@ -11,13 +10,7 @@ const Quote = () => {
 			},
 		},
 	} = useSettings();
-	const { isLoading, quote } = useQuote(categories);
-
-	if (isLoading) {
-		return <Skeleton className="h-24" />;
-	}
-
-	if (!quote) return null;
+	const quote = useQuote(categories);
 
 	return (
 		<Card className="p-6">

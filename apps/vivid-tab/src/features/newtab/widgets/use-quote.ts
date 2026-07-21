@@ -1,39 +1,18 @@
-import { useEffect, useState } from "react";
-import { loadQuote, type QuoteData } from "./quote-service";
+import { useMemo } from "react";
+import { type QuoteData, selectQuote } from "./quote-service";
 
-interface QuoteState {
-	isLoading: boolean;
-	quote: QuoteData | null;
-}
+// Each New Tab evaluates this module in a new document while React rerenders
+// within that document keep the selected quote stable.
+const NEW_TAB_RANDOM_VALUE = Math.random();
 
-const useQuote = (categories: readonly string[]): QuoteState => {
-	const [state, setState] = useState<QuoteState>({
-		isLoading: true,
-		quote: null,
-	});
+/** Selects once per New Tab mount and again only when its categories change. */
+const useQuote = (categories: readonly string[]): QuoteData => {
 	const categoriesKey = [...categories].sort().join("|");
 
-	useEffect(() => {
-		const controller = new AbortController();
-		const requestedCategories = categoriesKey ? categoriesKey.split("|") : [];
-		setState((current) =>
-			current.isLoading && current.quote === null
-				? current
-				: { isLoading: true, quote: null },
-		);
-
-		void loadQuote(requestedCategories, controller.signal)
-			.then((quote) => setState({ isLoading: false, quote }))
-			.catch(() => {
-				if (!controller.signal.aborted) {
-					setState({ isLoading: false, quote: null });
-				}
-			});
-
-		return () => controller.abort();
-	}, [categoriesKey]);
-
-	return state;
+	return useMemo(
+		() => selectQuote(categoriesKey.split("|"), () => NEW_TAB_RANDOM_VALUE),
+		[categoriesKey],
+	);
 };
 
 export { useQuote };

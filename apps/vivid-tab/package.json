@@ -15,6 +15,7 @@
 		"test:e2e:c": "bun e2e/run.ts chromium",
 		"test:e2e:ff": "bun e2e/run.ts firefox",
 		"test:e2e:types": "tsc --noEmit --project e2e/tsconfig.json",
+		"quotes:refresh": "bun scripts/refresh-quotes.ts",
 		"postinstall": "bun scripts/patch.ts",
 		"build:css": "tailwindcss -i ./src/styles/index.css -o ./build/chrome-mv3-prod/minified.css --minify"
 	},

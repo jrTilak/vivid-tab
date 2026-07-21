@@ -1,113 +1,55 @@
-import {
-	afterEach,
-	beforeEach,
-	describe,
-	expect,
-	mock,
-	test,
-} from "@test/jest";
-import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
+import { afterEach, describe, expect, test } from "@test/jest";
+import { cleanup, renderHook } from "@testing-library/react";
+import { QUOTE_CATEGORIES, QUOTES } from "@/data/quotes";
 import { useQuote } from "./use-quote";
 
-const quote = { _id: "one", author: "Author", content: "Quote" };
-const storageGet = mock(async () => ({}));
-const storageSet = mock(async (_values: Record<string, unknown>) => undefined);
-const fetchMock = mock(
-	async (_input: RequestInfo | URL, _init?: RequestInit) =>
-		new Response(JSON.stringify([quote])),
-);
-
-beforeEach(() => {
-	storageGet.mockReset();
-	storageGet.mockResolvedValue({});
-	storageSet.mockReset();
-	storageSet.mockResolvedValue(undefined);
-	fetchMock.mockReset();
-	fetchMock.mockResolvedValue(new Response(JSON.stringify([quote])));
-	globalThis.chrome = {
-		storage: { local: { get: storageGet, set: storageSet } },
-	} as unknown as typeof chrome;
-	globalThis.fetch = fetchMock as unknown as typeof fetch;
-});
-
-afterEach(() => {
-	cleanup();
-	mock.restore();
-});
+afterEach(cleanup);
 
 describe("useQuote", () => {
-	test("moves from loading to a validated quote", async () => {
-		const { result, rerender } = renderHook(
-			({ categories }) => useQuote(categories),
-			{ initialProps: { categories: ["science"] } },
-		);
-
-		expect(result.current).toEqual({ isLoading: true, quote: null });
-		await waitFor(() =>
-			expect(result.current).toEqual({ isLoading: false, quote }),
-		);
-
-		rerender({ categories: ["science"] });
-		expect(fetchMock).toHaveBeenCalledTimes(1);
-	});
-
-	test("settles with no quote after an unrecoverable request failure", async () => {
-		fetchMock.mockResolvedValueOnce(new Response("down", { status: 503 }));
+	test("returns a local quote synchronously", () => {
 		const { result } = renderHook(() => useQuote([]));
 
-		await waitFor(() =>
-			expect(result.current).toEqual({ isLoading: false, quote: null }),
-		);
+		expect(QUOTES.some((quote) => quote._id === result.current._id)).toBe(true);
 	});
 
-	test("returns to loading instead of showing a quote from old categories", async () => {
-		const { result, rerender, unmount } = renderHook(
-			({ categories }) => useQuote(categories),
-			{ initialProps: { categories: ["science"] } },
-		);
-		await waitFor(() => expect(result.current.quote).toEqual(quote));
+	test("returns a quote from the selected category", () => {
+		const category = QUOTE_CATEGORIES[0];
+		if (!category) throw new Error("Expected a quote category");
+		const { result } = renderHook(() => useQuote([category.slug]));
+		const selected = QUOTES.find((quote) => quote._id === result.current._id);
 
-		fetchMock.mockImplementationOnce((_input, init) => {
-			const signal = init?.signal as AbortSignal;
-			return new Promise<Response>((_resolve, reject) => {
-				signal.addEventListener(
-					"abort",
-					() => reject(new DOMException("Aborted", "AbortError")),
-					{ once: true },
-				);
-			});
-		});
-		rerender({ categories: ["wisdom"] });
-
-		expect(result.current).toEqual({ isLoading: true, quote: null });
-		unmount();
+		expect(selected?.categories).toContain(category.slug);
 	});
 
-	test("aborts obsolete category requests and the active request on unmount", async () => {
-		const signals: AbortSignal[] = [];
-		fetchMock.mockImplementation((_input, init) => {
-			const signal = init?.signal as AbortSignal;
-			signals.push(signal);
-
-			return new Promise<Response>((_resolve, reject) => {
-				signal.addEventListener(
-					"abort",
-					() => reject(new DOMException("Aborted", "AbortError")),
-					{ once: true },
-				);
-			});
-		});
-		const { rerender, unmount } = renderHook(
-			({ categories }) => useQuote(categories),
-			{ initialProps: { categories: ["science"] } },
+	test("keeps the quote when only category order changes", () => {
+		const categories = QUOTE_CATEGORIES.slice(0, 2).map(
+			(category) => category.slug,
 		);
-		await waitFor(() => expect(signals).toHaveLength(1));
+		const { result, rerender } = renderHook(
+			({ selected }) => useQuote(selected),
+			{ initialProps: { selected: categories } },
+		);
+		const firstQuote = result.current;
 
-		rerender({ categories: ["wisdom"] });
-		await waitFor(() => expect(signals).toHaveLength(2));
-		expect(signals[0]?.aborted).toBe(true);
+		rerender({ selected: [...categories].reverse() });
 
-		act(() => unmount());
-		expect(signals[1]?.aborted).toBe(true);
+		expect(result.current).toBe(firstQuote);
+	});
+
+	test("selects again when the category changes", () => {
+		const firstCategory = QUOTE_CATEGORIES[0];
+		const secondCategory = QUOTE_CATEGORIES[1];
+		if (!(firstCategory && secondCategory)) {
+			throw new Error("Expected at least two quote categories");
+		}
+		const { result, rerender } = renderHook(
+			({ selected }) => useQuote(selected),
+			{ initialProps: { selected: [firstCategory.slug] as string[] } },
+		);
+
+		rerender({ selected: [secondCategory.slug] });
+		const selected = QUOTES.find((quote) => quote._id === result.current._id);
+
+		expect(selected?.categories).toContain(secondCategory.slug);
 	});
 });

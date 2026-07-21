@@ -5,7 +5,6 @@ export const LAST_ONLINE_IMAGES_FETCHED_AT =
 	"vivid-tab.last-online-images-fetched-at";
 
 export const LOCAL_STORAGE = {
-	quote: "vivid-tab.cached-quote",
 	weather: "vivid-tab.cached-weather",
 	installedDate: "vivid-tab.installed-date",
 	reviewLastAskedAt: "vivid-tab.review-last-asked-at",

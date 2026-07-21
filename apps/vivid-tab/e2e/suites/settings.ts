@@ -23,45 +23,8 @@ const TODOS_STORAGE_KEY = "todos";
 
 const byAccessibleName = (name: string) => $(`aria/${name}`);
 
-const mockQuoteCategories = async () => {
-	await browser.execute(() => {
-		type QuoteMockWindow = Window & {
-			__vividTabOriginalFetch?: typeof window.fetch;
-		};
-		const pageWindow = window as QuoteMockWindow;
-
-		if (pageWindow.__vividTabOriginalFetch) return;
-
-		const originalFetch = window.fetch.bind(window);
-		pageWindow.__vividTabOriginalFetch = originalFetch;
-		window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
-			if (input === "https://api.quotable.io/tags") {
-				return Promise.resolve(
-					new Response(
-						JSON.stringify([
-							{
-								_id: "quote-technology",
-								name: "Technology",
-								slug: "technology",
-							},
-							{ _id: "quote-humor", name: "Humor", slug: "humor" },
-						]),
-						{
-							headers: { "content-type": "application/json" },
-							status: 200,
-						},
-					),
-				);
-			}
-
-			return originalFetch(input, init);
-		}) as typeof window.fetch;
-	});
-};
-
 const openSettingsDialog = async () => {
 	await openExtensionPage("newtab");
-	await mockQuoteCategories();
 
 	const trigger = byAccessibleName("Open settings");
 	await expect(trigger).toBeDisplayed();
@@ -557,6 +520,13 @@ export const runSettingsSuite = (browserName: BrowserName) => {
 		it("persists quote categories and handles todo duration boundaries", async () => {
 			await openSettingsDialog();
 			await openSettingsTab("Quotes");
+			await setCheckbox("technology", true);
+			await byAccessibleName("Clear quote categories").click();
+			await expect($("#technology")).toHaveAttribute("aria-checked", "false");
+			await waitForSettings(
+				(settings) => settings.widgets.quotes.categories.length === 0,
+				"Quote categories were not cleared",
+			);
 			await setCheckbox("technology", true);
 
 			await openSettingsTab("Todos");
