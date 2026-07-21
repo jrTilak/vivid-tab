@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "@test";
 import { resolveDevOverrides } from "./dev-overrides";
 
 describe("resolveDevOverrides", () => {
@@ -40,6 +40,20 @@ describe("resolveDevOverrides", () => {
 			radius: undefined,
 			visualEffect: undefined,
 			theme: undefined,
+		});
+	});
+
+	test("keeps valid overrides when other values are missing", () => {
+		expect(
+			resolveDevOverrides({
+				NODE_ENV: "development",
+				PLASMO_PUBLIC_DEV_RADIUS: "sm",
+				PLASMO_PUBLIC_DEV_THEME: "system",
+			}),
+		).toEqual({
+			radius: "sm",
+			visualEffect: undefined,
+			theme: "system",
 		});
 	});
 });

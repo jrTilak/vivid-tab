@@ -5,8 +5,8 @@ import {
 	SETTINGS_STORAGE_KEY,
 	serializeSettings,
 } from "@/lib/settings-storage";
-import { openImageDB, type StoredImage } from "@/lib/wallpaper-database";
-import { Wallhaven, type WallhavenImage } from "./extensions/wallhaven";
+import { openImageDB, type StoredImage } from "./database";
+import { Wallhaven, type WallhavenImage } from "./wallhaven";
 
 const ONLINE_IMAGE_REFRESH_INTERVAL_MS = 60 * 60 * 1000;
 
@@ -16,15 +16,20 @@ type ReplaceOnlineImagesResult = {
 };
 
 class Wallpaper {
-	private readonly provider = new Wallhaven();
-	private refreshPromise: Promise<void> | null = null;
+	private readonly _provider = new Wallhaven();
+	private _refreshPromise: Promise<void> | null = null;
+	private _refreshIsForced = false;
+	private _forcedRefreshQueued = false;
 
-	/** Replaces one provider's records atomically in a single IndexedDB transaction. */
-	private async replaceOnlineImages(
+	/**
+	 * Replaces one provider's records atomically in a single IndexedDB
+	 * transaction while leaving uploaded and unknown-provider images intact.
+	 */
+	private async _replaceOnlineImages(
 		images: readonly WallhavenImage[],
 	): Promise<ReplaceOnlineImagesResult> {
 		const db = await openImageDB();
-		const source = this.provider.sourceName;
+		const source = this._provider.sourceName;
 		const now = Date.now();
 		const storedImages = images.map<StoredImage>(({ src, thumbnailSrc }) => ({
 			fetchedAt: now,
@@ -71,17 +76,54 @@ class Wallpaper {
 		}
 	}
 
-	/** Coalesces alarm and UI refreshes so they cannot replace each other's IDs. */
+	/**
+	 * Refreshes cached online choices while coalescing simultaneous callers.
+	 *
+	 * Automatic refreshes honor rotation, cache age, and active-tab checks.
+	 * Forced refreshes bypass those gates for onboarding and explicit UI actions.
+	 *
+	 * @param forceFetch - Whether to bypass automatic refresh throttling.
+	 * @returns The shared in-flight refresh promise, if one already exists.
+	 */
 	fetchOnlineImages(forceFetch = false): Promise<void> {
-		this.refreshPromise ??= this.refreshOnlineImages(forceFetch).finally(() => {
-			this.refreshPromise = null;
+		if (this._refreshPromise) {
+			/* A UI refresh must not be swallowed by an automatic throttled request. */
+			if (forceFetch && !this._refreshIsForced) {
+				this._forcedRefreshQueued = true;
+			}
+
+			return this._refreshPromise;
+		}
+
+		this._refreshIsForced = forceFetch;
+		this._refreshPromise = this._runRefreshQueue(forceFetch).finally(() => {
+			this._refreshPromise = null;
+			this._refreshIsForced = false;
+			this._forcedRefreshQueued = false;
 		});
 
-		return this.refreshPromise;
+		return this._refreshPromise;
 	}
 
-	/** Fetches fresh online wallpapers and stores only their remote URLs. */
-	private async refreshOnlineImages(forceFetch: boolean): Promise<void> {
+	/**
+	 * Drains one queued forced refresh after the current automatic refresh. This
+	 * preserves explicit user intent without allowing an unbounded request queue.
+	 */
+	private async _runRefreshQueue(forceFetch: boolean): Promise<void> {
+		await this._refreshOnlineImages(forceFetch);
+
+		if (!this._forcedRefreshQueued) return;
+
+		this._forcedRefreshQueued = false;
+		this._refreshIsForced = true;
+		await this._refreshOnlineImages(true);
+	}
+
+	/**
+	 * Applies refresh policy, fetches remote choices, then reconciles IndexedDB
+	 * IDs with the latest settings value to preserve concurrent user changes.
+	 */
+	private async _refreshOnlineImages(forceFetch: boolean): Promise<void> {
 		try {
 			const result = await chrome.storage.sync.get(SETTINGS_STORAGE_KEY);
 			const resolved = resolveStoredSettings(result[SETTINGS_STORAGE_KEY]);
@@ -121,25 +163,32 @@ class Wallpaper {
 				if (activeTabs.length === 0) return;
 			}
 
-			const images = await this.provider.fetchImages(
+			const images = await this._provider.fetchImages(
 				wallpapers.onlineImages.keywords.split(","),
 				20,
 			);
 
 			if (images.length === 0) return;
 
-			const { ids, removedIds } = await this.replaceOnlineImages(images);
-			if (ids.length === 0) return;
-
 			/*
-			 * Fetching can take seconds. Re-read settings before writing so changes made
-			 * during the request survive. Unknown legacy-provider records are retained.
+			 * Fetching can take seconds. Re-read before touching IndexedDB so disabling
+			 * online images during the request takes effect and other changes survive.
 			 */
 			const latestResult = await chrome.storage.sync.get(SETTINGS_STORAGE_KEY);
 			const latest = resolveStoredSettings(
 				latestResult[SETTINGS_STORAGE_KEY],
 			).settings;
 			const currentWallpapers = latest.appearance.wallpapers;
+			if (!currentWallpapers.onlineImages.enabled) return;
+
+			const { ids, removedIds } = await this._replaceOnlineImages(images);
+			const firstNewImageId = ids[0];
+			if (!firstNewImageId) return;
+
+			/**
+			 * @deprecated Preserve unknown provider IDs through v1.4.0, then remove
+			 * this compatibility behavior in v1.5.0.
+			 */
 			const preservedIds = currentWallpapers.images.filter(
 				(id) => !removedIds.has(id),
 			);
@@ -156,7 +205,7 @@ class Wallpaper {
 							images: nextImageIds,
 							selectedImageId:
 								selectedImageId && !nextImageIds.includes(selectedImageId)
-									? (ids[0] ?? null)
+									? firstNewImageId
 									: selectedImageId,
 						},
 					},
@@ -172,4 +221,7 @@ class Wallpaper {
 	}
 }
 
+/**
+ * Shared online-wallpaper service for background alarms and settings actions.
+ */
 export const wallpaper = new Wallpaper();

@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "@test";
 import { DEFAULT_SETTINGS, SETTINGS_VERSION } from "@/constants/settings";
 import {
 	createDefaultSettings,
@@ -36,9 +36,9 @@ describe("settings normalization", () => {
 			},
 		});
 
-		expect(result.wasReset).toBeFalse();
+		expect(result.wasReset).toBe(false);
 		expect(result.settings.general.rootFolder).toBe("custom-folder");
-		expect(result.settings.general.showHistory).toBeFalse();
+		expect(result.settings.general.showHistory).toBe(false);
 		expect(result.settings.widgets.timer).toEqual({
 			timeFormat: "24h",
 			showSeconds: false,
@@ -61,8 +61,8 @@ describe("settings normalization", () => {
 			appearance: { visualEffect: "blurred" },
 		});
 
-		expect(radius.wasReset).toBeTrue();
-		expect(visualEffect.wasReset).toBeTrue();
+		expect(radius.wasReset).toBe(true);
+		expect(visualEffect.wasReset).toBe(true);
 	});
 
 	test("keeps widget layout atomic so hidden widgets stay hidden", () => {
@@ -72,7 +72,7 @@ describe("settings normalization", () => {
 			widgets: { layout },
 		});
 
-		expect(result.wasReset).toBeFalse();
+		expect(result.wasReset).toBe(false);
 		expect(result.settings.widgets.layout).toEqual(layout);
 		expect(result.settings.widgets.layout).not.toHaveProperty("1");
 
@@ -81,7 +81,7 @@ describe("settings normalization", () => {
 			widgets: { layout: {} },
 		});
 
-		expect(emptyLayout.wasReset).toBeFalse();
+		expect(emptyLayout.wasReset).toBe(false);
 		expect(emptyLayout.settings.widgets.layout).toEqual({});
 	});
 
@@ -99,9 +99,44 @@ describe("settings normalization", () => {
 			version: SETTINGS_VERSION,
 		});
 
-		expect(duplicateWidget.wasReset).toBeTrue();
-		expect(invalidPosition.wasReset).toBeTrue();
-		expect(extremeBlur.wasReset).toBeTrue();
+		expect(duplicateWidget.wasReset).toBe(true);
+		expect(invalidPosition.wasReset).toBe(true);
+		expect(extremeBlur.wasReset).toBe(true);
+	});
+
+	test("accepts numeric boundaries and rejects values immediately outside them", () => {
+		const boundaries = normalizeSettings({
+			version: SETTINGS_VERSION,
+			appearance: {
+				background: { blurIntensity: 0, brightness: 10 },
+			},
+			widgets: {
+				todos: {
+					expireAfterCompleted: { durationInMinutes: 525_600 },
+				},
+			},
+		});
+		const negativeBlur = normalizeSettings({
+			version: SETTINGS_VERSION,
+			appearance: { background: { blurIntensity: -1 } },
+		});
+		const excessiveTodoDuration = normalizeSettings({
+			version: SETTINGS_VERSION,
+			widgets: {
+				todos: {
+					expireAfterCompleted: { durationInMinutes: 525_601 },
+				},
+			},
+		});
+
+		expect(boundaries.wasReset).toBe(false);
+		expect(boundaries.settings.appearance.background.blurIntensity).toBe(0);
+		expect(boundaries.settings.appearance.background.brightness).toBe(10);
+		expect(
+			boundaries.settings.widgets.todos.expireAfterCompleted.durationInMinutes,
+		).toBe(525_600);
+		expect(negativeBlur.wasReset).toBe(true);
+		expect(excessiveTodoDuration.wasReset).toBe(true);
 	});
 
 	test("resets the complete settings object after validation failure", () => {
@@ -111,7 +146,7 @@ describe("settings normalization", () => {
 			widgets: { timer: { showSeconds: "yes" } },
 		});
 
-		expect(result.wasReset).toBeTrue();
+		expect(result.wasReset).toBe(true);
 		expect(result.settings).toEqual(createDefaultSettings());
 		expect(result.settings.general.rootFolder).toBe(
 			DEFAULT_SETTINGS.general.rootFolder,
@@ -123,13 +158,16 @@ describe("settings normalization", () => {
 		const legacyVersion = normalizeSettings({ version: 0 });
 		const future = normalizeSettings({ version: SETTINGS_VERSION + 1 });
 
-		expect(malformed.wasReset).toBeTrue();
-		expect(malformed.shouldPersist).toBeTrue();
+		expect(malformed.wasReset).toBe(true);
+		expect(malformed.shouldPersist).toBe(true);
 		expect(malformed.settings).toEqual(createDefaultSettings());
-		expect(legacyVersion.wasReset).toBeTrue();
+		expect(malformed.error).toBeInstanceOf(SyntaxError);
+		expect(legacyVersion.wasReset).toBe(true);
 		expect(legacyVersion.settings).toEqual(createDefaultSettings());
-		expect(future.wasReset).toBeTrue();
+		expect(legacyVersion.error).toBeDefined();
+		expect(future.wasReset).toBe(true);
 		expect(future.settings).toEqual(createDefaultSettings());
+		expect(future.error).toBeDefined();
 	});
 
 	test("resets legacy unversioned settings before deep merge", () => {
@@ -141,10 +179,23 @@ describe("settings normalization", () => {
 		const stored = JSON.stringify(legacy);
 		const resolved = resolveStoredSettings(stored);
 
-		expect(result.wasReset).toBeTrue();
+		expect(result.wasReset).toBe(true);
 		expect(result.settings).toEqual(createDefaultSettings());
 		expect(resolved.legacyBackup).toBe(stored);
 		expect(LEGACY_SETTINGS_STORAGE_KEY).toBe("settingsLegacyUnversioned");
+	});
+
+	test("backs up a serializable legacy object before resetting it", () => {
+		const legacy = {
+			general: { rootFolder: "legacy-folder" },
+			timer: { showSeconds: true },
+		};
+		const result = resolveStoredSettings(legacy);
+
+		expect(result.wasReset).toBe(true);
+		expect(result.shouldPersist).toBe(true);
+		expect(result.legacyBackup).toBe(JSON.stringify(legacy));
+		expect(result.settings).toEqual(createDefaultSettings());
 	});
 
 	test("strips unknown keys and avoids rewriting canonical storage", () => {
@@ -160,14 +211,14 @@ describe("settings normalization", () => {
 			},
 		});
 
-		expect(normalized.wasReset).toBeFalse();
+		expect(normalized.wasReset).toBe(false);
 		expect(normalized.settings).not.toHaveProperty("obsolete");
 		expect(normalized.settings.widgets.timer).not.toHaveProperty("obsolete");
 
 		const stored = serializeSettings(normalized.settings);
 		const resolved = resolveStoredSettings(stored);
 
-		expect(resolved.shouldPersist).toBeFalse();
+		expect(resolved.shouldPersist).toBe(false);
 	});
 
 	test("persists a canonical value when stored JSON needs cleanup", () => {
@@ -178,8 +229,8 @@ describe("settings normalization", () => {
 		});
 		const resolved = resolveStoredSettings(stored);
 
-		expect(resolved.wasReset).toBeFalse();
-		expect(resolved.shouldPersist).toBeTrue();
+		expect(resolved.wasReset).toBe(false);
+		expect(resolved.shouldPersist).toBe(true);
 		expect(resolved.settings.general.rootFolder).toBe("kept-folder");
 		expect(resolved.settings).not.toHaveProperty("obsolete");
 		expect(resolved.serialized).not.toBe(stored);
@@ -188,17 +239,35 @@ describe("settings normalization", () => {
 	test("treats missing storage as first run, not corruption", () => {
 		const result = resolveStoredSettings(undefined);
 
-		expect(result.wasReset).toBeFalse();
-		expect(result.shouldPersist).toBeTrue();
+		expect(result.wasReset).toBe(false);
+		expect(result.shouldPersist).toBe(true);
 		expect(result.settings).toEqual(createDefaultSettings());
 	});
 
-	test.todo("migrates legacy unversioned settings into grouped v1 settings", () => {
-		const result = normalizeSettings({
-			timer: { timeFormat: "24h", showSeconds: true },
-		});
+	test("accepts object storage but rewrites it to canonical JSON", () => {
+		const storedObject = {
+			version: SETTINGS_VERSION,
+			general: { rootFolder: "object-folder" },
+		};
+		const result = resolveStoredSettings(storedObject);
 
-		expect(result.wasReset).toBeFalse();
-		expect(result.settings.widgets.timer.timeFormat).toBe("24h");
+		expect(result.wasReset).toBe(false);
+		expect(result.shouldPersist).toBe(true);
+		expect(result.settings.general.rootFolder).toBe("object-folder");
+		expect(JSON.parse(result.serialized)).toEqual(result.settings);
 	});
+
+	test("still resets a non-serializable legacy object safely", () => {
+		const legacy: Record<string, unknown> = {};
+		legacy.self = legacy;
+
+		const result = resolveStoredSettings(legacy);
+
+		expect(result.wasReset).toBe(true);
+		expect(result.shouldPersist).toBe(true);
+		expect(result.legacyBackup).toBeUndefined();
+		expect(result.settings).toEqual(createDefaultSettings());
+	});
+
+	test.todo("migrates legacy unversioned settings into grouped v1 settings");
 });

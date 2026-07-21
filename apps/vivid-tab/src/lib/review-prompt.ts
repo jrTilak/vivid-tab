@@ -19,6 +19,13 @@ const parseDate = (value: unknown): Date | undefined => {
 	return Number.isNaN(date.getTime()) ? undefined : date;
 };
 
+/**
+ * Converts untrusted extension storage into the normalized state used by the
+ * review schedule. Invalid dates and counters fall back to safe empty values.
+ *
+ * @param stored - Raw values returned by `chrome.storage.local.get`.
+ * @returns Parsed dates and a finite, non-negative integer prompt count.
+ */
 export const parseReviewPromptState = (
 	stored: Record<string, unknown>,
 ): ReviewPromptState => {
@@ -27,10 +34,21 @@ export const parseReviewPromptState = (
 	return {
 		installedAt: parseDate(stored[LOCAL_STORAGE.installedDate]),
 		lastAskedAt: parseDate(stored[LOCAL_STORAGE.reviewLastAskedAt]),
-		timesAsked: typeof timesAsked === "number" ? Math.max(0, timesAsked) : 0,
+		timesAsked:
+			typeof timesAsked === "number" && Number.isFinite(timesAsked)
+				? Math.max(0, Math.floor(timesAsked))
+				: 0,
 	};
 };
 
+/**
+ * Determines whether the review dialog is due at a specific time.
+ * The first prompt waits seven days and subsequent prompts wait ninety days.
+ *
+ * @param state - Previously normalized installation and prompt history.
+ * @param now - Current time, passed explicitly to keep the decision deterministic.
+ * @returns `true` only when another prompt is allowed and its delay has elapsed.
+ */
 export const shouldShowReviewPrompt = (state: ReviewPromptState, now: Date) => {
 	if (!state.installedAt || state.timesAsked >= MAX_PROMPTS) return false;
 
@@ -50,7 +68,13 @@ export const shouldShowReviewPrompt = (state: ReviewPromptState, now: Date) => {
 
 let promptCheckPromise: Promise<boolean> | undefined;
 
-/** Atomically checks and records an automatic review prompt for this context. */
+/**
+ * Reads, checks, and records the automatic review prompt as one shared task.
+ * Concurrent callers reuse the same promise so one page context cannot increment
+ * the prompt count twice. A failed read or write clears the task for later retry.
+ *
+ * @returns Whether the caller should display the review prompt.
+ */
 export const checkAndRecordReviewPrompt = () => {
 	promptCheckPromise ??= (async () => {
 		const result = await chrome.storage.local.get([

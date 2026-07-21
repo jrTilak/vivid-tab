@@ -2,10 +2,13 @@ type PlainObject = Record<string, unknown>;
 
 const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
 
+/**
+ * Controls path-specific replacement behavior while merging persisted data.
+ */
 export interface DeepMergeOptions {
 	/**
-	 * Return true when a value should replace its default atomically instead of
-	 * recursively merging its object properties.
+	 * Decides whether the persisted value at a path replaces its default as one
+	 * atomic value instead of recursively merging object properties.
 	 */
 	shouldReplace?: (path: readonly string[]) => boolean;
 }
@@ -46,6 +49,22 @@ const cloneValue = (value: unknown): unknown => {
  * defaults as complete values. An invalid type is deliberately preserved so the
  * caller's runtime schema can reject it instead of silently hiding corruption.
  * Missing (`undefined`) values receive a fresh clone of the corresponding default.
+ * Prototype-mutating keys are omitted at every cloned or merged object level.
+ *
+ * @param defaults - Current complete value used to fill fields absent from storage.
+ * @param persisted - Partial or untrusted value read from persistent storage.
+ * @param options - Optional rules for values that must be replaced atomically.
+ * @returns A detached merged value without mutating either input.
+ *
+ * @example
+ * ```ts
+ * deepMerge(
+ *   { widgets: { layout: { 0: "searchbar", 1: "clock" } } },
+ *   { widgets: { layout: { 0: "searchbar" } } },
+ *   { shouldReplace: (path) => path.join(".") === "widgets.layout" },
+ * );
+ * // { widgets: { layout: { 0: "searchbar" } } }
+ * ```
  */
 export const deepMerge = (
 	defaults: unknown,

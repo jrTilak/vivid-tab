@@ -1,6 +1,10 @@
 const IMAGE_DB_NAME = "ImageDB";
 const IMAGE_DB_VERSION = 2;
 
+/**
+ * Wallpaper metadata persisted in IndexedDB. Uploaded images store their data
+ * URL in `src`; remote images may provide a smaller gallery thumbnail.
+ */
 export interface StoredImage {
 	id: string;
 	src: string;
@@ -10,7 +14,14 @@ export interface StoredImage {
 	thumbnailSrc?: string;
 }
 
-/** Opens the wallpaper database. Callers close the connection after a transaction. */
+/**
+ * Opens the shared IndexedDB database used for uploaded and online wallpapers.
+ *
+ * The caller owns the returned connection and must close it after its
+ * transaction completes.
+ *
+ * @returns An open connection whose `images` store is ready for transactions.
+ */
 export const openImageDB = (): Promise<IDBDatabase> =>
 	new Promise((resolve, reject) => {
 		const request = indexedDB.open(IMAGE_DB_NAME, IMAGE_DB_VERSION);
@@ -25,10 +36,18 @@ export const openImageDB = (): Promise<IDBDatabase> =>
 
 		request.onsuccess = () => resolve(request.result);
 		request.onerror = () =>
-			reject(new Error(`Failed to open ImageDB: ${request.error?.message}`));
+			reject(
+				new Error(
+					`Failed to open ImageDB: ${request.error?.message ?? "unknown error"}`,
+				),
+			);
 	});
 
-/** Resolves after IndexedDB has removed all stored wallpaper records. */
+/**
+ * Deletes the complete wallpaper database, including uploaded image data.
+ *
+ * @returns A promise that settles when IndexedDB finishes the delete request.
+ */
 export const deleteWallpaperDatabase = (): Promise<void> =>
 	new Promise((resolve, reject) => {
 		const request = indexedDB.deleteDatabase(IMAGE_DB_NAME);

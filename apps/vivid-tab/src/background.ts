@@ -1,120 +1,36 @@
-import * as z from "zod/mini";
-import { ALARMS, BACKGROUND_ACTIONS } from "./constants/background-actions";
-import {
-	DEFAULT_BOOKMARK_FOLDER_NAME,
-	LEGACY_BOOKMARK_FOLDER_NAME,
-	LOCAL_STORAGE,
-} from "./constants/keys";
-import { wallpaper } from "./lib/wallpapers";
+import { ALARMS, BACKGROUND_ACTIONS } from "@/constants/background-actions";
+import { LOCAL_STORAGE } from "@/constants/keys";
+import { resolveBookmarkRootFolder } from "@/lib/bookmarks";
+import { resolveSearchTarget } from "@/lib/search-query";
+import { wallpaper } from "@/lib/wallpapers/service";
 
-const URL_SCHEMA = z.url();
-
-const getBookmarkTree = () =>
-	new Promise<chrome.bookmarks.BookmarkTreeNode[]>((resolve, reject) => {
-		chrome.bookmarks.getTree((bookmarkTree) => {
-			const runtimeError = chrome.runtime.lastError;
-
-			if (runtimeError) {
-				reject(new Error(runtimeError.message));
-				return;
-			}
-
-			resolve(bookmarkTree);
-		});
-	});
-
-const getBookmarkById = (bookmarkId: string) =>
-	new Promise<chrome.bookmarks.BookmarkTreeNode | undefined>((resolve) => {
-		chrome.bookmarks.get(bookmarkId, (bookmarks) => {
-			if (chrome.runtime.lastError) {
-				resolve(undefined);
-				return;
-			}
-
-			resolve(bookmarks[0]);
-		});
-	});
-
-const findBookmarkFolder = (
-	bookmarkTree: chrome.bookmarks.BookmarkTreeNode[],
-	predicate: (node: chrome.bookmarks.BookmarkTreeNode) => boolean,
-): chrome.bookmarks.BookmarkTreeNode | undefined => {
-	for (const node of bookmarkTree) {
-		if (
-			node.url === undefined &&
-			node.parentId !== undefined &&
-			predicate(node)
-		) {
-			return node;
-		}
-
-		const nestedMatch = node.children
-			? findBookmarkFolder(node.children, predicate)
-			: undefined;
-
-		if (nestedMatch) return nestedMatch;
-	}
-
-	return undefined;
-};
-
-const createBookmarkFolder = () =>
-	new Promise<chrome.bookmarks.BookmarkTreeNode>((resolve, reject) => {
-		chrome.bookmarks.create(
-			{ title: DEFAULT_BOOKMARK_FOLDER_NAME },
-			(bookmarkFolder) => {
-				const runtimeError = chrome.runtime.lastError;
-
-				if (runtimeError) {
-					reject(new Error(runtimeError.message));
-					return;
-				}
-
-				resolve(bookmarkFolder);
-			},
-		);
-	});
-
-let rootFolderCreationPromise:
-	| Promise<chrome.bookmarks.BookmarkTreeNode>
-	| undefined;
-
-/** Validates the configured folder, reuses the default, or creates it once. */
-const ensureRootBookmarkFolder = async (rootFolderId: string) => {
-	if (rootFolderId) {
-		const configuredFolder = await getBookmarkById(rootFolderId);
-		if (configuredFolder && configuredFolder.url === undefined) {
-			return configuredFolder.id;
-		}
-	}
-
-	const bookmarkTree = await getBookmarkTree();
-
-	const defaultFolder = findBookmarkFolder(
-		bookmarkTree,
-		(node) =>
-			node.title === DEFAULT_BOOKMARK_FOLDER_NAME ||
-			node.title === LEGACY_BOOKMARK_FOLDER_NAME,
-	);
-
-	if (defaultFolder) return defaultFolder.id;
-
-	rootFolderCreationPromise ??= createBookmarkFolder().finally(() => {
-		rootFolderCreationPromise = undefined;
-	});
-
-	return (await rootFolderCreationPromise).id;
-};
+const WELCOME_PAGE_PATH = "tabs/welcome.html";
+const ONLINE_WALLPAPER_REFRESH_MINUTES = 180;
 
 /**
- * Handles background communication
+ * @deprecated Kept for one final cleanup cycle and planned for removal in the
+ * next release.
  */
-chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
+const LEGACY_DOWNLOAD_ALARM = "DOWNLOAD_PENDING_IMAGES";
+
+/* Only the bookmark request needs to keep Chrome's response channel open. */
+chrome.runtime.onMessage.addListener((message: unknown, _, sendResponse) => {
+	if (
+		message === null ||
+		typeof message !== "object" ||
+		!("action" in message)
+	) {
+		return undefined;
+	}
+
 	switch (message.action) {
-		case BACKGROUND_ACTIONS.ENSURE_ROOT_BOOKMARK_FOLDER:
-			void ensureRootBookmarkFolder(
-				typeof message.rootFolderId === "string" ? message.rootFolderId : "",
-			).then(
+		case BACKGROUND_ACTIONS.ENSURE_ROOT_BOOKMARK_FOLDER: {
+			const rootFolderId =
+				"rootFolderId" in message && typeof message.rootFolderId === "string"
+					? message.rootFolderId
+					: "";
+
+			void resolveBookmarkRootFolder(rootFolderId).then(
 				(folderId) => sendResponse({ folderId, ok: true }),
 				(error: unknown) =>
 					sendResponse({
@@ -124,70 +40,76 @@ chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
 			);
 
 			return true;
+		}
 
-		case BACKGROUND_ACTIONS.SEARCH_QUERY:
-			{
-				let { query, openIn } = message as {
-					query: string;
-					openIn: "new-tab" | "current-tab";
-				};
+		case BACKGROUND_ACTIONS.SEARCH_QUERY: {
+			const openIn = "openIn" in message ? message.openIn : undefined;
+			if (openIn !== "current-tab" && openIn !== "new-tab") return undefined;
 
-				let { success: isValidUrl } = z.safeParse(URL_SCHEMA, query);
+			const query = "query" in message ? message.query : undefined;
+			const target = resolveSearchTarget(query);
 
-				// for example, google.com is a valid url
-				if (
-					!isValidUrl &&
-					query
-						.split(".")
-						.map((part) => part.trim())
-						.filter(Boolean).length >= 2
-				) {
-					isValidUrl = true;
-					query = `https://${query}`;
-				}
-
-				if (isValidUrl) {
-					if (openIn === "new-tab") {
-						chrome.tabs.create({ url: query });
-					} else {
-						chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-							if (tabs.length > 0) {
-								chrome.tabs.update(tabs[0].id, { url: query });
-							}
-						});
-					}
-				} else {
-					chrome.search.query({
-						text: query,
-						disposition: openIn === "new-tab" ? "NEW_TAB" : "CURRENT_TAB",
-					});
-				}
+			if (target.kind === "search") {
+				void chrome.search.query({
+					disposition: openIn === "new-tab" ? "NEW_TAB" : "CURRENT_TAB",
+					text: target.query,
+				});
+				return undefined;
 			}
 
-			return true;
+			if (openIn === "new-tab") {
+				void chrome.tabs.create({ url: target.url });
+				return undefined;
+			}
+
+			chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+				const activeTabId = tabs[0]?.id;
+				if (typeof activeTabId === "number") {
+					void chrome.tabs.update(activeTabId, { url: target.url });
+				}
+			});
+
+			return undefined;
+		}
+
+		default:
+			return undefined;
 	}
 });
 
 chrome.runtime.onInstalled.addListener((details) => {
-	if (details.reason === "install") {
-		chrome.tabs.create({ url: chrome.runtime.getURL("tabs/welcome.html") });
+	switch (details.reason) {
+		case "install":
+			void chrome.tabs.create({
+				url: chrome.runtime.getURL(WELCOME_PAGE_PATH),
+			});
+			void chrome.storage.local.set({
+				[LOCAL_STORAGE.installedDate]: new Date().toString(),
+			});
+			void wallpaper.fetchOnlineImages(true);
+			break;
 
-		// also save installed date
-		chrome.storage.local.set({
-			[LOCAL_STORAGE.installedDate]: new Date().toString(),
-		});
+		case "update": {
+			const updateUrl = process.env.PLASMO_PUBLIC_UPDATE_URL?.trim();
+			if (updateUrl) void chrome.tabs.create({ url: updateUrl });
+			break;
+		}
 
-		void wallpaper.fetchOnlineImages(true);
+		default:
+			break;
 	}
 
-	// Refresh remote choices periodically; displayed URLs use the browser cache.
-	chrome.alarms.create(ALARMS.FETCH_ONLINE_IMAGES, { periodInMinutes: 60 * 3 });
+	chrome.alarms.create(ALARMS.FETCH_ONLINE_IMAGES, {
+		periodInMinutes: ONLINE_WALLPAPER_REFRESH_MINUTES,
+	});
 
-	// Remove the obsolete base64-download job left by older installations.
-	void chrome.alarms.clear("DOWNLOAD_PENDING_IMAGES");
+	/**
+	 * @deprecated Older releases stored downloaded wallpapers as base64. Remove
+	 * this alarm cleanup in v1.5.0 after the v1.4.0 upgrade window.
+	 */
+	void chrome.alarms.clear(LEGACY_DOWNLOAD_ALARM);
 });
 
-// Handle alarm for periodic image fetching
 chrome.alarms.onAlarm.addListener((alarm) => {
 	switch (alarm.name) {
 		case ALARMS.FETCH_ONLINE_IMAGES:
@@ -199,6 +121,5 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 	}
 });
 
-if (process.env.PLASMO_PUBLIC_UNINSTALL_URL) {
-	chrome.runtime.setUninstallURL(process.env.PLASMO_PUBLIC_UNINSTALL_URL);
-}
+const uninstallUrl = process.env.PLASMO_PUBLIC_UNINSTALL_URL?.trim();
+if (uninstallUrl) void chrome.runtime.setUninstallURL(uninstallUrl);

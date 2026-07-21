@@ -3,6 +3,7 @@ declare namespace NodeJS {
 		readonly PLASMO_PUBLIC_BROWSER_NAME?: "chrome" | "firefox";
 		readonly PLASMO_PUBLIC_WEATHER_API_KEY?: string;
 		readonly PLASMO_PUBLIC_UNINSTALL_URL?: string;
+		readonly PLASMO_PUBLIC_UPDATE_URL?: string;
 		readonly PLASMO_PUBLIC_FEEDBACK_URL?: string;
 		readonly PLASMO_PUBLIC_CHROME_WEBSTORE_URL?: string;
 		readonly PLASMO_PUBLIC_FIREFOX_ADDON_URL?: string;

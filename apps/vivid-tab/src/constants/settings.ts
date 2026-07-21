@@ -1,4 +1,4 @@
-import { DEFAULT_WALLHAVEN_KEYWORDS } from "./wallpapers";
+import { DEFAULT_SEARCH_TERMS } from "./wallpapers";
 
 /**
  * Increment when the persisted shape changes incompatibly and add a migration
@@ -58,7 +58,7 @@ export const DEFAULT_SETTINGS = {
 			images: [] as string[],
 			onlineImages: {
 				enabled: true,
-				keywords: DEFAULT_WALLHAVEN_KEYWORDS,
+				keywords: DEFAULT_SEARCH_TERMS.join(", "),
 			},
 		},
 		background: {

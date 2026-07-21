@@ -39,6 +39,8 @@ const getErrorMessage = (error: unknown) =>
  * TypeScript 7 no longer ships tsserver. Bun can leave the old TypeScript 5
  * executable symlink behind after an upgrade, and Parcel fails while scanning
  * that dangling entry. Remove only the broken legacy shim.
+ *
+ * @deprecated Remove in v1.5.0 after all v1.4.0 installs have refreshed dependencies.
  */
 const removeDanglingTsserverShim = (
 	tsserverPath: string = path.resolve(
