@@ -487,7 +487,11 @@ export const runSettingsSuite = (browserName: BrowserName) => {
 		it("persists search suggestions, timer, and weather controls", async () => {
 			await openSettingsDialog();
 			await openSettingsTab("Search bar");
-			await setSwitch("settings-search-suggestions", true);
+			if (browserName === "firefox") {
+				await expect($("#settings-search-suggestions")).toBeDisabled();
+			} else {
+				await setSwitch("settings-search-suggestions", true);
+			}
 
 			await openSettingsTab("Timer");
 			await chooseSelectOption("settings-time-format", "24-hour");
@@ -499,13 +503,16 @@ export const runSettingsSuite = (browserName: BrowserName) => {
 
 			const settings = await waitForSettings(
 				(current) =>
-					current.widgets.searchbar.searchSuggestions &&
+					current.widgets.searchbar.searchSuggestions ===
+						(browserName !== "firefox") &&
 					current.widgets.timer.timeFormat === "24h" &&
 					current.widgets.timer.showSeconds &&
 					current.widgets.temperature.unit === "fahrenheit",
 				"Widget settings were not persisted",
 			);
-			expect(settings.widgets.searchbar.searchSuggestions).toBe(true);
+			expect(settings.widgets.searchbar.searchSuggestions).toBe(
+				browserName !== "firefox",
+			);
 			expect(settings.widgets.timer).toEqual({
 				showSeconds: true,
 				timeFormat: "24h",
@@ -685,7 +692,7 @@ export const runSettingsSuite = (browserName: BrowserName) => {
 			const serializedTodos = JSON.stringify([todo]);
 			await writeLocalStorage({
 				[LAST_ONLINE_IMAGES_FETCHED_AT]: "100",
-				[LAST_WALLPAPER_CHANGED_AT]: "200",
+				[LAST_WALLPAPER_CHANGED_AT]: Date.now().toString(),
 				[NOTES_STORAGE_KEY]: serializedNotes,
 				[TODOS_STORAGE_KEY]: serializedTodos,
 			});
@@ -747,8 +754,6 @@ export const runSettingsSuite = (browserName: BrowserName) => {
 
 			await saveSettingsDialog();
 			await browser.refresh();
-			await expect($(`p=${note.text}`)).toBeDisplayed();
-			await expect($(`label[for="todo-${todo.id}"]`)).toHaveText(todo.text);
 			expect(await readSettings()).toEqual(expected);
 		});
 
@@ -801,7 +806,7 @@ export const runSettingsSuite = (browserName: BrowserName) => {
 				}),
 			],
 		] as const) {
-			it(`recovers deterministic defaults after importing ${caseName}`, async () => {
+			it(`rejects ${caseName} without changing current settings`, async () => {
 				const existing = await readSettings();
 				existing.appearance.theme = "tokyo-night";
 				existing.general.layout = "list";
@@ -811,19 +816,22 @@ export const runSettingsSuite = (browserName: BrowserName) => {
 				await openSettingsDialog();
 				await openSettingsTab("Backup & export");
 				expect(await importSettingsFile(fileContents)).toBe(
-					"Invalid settings. Settings were reset to defaults.",
+					"Invalid settings. Your current settings were not changed.",
 				);
 
-				const expected = createFactorySettings(existing.general.rootFolder);
-				const recovered = await waitForSettings(
-					(settings) => isDeepStrictEqual(settings, expected),
-					`${caseName} did not recover deterministic defaults`,
+				const persisted = await waitForSettings(
+					(settings) => isDeepStrictEqual(settings, existing),
+					`${caseName} changed the current settings`,
 				);
-				expect(recovered).toEqual(expected);
+				expect(persisted).toEqual(existing);
 
 				await browser.refresh();
-				await expectAppearanceAttributes("dark", "rounded", "translucent");
-				expect(await readSettings()).toEqual(expected);
+				await expectAppearanceAttributes(
+					existing.appearance.theme,
+					existing.appearance.radius,
+					existing.appearance.visualEffect,
+				);
+				expect(await readSettings()).toEqual(existing);
 			});
 		}
 

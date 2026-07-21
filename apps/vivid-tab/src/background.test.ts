@@ -13,6 +13,10 @@ import {
 	EXTENSION_COMMANDS,
 } from "@/constants/background-actions";
 import { LOCAL_STORAGE } from "@/constants/keys";
+import {
+	LEGACY_SETTINGS_STORAGE_KEY,
+	SETTINGS_STORAGE_KEY,
+} from "@/lib/settings-storage";
 
 type MessageListener = (
 	message: unknown,
@@ -62,6 +66,13 @@ const querySearch = mock((_details: chrome.search.QueryInfo) => undefined);
 const setLocalStorage = mock(
 	async (_values: Record<string, unknown>) => undefined,
 );
+let syncStorageValues: Record<string, unknown> = {};
+const getSyncStorage = mock(async (_keys: string | string[]) => ({
+	...syncStorageValues,
+}));
+const setSyncStorage = mock(async (values: Record<string, unknown>) => {
+	Object.assign(syncStorageValues, values);
+});
 const createAlarm = mock(
 	(_name: string, _alarmInfo: chrome.alarms.AlarmCreateInfo) => undefined,
 );
@@ -95,6 +106,9 @@ beforeEach(async () => {
 	sendRuntimeMessage.mockImplementation(async () => undefined);
 	querySearch.mockClear();
 	setLocalStorage.mockClear();
+	getSyncStorage.mockClear();
+	setSyncStorage.mockClear();
+	syncStorageValues = {};
 	createAlarm.mockClear();
 	clearAlarm.mockClear();
 	setUninstallURL.mockClear();
@@ -121,6 +135,7 @@ beforeEach(async () => {
 			},
 		},
 		runtime: {
+			getManifest: () => ({ version: "1.4.0" }) as chrome.runtime.Manifest,
 			getURL: (path: string) => `chrome-extension://extension-id/${path}`,
 			onInstalled: {
 				addListener: (
@@ -138,7 +153,10 @@ beforeEach(async () => {
 			setUninstallURL,
 		},
 		search: { query: querySearch },
-		storage: { local: { set: setLocalStorage } },
+		storage: {
+			local: { set: setLocalStorage },
+			sync: { get: getSyncStorage, set: setSyncStorage },
+		},
 		tabs: {
 			create: createTab,
 			query: queryTabs,
@@ -185,6 +203,10 @@ const dispatchRootMessage = (...rootFolderId: [unknown?]) =>
 
 		expect(result).toBe(true);
 	});
+
+const flushBackgroundWork = async () => {
+	for (let step = 0; step < 4; step += 1) await Promise.resolve();
+};
 
 describe("background commands", () => {
 	test("sends the typed toggle action to the current extension view", () => {
@@ -468,6 +490,7 @@ describe("background lifecycle", () => {
 		installedListener?.({
 			reason: "update",
 		} as chrome.runtime.InstalledDetails);
+		await flushBackgroundWork();
 
 		expect(createTab).not.toHaveBeenCalled();
 		expect(setUninstallURL).not.toHaveBeenCalled();
@@ -491,30 +514,98 @@ describe("background lifecycle", () => {
 			[LOCAL_STORAGE.installedDate]: FIXED_NOW.toString(),
 		});
 		expect(mockFetchOnlineImages).toHaveBeenCalledWith(true);
+		expect(getSyncStorage).not.toHaveBeenCalled();
 		expect(createAlarm).toHaveBeenCalledWith(ALARMS.FETCH_ONLINE_IMAGES, {
 			periodInMinutes: 180,
 		});
 		expect(clearAlarm).toHaveBeenCalledWith("DOWNLOAD_PENDING_IMAGES");
 	});
 
-	test("opens the configured update page and refreshes alarms after an update", () => {
+	test("opens the configured update page after migration and refreshes alarms", async () => {
 		installedListener?.({
 			reason: "update",
 		} as chrome.runtime.InstalledDetails);
 
+		expect(createTab).not.toHaveBeenCalled();
+		await flushBackgroundWork();
 		expect(createTab).toHaveBeenCalledWith({ url: UPDATE_URL });
 		expect(setLocalStorage).not.toHaveBeenCalled();
 		expect(mockFetchOnlineImages).not.toHaveBeenCalled();
+		expect(getSyncStorage).not.toHaveBeenCalled();
 		expect(createAlarm).toHaveBeenCalledTimes(1);
 		expect(clearAlarm).toHaveBeenCalledTimes(1);
 	});
 
-	test("trims the configured update URL", () => {
+	test("migrates unversioned v1.3 settings exactly once on a v1.4 update", async () => {
+		const legacy = {
+			timer: { timeFormat: "24h", showSeconds: true },
+			general: { rootFolder: "legacy-root", showHistory: true },
+			searchbar: { searchSuggestions: true, shortcuts: ["chatgpt"] },
+		};
+		const rawLegacy = JSON.stringify(legacy);
+		syncStorageValues[SETTINGS_STORAGE_KEY] = rawLegacy;
+
+		installedListener?.({
+			previousVersion: "1.3.0",
+			reason: "update",
+		} as chrome.runtime.InstalledDetails);
+		await flushBackgroundWork();
+
+		expect(setSyncStorage).toHaveBeenCalledTimes(1);
+		expect(syncStorageValues[LEGACY_SETTINGS_STORAGE_KEY]).toBe(rawLegacy);
+		expect(
+			JSON.parse(syncStorageValues[SETTINGS_STORAGE_KEY] as string),
+		).toMatchObject({
+			version: 1,
+			general: { rootFolder: "legacy-root", showHistory: true },
+			widgets: {
+				searchbar: { searchSuggestions: true },
+				timer: { timeFormat: "24h", showSeconds: true },
+			},
+		});
+
+		installedListener?.({
+			previousVersion: "1.3.0",
+			reason: "update",
+		} as chrome.runtime.InstalledDetails);
+		await flushBackgroundWork();
+
+		expect(getSyncStorage).toHaveBeenCalledTimes(2);
+		expect(setSyncStorage).toHaveBeenCalledTimes(1);
+	});
+
+	test("opens the update page after reporting a migration storage failure", async () => {
+		const error = new Error("sync storage unavailable");
+		const consoleError = jest
+			.spyOn(console, "error")
+			.mockImplementation(() => undefined);
+		syncStorageValues[SETTINGS_STORAGE_KEY] = JSON.stringify({
+			timer: { timeFormat: "24h" },
+		});
+		setSyncStorage.mockRejectedValueOnce(error);
+
+		installedListener?.({
+			previousVersion: "1.3.0",
+			reason: "update",
+		} as chrome.runtime.InstalledDetails);
+		expect(createTab).not.toHaveBeenCalled();
+		await flushBackgroundWork();
+
+		expect(consoleError).toHaveBeenCalledWith(
+			"Failed to migrate v1.3 settings:",
+			error,
+		);
+		expect(createTab).toHaveBeenCalledWith({ url: UPDATE_URL });
+		consoleError.mockRestore();
+	});
+
+	test("trims the configured update URL", async () => {
 		Reflect.set(process.env, "PLASMO_PUBLIC_UPDATE_URL", `  ${UPDATE_URL}  `);
 
 		installedListener?.({
 			reason: "update",
 		} as chrome.runtime.InstalledDetails);
+		await flushBackgroundWork();
 
 		expect(createTab).toHaveBeenCalledWith({ url: UPDATE_URL });
 	});
@@ -523,7 +614,7 @@ describe("background lifecycle", () => {
 		undefined,
 		"",
 		"   ",
-	])("does not open an update page when its URL is absent: %j", (updateUrl) => {
+	])("does not open an update page when its URL is absent: %j", async (updateUrl) => {
 		if (updateUrl === undefined) {
 			Reflect.deleteProperty(process.env, "PLASMO_PUBLIC_UPDATE_URL");
 		} else {
@@ -533,6 +624,7 @@ describe("background lifecycle", () => {
 		installedListener?.({
 			reason: "update",
 		} as chrome.runtime.InstalledDetails);
+		await flushBackgroundWork();
 
 		expect(createTab).not.toHaveBeenCalled();
 		expect(createAlarm).toHaveBeenCalledTimes(1);

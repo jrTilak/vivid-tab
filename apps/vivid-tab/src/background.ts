@@ -7,6 +7,7 @@ import {
 import { LOCAL_STORAGE } from "@/constants/keys";
 import { resolveBookmarkRootFolder } from "@/lib/bookmarks";
 import { resolveSearchTarget } from "@/lib/search-query";
+import { migrateV13SettingsOnUpgrade } from "@/lib/settings-storage";
 import { wallpaper } from "@/lib/wallpapers/service";
 
 const WELCOME_PAGE_PATH = "tabs/welcome.html";
@@ -131,10 +132,19 @@ chrome.runtime.onInstalled.addListener((details) => {
 			break;
 
 		case "update": {
-			if (!SHOULD_OPEN_LIFECYCLE_PAGES) break;
+			void migrateV13SettingsOnUpgrade(
+				details.previousVersion,
+				chrome.runtime.getManifest().version,
+			)
+				.catch((error) => {
+					console.error("Failed to migrate v1.3 settings:", error);
+				})
+				.then(() => {
+					if (!SHOULD_OPEN_LIFECYCLE_PAGES) return;
 
-			const updateUrl = process.env.PLASMO_PUBLIC_UPDATE_URL?.trim();
-			if (updateUrl) void chrome.tabs.create({ url: updateUrl });
+					const updateUrl = process.env.PLASMO_PUBLIC_UPDATE_URL?.trim();
+					if (updateUrl) void chrome.tabs.create({ url: updateUrl });
+				});
 			break;
 		}
 

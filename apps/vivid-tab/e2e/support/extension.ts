@@ -45,7 +45,36 @@ const PAGE_PATHS: Record<ExtensionPage, string> = {
 };
 
 let extensionBaseUrl: string | undefined;
+const desktopNewtabHandles = new Set<string>();
 const polyfilledWindowHandles = new Set<string>();
+
+/**
+ * Mounts desktop-only widgets in visible E2E runs even when a tiling compositor
+ * constrains the browser below Tailwind's xl breakpoint. CSS remains responsive;
+ * only the React mount guard is made deterministic for interaction coverage.
+ */
+const ensureDesktopNewtabLayout = async (): Promise<void> => {
+	const windowHandle = await browser.getWindowHandle();
+	if (desktopNewtabHandles.has(windowHandle)) return;
+
+	await browser.addInitScript(() => {
+		const matchMedia = window.matchMedia.bind(window);
+		window.matchMedia = (query) => {
+			const mediaQuery = matchMedia(query);
+			if (query !== "(min-width: 80rem)") return mediaQuery;
+
+			return new Proxy(mediaQuery, {
+				get(target, property) {
+					if (property === "matches") return true;
+
+					const value = Reflect.get(target, property, target);
+					return typeof value === "function" ? value.bind(target) : value;
+				},
+			});
+		};
+	});
+	desktopNewtabHandles.add(windowHandle);
+};
 
 /**
  * Supplies the function-name helper emitted by the TypeScript E2E transform.
@@ -121,7 +150,7 @@ const findExtensionBaseUrl = async (): Promise<string | undefined> => {
 };
 
 /** Discovers the random profile-local extension origin from a real loaded page. */
-export const getExtensionBaseUrl = async (): Promise<string> => {
+const getExtensionBaseUrl = async (): Promise<string> => {
 	if (extensionBaseUrl) return extensionBaseUrl;
 	if (browser.capabilities.browserName === "firefox") {
 		extensionBaseUrl = FIREFOX_EXTENSION_BASE_URL;
@@ -162,7 +191,9 @@ export const getExtensionPageUrl = async (
 
 /** Opens one of the extension's real HTML entry points in the current tab. */
 export const openExtensionPage = async (page: ExtensionPage): Promise<void> => {
-	await browser.url(await getExtensionPageUrl(page));
+	const pageUrl = await getExtensionPageUrl(page);
+	if (page === "newtab") await ensureDesktopNewtabLayout();
+	await browser.url(pageUrl);
 	await ensureWebdriverScriptPolyfill();
 	await browser.waitUntil(
 		async () =>
@@ -210,6 +241,7 @@ export const waitForExtensionPage = async (
 /** Opens the browser-owned new-tab URL to verify the manifest override itself. */
 export const openBrowserNewTabOverride = async (): Promise<void> => {
 	const isFirefox = browser.capabilities.browserName === "firefox";
+	await ensureDesktopNewtabLayout();
 
 	/* Marionette cannot dispatch Firefox chrome-level Ctrl+T shortcuts. Read the
 	 * manifest from the installed add-on itself, then load its registered page. */

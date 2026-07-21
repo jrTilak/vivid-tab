@@ -1,14 +1,21 @@
 {
 	"name": "@jrtilak/vivid-tab",
 	"displayName": "Vivid Tab",
-	"version": "1.3.0",
+	"description": "A customizable new tab dashboard with bookmarks, search, widgets, themes, and wallpapers.",
+	"version": "1.4.0",
 	"author": "jrTilak <contact@jrtilak.dev>",
 	"scripts": {
 		"dev": "cross-env PLASMO_PUBLIC_BROWSER_NAME='chrome' plasmo dev",
 		"dev:f": "cross-env PLASMO_PUBLIC_BROWSER_NAME='firefox' plasmo dev --target=firefox-mv3",
 		"build": "cross-env PLASMO_PUBLIC_BROWSER_NAME='chrome' plasmo build",
 		"build:f": "cross-env PLASMO_PUBLIC_BROWSER_NAME='firefox' plasmo build --target=firefox-mv3",
-		"package": "plasmo package",
+		"package": "bun run package:all",
+		"package:all": "bun run package:c && bun run package:f",
+		"package:c": "bun run build && cross-env PLASMO_PUBLIC_BROWSER_NAME='chrome' plasmo package --target=chrome-mv3",
+		"package:f": "bun run build:f && cross-env PLASMO_PUBLIC_BROWSER_NAME='firefox' plasmo package --target=firefox-mv3",
+		"release": "bun run package:all && bun run release:validate",
+		"release:validate": "bun scripts/validate-release.ts",
+		"check:dead-code": "knip",
 		"test": "jest",
 		"test:coverage": "jest --coverage",
 		"test:e2e": "bun e2e/run.ts all",
@@ -65,7 +72,6 @@
 		"postcss": "^8.5.20",
 		"shadcn": "^4.13.1",
 		"tailwindcss": "^4.3.3",
-		"tsx": "^4.23.1",
 		"tw-animate-css": "^1.4.0",
 		"typescript": "7.0.2",
 		"webdriverio": "^9.29.1"
@@ -80,26 +86,34 @@
 				"description": "Toggle Vivid Tab search"
 			}
 		},
-		"web_accessible_resources": [
-			{
-				"resources": [
-					"assets/*"
-				],
-				"matches": [
-					"<all_urls>"
+		"host_permissions": [
+			"https://suggestqueries.google.com/*",
+			"https://ipapi.co/*",
+			"https://api.weatherapi.com/*",
+			"https://cdn.weatherapi.com/*",
+			"https://wallhaven.cc/*",
+			"https://w.wallhaven.cc/*",
+			"https://th.wallhaven.cc/*"
+		],
+		"overrides": {
+			"firefox": {
+				"host_permissions": [
+					"https://ipapi.co/*",
+					"https://api.weatherapi.com/*",
+					"https://cdn.weatherapi.com/*",
+					"https://wallhaven.cc/*",
+					"https://w.wallhaven.cc/*",
+					"https://th.wallhaven.cc/*"
 				]
 			}
-		],
-		"host_permissions": [
-			"https://*/*"
-		],
+		},
 		"permissions": [
 			"bookmarks",
 			"storage",
 			"unlimitedStorage",
 			"search",
 			"topSites",
-			"tabs",
+			"geolocation",
 			"alarms"
 		],
 		"optional_permissions": [
@@ -108,9 +122,11 @@
 		"browser_specific_settings": {
 			"gecko": {
 				"id": "vividtab@jrtilak.dev",
+				"strict_min_version": "140.0",
 				"data_collection_permissions": {
 					"required": [
-						"none"
+						"locationInfo",
+						"searchTerms"
 					]
 				}
 			}

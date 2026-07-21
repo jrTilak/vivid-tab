@@ -14,6 +14,7 @@ import {
 	parseSettingsFile,
 	SettingsFileReadError,
 	selectSettingsFile,
+	validateImportedSettings,
 } from "./settings-file";
 
 const originalFileReader = globalThis.FileReader;
@@ -67,6 +68,29 @@ describe("parseSettingsFile", () => {
 		['{"settings":false}', false],
 	])("preserves valid JSON payloads from %s", (source, expected) => {
 		expect(parseSettingsFile(source)).toEqual(expected);
+	});
+});
+
+describe("validateImportedSettings", () => {
+	test("returns a normalized copy of valid versioned settings", () => {
+		const candidate = createDefaultSettings();
+		candidate.general.layout = "list";
+
+		const validated = validateImportedSettings(candidate);
+
+		expect(validated).toEqual(candidate);
+		expect(validated).not.toBe(candidate);
+	});
+
+	test.each([
+		null,
+		false,
+		{ version: 1, appearance: { theme: "invalid-theme" } },
+		{ general: { layout: "list" } },
+	])("rejects invalid or legacy payloads without returning defaults: %j", (value) => {
+		expect(() => validateImportedSettings(value)).toThrow(
+			InvalidSettingsFileError,
+		);
 	});
 });
 

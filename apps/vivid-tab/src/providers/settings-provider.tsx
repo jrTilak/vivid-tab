@@ -151,7 +151,12 @@ const SettingsProvider: React.FC<{
 					...resolved,
 					settings,
 					serialized: serializeSettings(settings),
-					shouldPersist: true,
+					/*
+					 * Legacy settings are both reset and intentionally read-only until the
+					 * update-event migration. Resolving their bookmark root must not turn
+					 * that temporary fallback into a write that can race the migration.
+					 */
+					shouldPersist: resolved.shouldPersist || !resolved.wasReset,
 				};
 			} catch (error) {
 				/* A transient bookmarks failure must not discard otherwise valid settings. */

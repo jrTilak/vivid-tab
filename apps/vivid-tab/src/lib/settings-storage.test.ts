@@ -1,12 +1,36 @@
-import { describe, expect, test } from "@test/jest";
+import { afterEach, describe, expect, mock, test } from "@test/jest";
 import { DEFAULT_SETTINGS, SETTINGS_VERSION } from "@/constants/settings";
 import {
 	createDefaultSettings,
 	LEGACY_SETTINGS_STORAGE_KEY,
+	migrateV13SettingsOnUpgrade,
 	normalizeSettings,
 	resolveStoredSettings,
+	SETTINGS_STORAGE_KEY,
 	serializeSettings,
 } from "@/lib/settings-storage";
+
+const originalChrome = globalThis.chrome;
+
+afterEach(() => {
+	globalThis.chrome = originalChrome;
+});
+
+const installSyncStorage = (initialSettings: unknown) => {
+	const values: Record<string, unknown> = {
+		[SETTINGS_STORAGE_KEY]: initialSettings,
+	};
+	const get = mock(async (_keys: string | string[]) => ({ ...values }));
+	const set = mock(async (updates: Record<string, unknown>) => {
+		Object.assign(values, updates);
+	});
+
+	globalThis.chrome = {
+		storage: { sync: { get, set } },
+	} as unknown as typeof chrome;
+
+	return { get, set, values };
+};
 
 describe("settings normalization", () => {
 	test("creates fresh grouped v1 defaults", () => {
@@ -201,7 +225,7 @@ describe("settings normalization", () => {
 		expect(LEGACY_SETTINGS_STORAGE_KEY).toBe("settingsLegacyUnversioned");
 	});
 
-	test("backs up a serializable legacy object before resetting it", () => {
+	test("retains a serializable legacy object for the update-event migration", () => {
 		const legacy = {
 			general: { rootFolder: "legacy-folder" },
 			timer: { showSeconds: true },
@@ -209,7 +233,7 @@ describe("settings normalization", () => {
 		const result = resolveStoredSettings(legacy);
 
 		expect(result.wasReset).toBe(true);
-		expect(result.shouldPersist).toBe(true);
+		expect(result.shouldPersist).toBe(false);
 		expect(result.legacyBackup).toBe(JSON.stringify(legacy));
 		expect(result.settings).toEqual(createDefaultSettings());
 	});
@@ -273,17 +297,206 @@ describe("settings normalization", () => {
 		expect(JSON.parse(result.serialized)).toEqual(result.settings);
 	});
 
-	test("still resets a non-serializable legacy object safely", () => {
+	test("leaves a non-serializable legacy object untouched", () => {
 		const legacy: Record<string, unknown> = {};
 		legacy.self = legacy;
 
 		const result = resolveStoredSettings(legacy);
 
 		expect(result.wasReset).toBe(true);
-		expect(result.shouldPersist).toBe(true);
+		expect(result.shouldPersist).toBe(false);
 		expect(result.legacyBackup).toBeUndefined();
 		expect(result.settings).toEqual(createDefaultSettings());
 	});
 
-	test.todo("migrates legacy unversioned settings into grouped v1 settings");
+	test("migrates every compatible v1.3 preference and keeps its raw backup", async () => {
+		const legacy = {
+			timer: { timeFormat: "24h", showSeconds: true },
+			temperature: { unit: "fahrenheit" },
+			quotes: { categories: ["inspirational", "technology"] },
+			todos: {
+				expireAfterCompleted: {
+					enabled: false,
+					durationInMinutes: 1_440,
+				},
+			},
+			wallpapers: {
+				selectedImageId: "manual-1",
+				images: ["manual-1", "online-1"],
+				onlineImages: { enabled: true, keywords: "anime, comics" },
+			},
+			layout: { 0: "searchbar", 3: "todos", 4: "bookmarks" },
+			general: {
+				rootFolder: "legacy-folder",
+				showHistory: true,
+				showTopSites: true,
+				layout: "list",
+				openUrlIn: "new-tab",
+				bookmarksCanTakeExtraSpaceIfAvailable: false,
+			},
+			searchbar: {
+				dialogBackground: "transparent",
+				shortcuts: ["chatgpt"],
+				submitDefaultAction: "ask-chatgpt",
+				searchSuggestions: true,
+			},
+			background: {
+				blurIntensity: 2,
+				brightness: 7,
+				randomizeWallpaper: "daily",
+			},
+		};
+		const rawLegacy = JSON.stringify(legacy);
+		const storage = installSyncStorage(rawLegacy);
+
+		await expect(migrateV13SettingsOnUpgrade("1.3.0", "1.4.0")).resolves.toBe(
+			true,
+		);
+
+		expect(storage.set).toHaveBeenCalledTimes(1);
+		expect(storage.get).toHaveBeenCalledWith([
+			SETTINGS_STORAGE_KEY,
+			LEGACY_SETTINGS_STORAGE_KEY,
+			"settingsV13MigrationComplete",
+		]);
+		expect(storage.values[LEGACY_SETTINGS_STORAGE_KEY]).toBe(rawLegacy);
+		const migrated = JSON.parse(
+			storage.values[SETTINGS_STORAGE_KEY] as string,
+		) as ReturnType<typeof createDefaultSettings>;
+
+		expect(migrated.version).toBe(SETTINGS_VERSION);
+		expect(migrated.general).toEqual(legacy.general);
+		expect(migrated.widgets).toMatchObject({
+			timer: legacy.timer,
+			temperature: legacy.temperature,
+			quotes: legacy.quotes,
+			todos: legacy.todos,
+			layout: legacy.layout,
+			searchbar: { searchSuggestions: true },
+		});
+		expect(migrated.widgets.searchbar).not.toHaveProperty("shortcuts");
+		expect(migrated.appearance).toEqual({
+			...createDefaultSettings().appearance,
+			wallpapers: {
+				...legacy.wallpapers,
+				bookmarkedImageIds: [],
+			},
+			background: legacy.background,
+		});
+	});
+
+	test("migrates partial object storage with defaults and then becomes a no-op", async () => {
+		const legacy = {
+			general: { rootFolder: "legacy-folder" },
+			timer: { showSeconds: true },
+		};
+		const storage = installSyncStorage(legacy);
+
+		await expect(
+			migrateV13SettingsOnUpgrade("1.3.9.4", "1.4.2.1"),
+		).resolves.toBe(true);
+		expect(storage.values[LEGACY_SETTINGS_STORAGE_KEY]).toBe(
+			JSON.stringify(legacy),
+		);
+
+		const migrated = JSON.parse(
+			storage.values[SETTINGS_STORAGE_KEY] as string,
+		) as ReturnType<typeof createDefaultSettings>;
+		expect(migrated.general.rootFolder).toBe("legacy-folder");
+		expect(migrated.widgets.timer).toEqual({
+			timeFormat: "12h",
+			showSeconds: true,
+		});
+		expect(migrated.appearance).toEqual(createDefaultSettings().appearance);
+
+		await expect(
+			migrateV13SettingsOnUpgrade("1.3.9.4", "1.4.2.1"),
+		).resolves.toBe(false);
+		expect(storage.get).toHaveBeenCalledTimes(2);
+		expect(storage.set).toHaveBeenCalledTimes(1);
+	});
+
+	test("recovers from the raw backup when ordinary hydration won the update race", async () => {
+		const legacy = {
+			general: { rootFolder: "race-preserved-folder" },
+			temperature: { unit: "fahrenheit" },
+		};
+		const rawLegacy = JSON.stringify(legacy);
+		const storage = installSyncStorage(
+			serializeSettings(createDefaultSettings()),
+		);
+		storage.values[LEGACY_SETTINGS_STORAGE_KEY] = rawLegacy;
+
+		await expect(migrateV13SettingsOnUpgrade("1.3.0", "1.4.0")).resolves.toBe(
+			true,
+		);
+
+		const migrated = JSON.parse(
+			storage.values[SETTINGS_STORAGE_KEY] as string,
+		) as ReturnType<typeof createDefaultSettings>;
+		expect(migrated.general.rootFolder).toBe("race-preserved-folder");
+		expect(migrated.widgets.temperature.unit).toBe("fahrenheit");
+		expect(storage.values[LEGACY_SETTINGS_STORAGE_KEY]).toBe(rawLegacy);
+
+		await expect(migrateV13SettingsOnUpgrade("1.3.0", "1.4.0")).resolves.toBe(
+			false,
+		);
+		expect(storage.set).toHaveBeenCalledTimes(1);
+	});
+
+	test("leaves malformed legacy preferences untouched for manual recovery", async () => {
+		const rawLegacy = JSON.stringify({
+			general: { rootFolder: "preserve-this-backup" },
+			timer: { showSeconds: "yes" },
+		});
+		const storage = installSyncStorage(rawLegacy);
+
+		await expect(migrateV13SettingsOnUpgrade("1.3.0", "1.4.0")).resolves.toBe(
+			false,
+		);
+		expect(storage.set).not.toHaveBeenCalled();
+		expect(storage.values[SETTINGS_STORAGE_KEY]).toBe(rawLegacy);
+	});
+
+	test.each([
+		[undefined, "1.4.0"],
+		["1.2.9", "1.4.0"],
+		["1.3.0", "1.3.1"],
+		["1.3.0", "1.5.0"],
+		["1.4.0", "1.4.1"],
+		["11.3.0", "1.4.0"],
+		["1.30.0", "1.4.0"],
+	])("does not inspect storage outside the v1.3-to-v1.4 boundary (%s -> %s)", async (previousVersion, currentVersion) => {
+		const storage = installSyncStorage({ timer: { showSeconds: true } });
+
+		await expect(
+			migrateV13SettingsOnUpgrade(previousVersion, currentVersion),
+		).resolves.toBe(false);
+		expect(storage.get).not.toHaveBeenCalled();
+		expect(storage.set).not.toHaveBeenCalled();
+	});
+
+	test.each([
+		["malformed JSON", "{not-json"],
+		["missing settings", undefined],
+		["already versioned settings", serializeSettings(createDefaultSettings())],
+	])("does not rewrite %s during migration", async (_label, storedValue) => {
+		const storage = installSyncStorage(storedValue);
+
+		await expect(migrateV13SettingsOnUpgrade("1.3.0", "1.4.0")).resolves.toBe(
+			false,
+		);
+		expect(storage.set).not.toHaveBeenCalled();
+	});
+
+	test("keeps an unserializable legacy object untouched", async () => {
+		const legacy: Record<string, unknown> = {};
+		legacy.self = legacy;
+		const storage = installSyncStorage(legacy);
+
+		await expect(migrateV13SettingsOnUpgrade("1.3.0", "1.4.0")).resolves.toBe(
+			false,
+		);
+		expect(storage.set).not.toHaveBeenCalled();
+	});
 });

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
 	buildSearchSuggestionsUrl,
 	parseSearchSuggestions,
+	supportsRemoteSearchSuggestions,
 } from "@/lib/search-suggestions";
 
 type Props = {
@@ -16,9 +17,12 @@ const useSearchSuggestions = ({ query, enabled = true }: Props) => {
 	useEffect(() => {
 		const normalizedQuery = query.trim();
 		const abortController = new AbortController();
+		const isSupported = supportsRemoteSearchSuggestions(
+			process.env.PLASMO_PUBLIC_BROWSER_NAME,
+		);
 
 		setSuggestions([]);
-		if (!enabled || !normalizedQuery) {
+		if (!isSupported || !enabled || !normalizedQuery) {
 			return () => abortController.abort();
 		}
 

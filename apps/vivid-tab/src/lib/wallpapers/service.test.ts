@@ -10,7 +10,6 @@ import {
 import { LAST_ONLINE_IMAGES_FETCHED_AT } from "@/constants/keys";
 import {
 	createDefaultSettings,
-	LEGACY_SETTINGS_STORAGE_KEY,
 	serializeSettings,
 } from "@/lib/settings-storage";
 import {
@@ -364,17 +363,14 @@ describe("online wallpaper refresh", () => {
 		expect(JSON.parse(write.settings)).toEqual(createDefaultSettings());
 	});
 
-	test("preserves legacy settings before replacing them with defaults", async () => {
+	test("leaves legacy settings for the update-event migration", async () => {
 		const storage = installChromeMock();
 		const legacySettings = JSON.stringify({ theme: "dark" });
 		storage.syncGet.mockResolvedValue({ settings: legacySettings });
 
 		await wallpaper.fetchOnlineImages(true);
 
-		expect(storage.syncSet).toHaveBeenCalledWith({
-			[LEGACY_SETTINGS_STORAGE_KEY]: legacySettings,
-			settings: serializeSettings(createDefaultSettings()),
-		});
+		expect(storage.syncSet).not.toHaveBeenCalled();
 	});
 
 	test("preserves user images and repairs a removed selected image", async () => {
@@ -424,6 +420,32 @@ describe("online wallpaper refresh", () => {
 		expect(storage.localSet).toHaveBeenCalledWith({
 			[LAST_ONLINE_IMAGES_FETCHED_AT]: String(now),
 		});
+	});
+
+	test("clears a removed selection when refresh leaves no wallpaper", async () => {
+		const settings = makeSettings();
+		settings.appearance.wallpapers.images = ["old-online"];
+		settings.appearance.wallpapers.selectedImageId = "old-online";
+		const storage = installChromeMock({ settings });
+		service._provider.fetchImages = mock(async () => [
+			{
+				src: "https://wallhaven.cc/reused.jpg",
+				thumbnailSrc: "https://wallhaven.cc/reused-thumb.jpg",
+			},
+		]);
+		service._replaceOnlineImages = mock(async () => ({
+			ids: [],
+			removedIds: new Set(["old-online"]),
+		}));
+
+		await wallpaper.fetchOnlineImages(true);
+
+		const write = storage.syncSet.mock.calls[0]?.[0] as { settings: string };
+		const writtenSettings = JSON.parse(write.settings) as ReturnType<
+			typeof makeSettings
+		>;
+		expect(writtenSettings.appearance.wallpapers.images).toEqual([]);
+		expect(writtenSettings.appearance.wallpapers.selectedImageId).toBeNull();
 	});
 
 	test("records a successful refresh when every downloaded URL is already saved", async () => {

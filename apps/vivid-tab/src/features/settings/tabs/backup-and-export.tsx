@@ -7,6 +7,7 @@ import {
 	InvalidSettingsFileError,
 	SettingsFileReadError,
 	selectSettingsFile,
+	validateImportedSettings,
 } from "./settings-file";
 
 const BackupAndExportSettings = () => {
@@ -17,23 +18,13 @@ const BackupAndExportSettings = () => {
 			const candidate = await selectSettingsFile();
 			if (candidate === undefined) return;
 
-			const imported = await saveSettings(candidate);
-
-			window.alert(
-				imported
-					? "Settings imported successfully."
-					: "Invalid settings. Settings were reset to defaults.",
-			);
+			await saveSettings(validateImportedSettings(candidate));
+			window.alert("Settings imported successfully.");
 		} catch (error) {
 			if (error instanceof InvalidSettingsFileError) {
-				try {
-					await saveSettings(null);
-					window.alert("Invalid settings. Settings were reset to defaults.");
-				} catch (resetError) {
-					console.error("Failed to reset invalid settings:", resetError);
-					window.alert("The file was invalid and defaults could not be saved.");
-				}
-
+				window.alert(
+					"Invalid settings. Your current settings were not changed.",
+				);
 				return;
 			}
 

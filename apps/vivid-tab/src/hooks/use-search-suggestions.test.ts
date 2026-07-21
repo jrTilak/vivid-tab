@@ -3,6 +3,7 @@ import { cleanup, renderHook, waitFor } from "@testing-library/react";
 import { useSearchSuggestions } from "./use-search-suggestions";
 
 const originalFetch = globalThis.fetch;
+const originalBrowserName = process.env.PLASMO_PUBLIC_BROWSER_NAME;
 type FetchImplementation = (
 	input: RequestInfo | URL,
 	init?: RequestInit,
@@ -20,10 +21,27 @@ const installFetch = (implementation: FetchImplementation) => {
 afterEach(() => {
 	cleanup();
 	globalThis.fetch = originalFetch;
+	if (originalBrowserName === undefined) {
+		Reflect.deleteProperty(process.env, "PLASMO_PUBLIC_BROWSER_NAME");
+	} else {
+		Reflect.set(process.env, "PLASMO_PUBLIC_BROWSER_NAME", originalBrowserName);
+	}
 	mock.restore();
 });
 
 describe("useSearchSuggestions", () => {
+	test("never transmits typed text in Firefox", () => {
+		Reflect.set(process.env, "PLASMO_PUBLIC_BROWSER_NAME", "firefox");
+		const fetchMock = installFetch((_input) => Promise.resolve(new Response()));
+
+		const { result } = renderHook(() =>
+			useSearchSuggestions({ enabled: true, query: "private query" }),
+		);
+
+		expect(result.current).toEqual([]);
+		expect(fetchMock).not.toHaveBeenCalled();
+	});
+
 	test("does not request disabled or blank queries", () => {
 		const fetchMock = installFetch((_input) => Promise.resolve(new Response()));
 		const { result, rerender } = renderHook(

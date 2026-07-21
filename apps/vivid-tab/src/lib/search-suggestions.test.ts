@@ -2,9 +2,16 @@ import { describe, expect, test } from "@test/jest";
 import {
 	buildSearchSuggestionsUrl,
 	parseSearchSuggestions,
+	supportsRemoteSearchSuggestions,
 } from "./search-suggestions";
 
 describe("search suggestions", () => {
+	test("supports remote suggestions outside Firefox only", () => {
+		expect(supportsRemoteSearchSuggestions("chrome")).toBe(true);
+		expect(supportsRemoteSearchSuggestions(undefined)).toBe(true);
+		expect(supportsRemoteSearchSuggestions("firefox")).toBe(false);
+	});
+
 	test("encodes the query through URLSearchParams", () => {
 		const url = new URL(buildSearchSuggestionsUrl("cats & dogs/नेपाल"));
 

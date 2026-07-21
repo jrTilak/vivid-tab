@@ -1,8 +1,12 @@
 import { Switch } from "@/components/ui/switch";
+import { supportsRemoteSearchSuggestions } from "@/lib/search-suggestions";
 import { useSettings } from "@/providers/settings-provider";
 import { SettingsPage, SettingsRow, SettingsSection } from "../../settings-ui";
 
 const SearchbarSettings = () => {
+	const suggestionsSupported = supportsRemoteSearchSuggestions(
+		process.env.PLASMO_PUBLIC_BROWSER_NAME,
+	);
 	const {
 		settings: {
 			widgets: { searchbar },
@@ -15,11 +19,16 @@ const SearchbarSettings = () => {
 			<SettingsSection title="Search suggestions">
 				<SettingsRow
 					controlId="settings-search-suggestions"
-					description="Show suggestions while entering a search or bang query."
+					description={
+						suggestionsSupported
+							? "Show suggestions while entering a search or bang query."
+							: "Unavailable in Firefox to avoid transmitting text while you type."
+					}
 					label="Search suggestions"
 				>
 					<Switch
-						checked={searchbar.searchSuggestions}
+						checked={suggestionsSupported && searchbar.searchSuggestions}
+						disabled={!suggestionsSupported}
 						id="settings-search-suggestions"
 						onCheckedChange={(checked) => {
 							setSettings((current) => ({

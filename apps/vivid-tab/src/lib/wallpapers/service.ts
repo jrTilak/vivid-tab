@@ -1,6 +1,5 @@
 import { LAST_ONLINE_IMAGES_FETCHED_AT } from "@/constants/keys";
 import {
-	LEGACY_SETTINGS_STORAGE_KEY,
 	resolveStoredSettings,
 	SETTINGS_STORAGE_KEY,
 	serializeSettings,
@@ -46,8 +45,8 @@ class Wallpaper {
 			while (nextIndex < uniqueImages.length) {
 				const index = nextIndex;
 				nextIndex += 1;
-				const image = uniqueImages[index];
-				if (!image) continue;
+				/* The loop guard and synchronous increment keep this index in range. */
+				const image = uniqueImages[index] as WallhavenImage;
 
 				try {
 					const response = await fetch(image.src);
@@ -217,11 +216,6 @@ class Wallpaper {
 			if (resolved.shouldPersist) {
 				await chrome.storage.sync.set({
 					[SETTINGS_STORAGE_KEY]: resolved.serialized,
-					...(resolved.legacyBackup === undefined
-						? {}
-						: {
-								[LEGACY_SETTINGS_STORAGE_KEY]: resolved.legacyBackup,
-							}),
 				});
 			}
 

@@ -142,6 +142,89 @@ describe("SettingsProvider and useSettings", () => {
 		consoleError.mockRestore();
 	});
 
+	test("leaves unversioned storage untouched for the update-event migration", async () => {
+		const consoleError = spyOn(console, "error").mockImplementation(() => {});
+		storedSettings = JSON.stringify({
+			general: { rootFolder: "legacy-folder" },
+			timer: { showSeconds: true },
+		});
+		syncGet.mockResolvedValue({ [SETTINGS_STORAGE_KEY]: storedSettings });
+
+		const { result } = await renderSettingsHook();
+
+		expect(result.current.settings).toEqual(createDefaultSettings());
+		expect(syncSet).not.toHaveBeenCalled();
+		expect(consoleError).toHaveBeenCalledWith(
+			"Invalid settings from initial load; reset to defaults.",
+			expect.any(Object),
+		);
+		consoleError.mockRestore();
+	});
+
+	test("does not let legacy root resolution overwrite a concurrent migration", async () => {
+		const consoleError = spyOn(console, "error").mockImplementation(() => {});
+		const legacySettings = JSON.stringify({
+			general: { rootFolder: "legacy-folder", showTopSites: false },
+			timer: { showSeconds: true },
+		});
+		storedSettings = legacySettings;
+		syncGet.mockResolvedValue({ [SETTINGS_STORAGE_KEY]: storedSettings });
+		const rootCallbacks: Array<
+			(response: { folderId: string; ok: true }) => void
+		> = [];
+		sendMessage.mockImplementation((_message, callback) => {
+			rootCallbacks.push(callback);
+		});
+		const rendered = renderHook(() => useSettings(), {
+			wrapper: createWrapper(true),
+		});
+		await waitFor(() => expect(rootCallbacks).toHaveLength(1));
+
+		const migrated = createDefaultSettings();
+		migrated.general.rootFolder = "migrated-root";
+		migrated.general.showTopSites = true;
+		const serializedMigration = serializeSettings(migrated);
+		const backgroundWrite = {
+			[LEGACY_SETTINGS_STORAGE_KEY]: legacySettings,
+			[SETTINGS_STORAGE_KEY]: serializedMigration,
+			settingsV13MigrationComplete: true,
+		};
+
+		/* The storage write can complete before Chrome delivers its change event. */
+		await syncSet(backgroundWrite);
+		act(() =>
+			rootCallbacks[0]?.({ folderId: "legacy-resolved-root", ok: true }),
+		);
+		await waitFor(() => expect(rendered.result.current).not.toBeNull());
+		expect(syncSet).toHaveBeenCalledTimes(1);
+		expect(syncSet).toHaveBeenLastCalledWith(backgroundWrite);
+
+		act(() => {
+			for (const listener of storageListeners) {
+				listener(
+					{
+						[SETTINGS_STORAGE_KEY]: {
+							newValue: serializedMigration,
+							oldValue: legacySettings,
+						},
+					},
+					"sync",
+				);
+			}
+		});
+		await waitFor(() => expect(rootCallbacks).toHaveLength(2));
+		act(() => rootCallbacks[1]?.({ folderId: "migrated-root", ok: true }));
+
+		await waitFor(() =>
+			expect(rendered.result.current.settings.general.showTopSites).toBe(true),
+		);
+		expect(rendered.result.current.settings.general.rootFolder).toBe(
+			"migrated-root",
+		);
+		expect(syncSet).toHaveBeenCalledTimes(1);
+		consoleError.mockRestore();
+	});
+
 	test("reports a failed canonical write during initial recovery", async () => {
 		const consoleError = spyOn(console, "error").mockImplementation(() => {});
 		storedSettings = undefined;

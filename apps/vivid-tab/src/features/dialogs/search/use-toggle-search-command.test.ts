@@ -127,6 +127,27 @@ describe("useToggleSearchCommand", () => {
 		expect(onToggle).toHaveBeenCalledTimes(1);
 	});
 
+	test("replays one pending command when the current tab ID resolves", async () => {
+		const currentTab = createDeferred<chrome.tabs.Tab | undefined>();
+		const runtime = installChrome(mock(() => currentTab.promise));
+		const onToggle = mock(() => undefined);
+		renderHook(() => useToggleSearchCommand(onToggle));
+
+		act(() => {
+			runtime.dispatch({
+				action: BACKGROUND_ACTIONS.TOGGLE_VIVID_SEARCH,
+				targetTabId: 7,
+			});
+			runtime.dispatch({
+				action: BACKGROUND_ACTIONS.TOGGLE_VIVID_SEARCH,
+				targetTabId: 8,
+			});
+		});
+		await act(async () => currentTab.resolve({ id: 7 } as chrome.tabs.Tab));
+
+		expect(onToggle).toHaveBeenCalledTimes(1);
+	});
+
 	test.each([
 		"missing",
 		"rejected",

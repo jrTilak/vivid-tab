@@ -2,6 +2,15 @@ const SEARCH_SUGGESTIONS_ENDPOINT =
 	"https://suggestqueries.google.com/complete/search";
 
 /**
+ * Firefox add-on policy forbids sending text while a user types in extension
+ * search UI. Chromium keeps the opt-in provider integration; Firefox does not
+ * request its host permission or execute the remote suggestion path.
+ */
+export const supportsRemoteSearchSuggestions = (
+	browserName: string | undefined,
+): boolean => browserName !== "firefox";
+
+/**
  * Builds the provider URL through URLSearchParams so arbitrary query text
  * cannot alter fixed provider parameters.
  */

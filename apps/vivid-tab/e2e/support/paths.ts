@@ -2,7 +2,6 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const APP_ROOT = fileURLToPath(new URL("../../", import.meta.url));
-export const E2E_ROOT = path.join(APP_ROOT, "e2e");
 export const CHROMIUM_EXTENSION_PATH = path.join(
 	APP_ROOT,
 	"build/chrome-mv3-prod",

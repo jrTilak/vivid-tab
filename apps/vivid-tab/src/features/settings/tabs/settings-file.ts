@@ -1,3 +1,4 @@
+import { normalizeSettings } from "@/lib/settings-storage";
 import type { Settings } from "@/zod/settings";
 
 /** Signals that a readable file did not contain valid JSON. */
@@ -46,6 +47,21 @@ export const parseSettingsFile = (source: string): unknown => {
 	 * this fallback in v1.5.0.
 	 */
 	return parsed;
+};
+
+/**
+ * Validates an imported payload without mutating the user's current settings.
+ * Storage recovery may safely replace corrupted persisted data, but a file the
+ * user merely selected must be rejected before it reaches that reset boundary.
+ */
+export const validateImportedSettings = (candidate: unknown): Settings => {
+	const normalized = normalizeSettings(candidate);
+
+	if (normalized.wasReset) {
+		throw new InvalidSettingsFileError(normalized.error);
+	}
+
+	return normalized.settings;
 };
 
 /** Opens the file picker and returns the imported settings payload. */
