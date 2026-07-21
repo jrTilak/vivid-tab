@@ -1,31 +1,23 @@
 import { IconPlayerSkipForward } from "@tabler/icons-react";
+import { Button } from "@/components/ui/button";
 import { useNextWallpaper } from "@/hooks/use-next-wallpaper";
-import { cn } from "@/lib/cn";
 
 export const NextWallpaperButton = () => {
 	const { nextWallpaper, hasWallpapers } = useNextWallpaper();
 
-	// Don't render if no wallpapers available
 	if (!hasWallpapers) return null;
 
 	return (
-		<button
-			type="button"
-			onClick={nextWallpaper}
-			className={cn(
-				"fixed bottom-4 right-4 z-50",
-				"bg-white/10 backdrop-blur-md",
-				"hover:bg-white/20",
-				"text-white",
-				"p-3 rounded-full",
-				"transition-all duration-200",
-				"shadow-lg hover:shadow-xl",
-				"cursor-pointer disabled:cursor-default",
-			)}
+		<Button
 			aria-label="Next wallpaper"
+			className="fixed right-6 bottom-6 z-40 text-foreground shadow-lg"
+			onClick={nextWallpaper}
+			size="icon"
 			title="Next wallpaper"
+			type="button"
+			variant="secondary"
 		>
 			<IconPlayerSkipForward className="size-5" />
-		</button>
+		</Button>
 	);
 };
