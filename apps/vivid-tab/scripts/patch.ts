@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
 /**
  * Plasmo + Tailwind v4 Compatibility Patch
@@ -9,8 +9,8 @@
  * @see https://github.com/PlasmoHQ/plasmo/issues/1188
  */
 
-const fs = require("node:fs");
-const path = require("node:path");
+const fs = require("node:fs") as typeof import("node:fs");
+const path = require("node:path") as typeof import("node:path");
 
 // Console colors
 const c = {
@@ -22,23 +22,33 @@ const c = {
 	cyan: "\x1b[36m",
 };
 
-const log = (msg, color = "reset") =>
+type Color = keyof typeof c;
+
+const log = (msg: string, color: Color = "reset") =>
 	console.log(`${c[color]}${msg}${c.reset}`);
+
+const getErrorMessage = (error: unknown) =>
+	typeof error === "object" &&
+	error !== null &&
+	"message" in error &&
+	typeof error.message === "string"
+		? error.message
+		: String(error);
 
 /**
  * TypeScript 7 no longer ships tsserver. Bun can leave the old TypeScript 5
  * executable symlink behind after an upgrade, and Parcel fails while scanning
  * that dangling entry. Remove only the broken legacy shim.
  */
-const removeDanglingTsserverShim = () => {
-	const tsserverPath = path.resolve(
+const removeDanglingTsserverShim = (
+	tsserverPath: string = path.resolve(
 		__dirname,
 		"..",
 		"node_modules",
 		".bin",
 		"tsserver",
-	);
-
+	),
+) => {
 	try {
 		const file = fs.lstatSync(tsserverPath);
 
@@ -51,15 +61,25 @@ const removeDanglingTsserverShim = () => {
 
 		return true;
 	} catch (error) {
-		if (error.code === "ENOENT") return true;
+		if (
+			typeof error === "object" &&
+			error !== null &&
+			"code" in error &&
+			error.code === "ENOENT"
+		) {
+			return true;
+		}
 
-		log(`❌ ${tsserverPath} - error: ${error.message}`, "red");
+		log(`❌ ${tsserverPath} - error: ${getErrorMessage(error)}`, "red");
 
 		return false;
 	}
 };
 
-const addNodeModulesFromAncestors = (startPath, directories) => {
+const addNodeModulesFromAncestors = (
+	startPath: string,
+	directories: Set<string>,
+) => {
 	let currentPath = path.resolve(startPath);
 
 	while (true) {
@@ -80,46 +100,45 @@ const addNodeModulesFromAncestors = (startPath, directories) => {
 /**
  * Find package files that need patching
  */
-const findPackageFiles = () => {
-	const nodeModulesDirectories = new Set();
-	addNodeModulesFromAncestors(process.cwd(), nodeModulesDirectories);
+type FindPackageFilesOptions = {
+	currentWorkingDirectory?: string;
+	scriptDirectory?: string;
+};
+
+const findPackageFiles = ({
+	currentWorkingDirectory = process.cwd(),
+	scriptDirectory = __dirname,
+}: FindPackageFilesOptions = {}) => {
+	const nodeModulesDirectories = new Set<string>();
+	addNodeModulesFromAncestors(currentWorkingDirectory, nodeModulesDirectories);
 	addNodeModulesFromAncestors(
-		path.resolve(__dirname, ".."),
+		path.resolve(scriptDirectory, ".."),
 		nodeModulesDirectories,
 	);
 
-	const files = new Set();
-
-	// Helper to check file exists
-	const fileExists = (filePath) => {
-		try {
-			return fs.existsSync(filePath);
-		} catch {
-			return false;
-		}
-	};
+	const files = new Set<string>();
 
 	// Find jiti files
-	const addJitiFiles = (basePath) => {
+	const addJitiFiles = (basePath: string) => {
 		const jitiPath = path.join(basePath, "jiti");
-		if (!fileExists(jitiPath)) return;
+		if (!fs.existsSync(jitiPath)) return;
 
 		const targets = ["dist/jiti.cjs", "dist/babel.cjs", "lib/jiti.cjs"];
 
 		for (const target of targets) {
 			const filePath = path.join(jitiPath, target);
 
-			if (fileExists(filePath)) {
+			if (fs.existsSync(filePath)) {
 				files.add(fs.realpathSync(filePath));
 			}
 		}
 	};
 
 	// Find oxide files
-	const addOxideFile = (basePath) => {
+	const addOxideFile = (basePath: string) => {
 		const oxidePath = path.join(basePath, "@tailwindcss", "oxide", "index.js");
 
-		if (fileExists(oxidePath)) {
+		if (fs.existsSync(oxidePath)) {
 			files.add(fs.realpathSync(oxidePath));
 		}
 	};
@@ -130,7 +149,7 @@ const findPackageFiles = () => {
 
 		const bunStore = path.join(nodeModules, ".bun");
 
-		if (!fileExists(bunStore)) continue;
+		if (!fs.existsSync(bunStore)) continue;
 
 		for (const entry of fs.readdirSync(bunStore, { withFileTypes: true })) {
 			if (!entry.isDirectory()) continue;
@@ -157,7 +176,7 @@ const findPackageFiles = () => {
 /**
  * Patch a single file
  */
-const patchFile = (filePath) => {
+const patchFile = (filePath: string) => {
 	try {
 		if (!fs.existsSync(filePath)) {
 			log(`⚠️  File not found: ${filePath}`, "yellow");
@@ -182,46 +201,69 @@ const patchFile = (filePath) => {
 		log(`✅ ${filePath} - patched successfully`, "green");
 		return true;
 	} catch (error) {
-		log(`❌ ${filePath} - error: ${error.message}`, "red");
+		log(`❌ ${filePath} - error: ${getErrorMessage(error)}`, "red");
 		return false;
 	}
+};
+
+type MainDependencies = {
+	findFiles?: () => string[];
+	patch?: (filePath: string) => boolean;
+	removeTsserverShim?: () => boolean;
+	writeLog?: (message: string, color?: Color) => void;
 };
 
 /**
  * Main execution
  */
-const main = () => {
-	log("🔧 Plasmo + Tailwind v4 compatibility patch", "cyan");
-	const tsserverReady = removeDanglingTsserverShim();
+const main = ({
+	findFiles = findPackageFiles,
+	patch = patchFile,
+	removeTsserverShim = removeDanglingTsserverShim,
+	writeLog = log,
+}: MainDependencies = {}) => {
+	writeLog("🔧 Plasmo + Tailwind v4 compatibility patch", "cyan");
+	const tsserverReady = removeTsserverShim();
+	let files: string[];
 
-	const files = findPackageFiles();
+	try {
+		files = findFiles();
+	} catch (error) {
+		writeLog(
+			`❌ Unable to find package files: ${getErrorMessage(error)}`,
+			"red",
+		);
+		return false;
+	}
 
 	if (files.length === 0) {
-		log("⚠️  No files found to patch", "yellow");
-		log(
+		writeLog("⚠️  No files found to patch", "yellow");
+		writeLog(
 			"   This might mean packages are not installed or using different structure",
 			"yellow",
 		);
-		return;
+		return tsserverReady;
 	}
 
-	log(`   Found ${files.length} files to check`, "blue");
+	writeLog(`   Found ${files.length} files to check`, "blue");
 
-	const results = files.map(patchFile);
+	const results = files.map(patch);
 	const successful = results.filter(Boolean).length;
 
-	log(""); // Empty line
+	writeLog(""); // Empty line
 
 	if (successful === files.length && tsserverReady) {
-		log("🎉 All files patched successfully!", "green");
-		log("   Tailwind v4 should now work with Plasmo", "green");
+		writeLog("🎉 All files patched successfully!", "green");
+		writeLog("   Tailwind v4 should now work with Plasmo", "green");
 	} else {
-		log(`⚠️  ${successful}/${files.length} files patched`, "yellow");
+		writeLog(`⚠️  ${successful}/${files.length} files patched`, "yellow");
 	}
 
 	if (successful === 0) {
-		log("💡 Try running: bun install && bun run postinstall", "blue");
+		writeLog("💡 Try running: bun install && bun run postinstall", "blue");
 	}
+
+	return successful === files.length && tsserverReady;
 };
 
 // Execute if run directly
