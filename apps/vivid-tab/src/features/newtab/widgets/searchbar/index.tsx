@@ -22,7 +22,7 @@ const Searchbar = () => {
 					aria-expanded={isOpen}
 					aria-haspopup="dialog"
 					aria-label="Open search"
-					className="cursor-pointer pr-10 text-muted-foreground shadow-lg sm:pr-48"
+					className="cursor-pointer pr-10 text-muted-foreground shadow-lg in-data-[visual-effect=translucent]:bg-card/70 in-data-[visual-effect=translucent]:backdrop-blur-lg dark:in-data-[visual-effect=translucent]:bg-card/70 sm:pr-48"
 					onClick={openSearch}
 					onKeyDown={(event) => {
 						if (event.key !== "Enter" && event.key !== " ") return;

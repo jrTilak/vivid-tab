@@ -3,11 +3,11 @@
 @import "shadcn/tailwind.css";
 
 @font-face {
-	font-family: "Spline Sans";
+	font-family: "Outfit";
 	font-style: normal;
 	font-display: swap;
 	font-weight: 100 900;
-	src: url("npm:@fontsource-variable/spline-sans/files/spline-sans-latin-wght-normal.woff2")
+	src: url("npm:@fontsource-variable/outfit/files/outfit-latin-wght-normal.woff2")
 		format("woff2-variations");
 }
 
@@ -23,7 +23,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-	--font-body: "Spline Sans", sans-serif;
+	--font-body: "Outfit", sans-serif;
 	--font-heading: "Bricolage Grotesque", sans-serif;
 	--color-sidebar-ring: var(--sidebar-ring);
 	--color-sidebar-border: var(--sidebar-border);

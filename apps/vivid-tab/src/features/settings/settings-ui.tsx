@@ -1,6 +1,16 @@
 import type * as React from "react";
+import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/cn";
+
+const SettingsNewBadge = ({ className }: { className?: string }) => (
+	<Badge
+		className={cn("h-4 px-1.5 text-[0.625rem]", className)}
+		variant="secondary"
+	>
+		New
+	</Badge>
+);
 
 const SettingsPage = ({ className, ...props }: React.ComponentProps<"div">) => (
 	<div className={cn("space-y-6 p-5", className)} {...props} />
@@ -34,6 +44,7 @@ const SettingsSection = ({
 type SettingsRowProps = React.ComponentProps<"div"> & {
 	controlId?: string;
 	description?: string;
+	isNew?: boolean;
 	label: string;
 };
 
@@ -42,6 +53,7 @@ const SettingsRow = ({
 	className,
 	controlId,
 	description,
+	isNew = false,
 	label,
 	...props
 }: SettingsRowProps) => (
@@ -53,7 +65,10 @@ const SettingsRow = ({
 		{...props}
 	>
 		<div className="min-w-0 space-y-1">
-			<Label htmlFor={controlId}>{label}</Label>
+			<div className="flex items-center gap-2">
+				<Label htmlFor={controlId}>{label}</Label>
+				{isNew && <SettingsNewBadge />}
+			</div>
 			{description && (
 				<p className="text-xs leading-relaxed text-muted-foreground">
 					{description}
@@ -64,4 +79,4 @@ const SettingsRow = ({
 	</div>
 );
 
-export { SettingsPage, SettingsRow, SettingsSection };
+export { SettingsNewBadge, SettingsPage, SettingsRow, SettingsSection };

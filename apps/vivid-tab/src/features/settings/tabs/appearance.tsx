@@ -42,7 +42,7 @@ const AppearanceSettings = () => {
 				description="Control the overall look of Vivid Tab."
 				title="Interface"
 			>
-				<SettingsRow controlId="settings-theme" label="Theme">
+				<SettingsRow controlId="settings-theme" isNew label="Theme">
 					<Select
 						value={appearance.theme}
 						onValueChange={(value) =>
@@ -65,6 +65,7 @@ const AppearanceSettings = () => {
 				<SettingsRow
 					controlId="settings-radius"
 					description="Adjust corner rounding across the interface."
+					isNew
 					label="Corner radius"
 				>
 					<Select
@@ -89,6 +90,7 @@ const AppearanceSettings = () => {
 				<SettingsRow
 					controlId="settings-visual-effect"
 					description="Use solid surfaces or let the wallpaper show through."
+					isNew
 					label="Visual effect"
 				>
 					<Select

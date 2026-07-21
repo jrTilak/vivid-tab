@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/cn";
 import { useSettings } from "@/providers/settings-provider";
+import { SettingsNewBadge } from "./settings-ui";
 import AppearanceSettings from "./tabs/appearance";
 import BackgroundSettings from "./tabs/background";
 import BackupAndExportSettings from "./tabs/backup-and-export";
@@ -54,7 +55,17 @@ type SettingsTabId =
 	| "todos"
 	| "wallpaper";
 
-const SETTINGS_GROUPS = [
+type SettingsTab = {
+	icon: typeof IconDevices;
+	id: SettingsTabId;
+	isNew?: boolean;
+	label: string;
+};
+
+const SETTINGS_GROUPS: ReadonlyArray<{
+	label: string;
+	tabs: ReadonlyArray<SettingsTab>;
+}> = [
 	{
 		label: "General",
 		tabs: [{ icon: IconDevices, id: "general", label: "General" }],
@@ -62,7 +73,7 @@ const SETTINGS_GROUPS = [
 	{
 		label: "Appearance",
 		tabs: [
-			{ icon: IconPalette, id: "appearance", label: "Appearance" },
+			{ icon: IconPalette, id: "appearance", isNew: true, label: "Appearance" },
 			{ icon: IconLayoutGrid, id: "layout", label: "Layout" },
 			{ icon: IconPhotoPlus, id: "wallpaper", label: "Wallpaper" },
 			{ icon: IconPhoto, id: "background", label: "Background" },
@@ -86,14 +97,7 @@ const SETTINGS_GROUPS = [
 		label: "Help",
 		tabs: [{ icon: IconHeartHandshake, id: "support", label: "Support" }],
 	},
-] as const satisfies ReadonlyArray<{
-	label: string;
-	tabs: ReadonlyArray<{
-		icon: typeof IconDevices;
-		id: SettingsTabId;
-		label: string;
-	}>;
-}>;
+];
 
 const SettingsDialog = ({
 	onOpenChange,
@@ -124,13 +128,14 @@ const SettingsDialog = ({
 	};
 
 	return (
-		<DialogContent className="grid h-[min(42rem,90vh)] w-[90vw] min-w-lg max-w-[90vw] grid-cols-[14rem_minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden p-0 lg:max-w-5xl">
+		<DialogContent className="grid h-[min(42rem,90vh)] w-[90vw] min-w-lg grid-cols-[14rem_minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden p-0 max-w-5xl!">
 			<aside className="row-span-3 min-h-0 overflow-y-auto border-r bg-muted in-data-[visual-effect=opaque]:bg-muted in-data-[visual-effect=translucent]:bg-muted/30">
 				<nav aria-label="Settings sections" className="space-y-5 p-3">
 					{SETTINGS_GROUPS.map((group) => (
-						<div className="space-y-1" key={group.label}>
-							<p className="px-3 text-[0.6875rem] font-medium tracking-wider text-muted-foreground uppercase">
-								{group.label}
+						<div key={group.label}>
+							<p className="mb-1 flex items-center gap-2 px-3 text-[0.6875rem] font-medium tracking-wider text-muted-foreground uppercase">
+								<span>{group.label}</span>
+								{group.tabs.some((tab) => tab.isNew) && <SettingsNewBadge />}
 							</p>
 							{group.tabs.map((tab) => (
 								<Button
@@ -145,6 +150,7 @@ const SettingsDialog = ({
 								>
 									<tab.icon className="size-4" />
 									{tab.label}
+									{tab.isNew && <SettingsNewBadge className="ml-auto" />}
 								</Button>
 							))}
 						</div>

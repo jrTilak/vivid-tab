@@ -16,10 +16,10 @@ export function PopularApps() {
 			<PopoverTrigger asChild>
 				<Button
 					aria-label="Open popular apps"
-					className="text-foreground transition-transform hover:scale-105"
+					className="text-foreground"
 					size="icon"
 					type="button"
-					variant="ghost"
+					variant="secondary"
 				>
 					<IconApps className="size-6" />
 				</Button>

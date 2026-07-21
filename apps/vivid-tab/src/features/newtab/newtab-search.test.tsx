@@ -124,6 +124,9 @@ describe("NewtabSearchProvider", () => {
 		expect(mockSearchDialog).toHaveBeenCalledTimes(1);
 		const trigger = screen.getByRole("textbox", { name: "Open search" });
 		expect(trigger.getAttribute("aria-expanded")).toBe("false");
+		expect(trigger.className).toContain(
+			"in-data-[visual-effect=translucent]:bg-card/70",
+		);
 		expect(screen.getByText("Ctrl+Shift+Space")).not.toBeNull();
 
 		fireEvent.click(trigger);

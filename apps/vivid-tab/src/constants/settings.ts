@@ -51,7 +51,7 @@ export const DEFAULT_SETTINGS = {
 		},
 	},
 	appearance: {
-		radius: "rounded",
+		radius: "none",
 		theme: "dark",
 		visualEffect: "translucent",
 		wallpapers: {

@@ -59,7 +59,7 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
 	);
 	return (
 		<Dialog onOpenChange={handleOpenChange} open={open}>
-			<DialogContent className="w-[min(90vw,34rem)] max-w-[min(90vw,34rem)] pt-14">
+			<DialogContent className="top-[30%] w-[min(90vw,34rem)] max-w-[min(90vw,34rem)] pt-10">
 				<DialogTitle className="sr-only">Search the web</DialogTitle>
 				<DialogDescription className="sr-only">
 					Search directly or use a bang shortcut such as !yt.
