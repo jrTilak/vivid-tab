@@ -1,6 +1,5 @@
 import { IconSearch } from "@tabler/icons-react";
 import { useCallback, useState } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -58,14 +57,6 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
 		},
 		[general.openUrlIn, handleOpenChange],
 	);
-
-	useHotkeys(
-		["ctrl+comma", "meta+comma"],
-		() => handleOpenChange(!open),
-		{ enableOnFormTags: true, preventDefault: true },
-		[handleOpenChange, open],
-	);
-
 	return (
 		<Dialog onOpenChange={handleOpenChange} open={open}>
 			<DialogContent className="w-[min(90vw,34rem)] max-w-[min(90vw,34rem)] pt-14">

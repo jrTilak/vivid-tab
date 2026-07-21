@@ -7,7 +7,11 @@ import {
 	mock,
 	test,
 } from "@test/jest";
-import { ALARMS, BACKGROUND_ACTIONS } from "@/constants/background-actions";
+import {
+	ALARMS,
+	BACKGROUND_ACTIONS,
+	EXTENSION_COMMANDS,
+} from "@/constants/background-actions";
 import { LOCAL_STORAGE } from "@/constants/keys";
 
 type MessageListener = (
@@ -15,6 +19,8 @@ type MessageListener = (
 	sender: chrome.runtime.MessageSender,
 	sendResponse: (response?: unknown) => void,
 ) => boolean | undefined;
+
+type CommandListener = (command: string, tab?: chrome.tabs.Tab) => void;
 
 const FIXED_NOW = new Date("2026-07-21T08:30:00.000Z");
 const UNINSTALL_URL = "https://example.com/uninstalled";
@@ -29,6 +35,7 @@ let installedListener:
 	| ((details: chrome.runtime.InstalledDetails) => void)
 	| undefined;
 let alarmListener: ((alarm: chrome.alarms.Alarm) => void) | undefined;
+let commandListener: CommandListener | undefined;
 
 const mockResolveRootFolder = mock(async (_rootFolderId: string) => "resolved");
 const mockFetchOnlineImages = mock(async (_forceFetch?: boolean) => undefined);
@@ -50,6 +57,7 @@ const queryTabs = mock(
 const updateTab = mock(
 	(_tabId: number, _details: chrome.tabs.UpdateProperties) => undefined,
 );
+const sendRuntimeMessage = mock(async (_message: unknown) => undefined);
 const querySearch = mock((_details: chrome.search.QueryInfo) => undefined);
 const setLocalStorage = mock(
 	async (_values: Record<string, unknown>) => undefined,
@@ -75,6 +83,7 @@ beforeEach(async () => {
 	messageListener = undefined;
 	installedListener = undefined;
 	alarmListener = undefined;
+	commandListener = undefined;
 
 	createTab.mockClear();
 	queryTabs.mockReset();
@@ -82,6 +91,8 @@ beforeEach(async () => {
 		callback([{ id: 7 } as chrome.tabs.Tab]),
 	);
 	updateTab.mockClear();
+	sendRuntimeMessage.mockReset();
+	sendRuntimeMessage.mockImplementation(async () => undefined);
 	querySearch.mockClear();
 	setLocalStorage.mockClear();
 	createAlarm.mockClear();
@@ -102,6 +113,13 @@ beforeEach(async () => {
 				},
 			},
 		},
+		commands: {
+			onCommand: {
+				addListener: (listener: CommandListener) => {
+					commandListener = listener;
+				},
+			},
+		},
 		runtime: {
 			getURL: (path: string) => `chrome-extension://extension-id/${path}`,
 			onInstalled: {
@@ -116,6 +134,7 @@ beforeEach(async () => {
 					messageListener = listener;
 				},
 			},
+			sendMessage: sendRuntimeMessage,
 			setUninstallURL,
 		},
 		search: { query: querySearch },
@@ -166,6 +185,85 @@ const dispatchRootMessage = (...rootFolderId: [unknown?]) =>
 
 		expect(result).toBe(true);
 	});
+
+describe("background commands", () => {
+	test("sends the typed toggle action to the current extension view", () => {
+		commandListener?.(EXTENSION_COMMANDS.TOGGLE_VIVID_SEARCH, {
+			id: 31,
+		} as chrome.tabs.Tab);
+
+		expect(queryTabs).not.toHaveBeenCalled();
+		expect(sendRuntimeMessage).toHaveBeenCalledWith({
+			action: BACKGROUND_ACTIONS.TOGGLE_VIVID_SEARCH,
+			targetTabId: 31,
+		});
+	});
+
+	test("does not depend on the active tab URL being available", () => {
+		commandListener?.(EXTENSION_COMMANDS.TOGGLE_VIVID_SEARCH, {
+			id: 41,
+			url: "chrome-extension://extension-id/newtab.html",
+		} as chrome.tabs.Tab);
+
+		expect(sendRuntimeMessage).toHaveBeenCalledWith({
+			action: BACKGROUND_ACTIONS.TOGGLE_VIVID_SEARCH,
+			targetTabId: 41,
+		});
+	});
+
+	test("queries the active tab when the browser omits the command tab", () => {
+		queryTabs.mockImplementationOnce((_query, callback) =>
+			callback([
+				{
+					id: 42,
+					url: "https://example.com",
+				} as chrome.tabs.Tab,
+			]),
+		);
+
+		commandListener?.(EXTENSION_COMMANDS.TOGGLE_VIVID_SEARCH);
+
+		expect(queryTabs).toHaveBeenCalledWith(
+			{ active: true, currentWindow: true },
+			expect.any(Function),
+		);
+		expect(sendRuntimeMessage).toHaveBeenCalledWith({
+			action: BACKGROUND_ACTIONS.TOGGLE_VIVID_SEARCH,
+			targetTabId: 42,
+		});
+	});
+
+	test("ignores another command and an active query without a usable tab", () => {
+		commandListener?.("another-command", { id: 31 } as chrome.tabs.Tab);
+		expect(queryTabs).not.toHaveBeenCalled();
+
+		queryTabs.mockImplementationOnce((_query, callback) => callback([]));
+		commandListener?.(EXTENSION_COMMANDS.TOGGLE_VIVID_SEARCH);
+
+		expect(sendRuntimeMessage).not.toHaveBeenCalled();
+	});
+
+	test("swallows extension-view runtime delivery failures", async () => {
+		sendRuntimeMessage.mockRejectedValueOnce(new Error("View closed"));
+		expect(() =>
+			commandListener?.(EXTENSION_COMMANDS.TOGGLE_VIVID_SEARCH, {
+				id: 41,
+				url: "chrome-extension://extension-id/newtab.html?source=command",
+			} as chrome.tabs.Tab),
+		).not.toThrow();
+		await Promise.resolve();
+
+		sendRuntimeMessage.mockImplementationOnce(() => {
+			throw new Error("Runtime unavailable");
+		});
+		expect(() =>
+			commandListener?.(EXTENSION_COMMANDS.TOGGLE_VIVID_SEARCH, {
+				id: 42,
+				url: "chrome-extension://extension-id/newtab.html#search",
+			} as chrome.tabs.Tab),
+		).not.toThrow();
+	});
+});
 
 describe("background messages", () => {
 	test.each([

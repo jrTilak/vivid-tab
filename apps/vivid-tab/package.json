@@ -32,7 +32,6 @@
 		"radix-ui": "^1.6.4",
 		"react": "19.2.7",
 		"react-dom": "19.2.7",
-		"react-hotkeys-hook": "^5.3.3",
 		"tailwind-merge": "^3.6.0",
 		"zod": "^4.4.3"
 	},
@@ -72,6 +71,15 @@
 		"webdriverio": "^9.29.1"
 	},
 	"manifest": {
+		"commands": {
+			"toggle-vivid-search": {
+				"suggested_key": {
+					"default": "Ctrl+Shift+Space",
+					"mac": "Command+Shift+Space"
+				},
+				"description": "Toggle Vivid Tab search"
+			}
+		},
 		"web_accessible_resources": [
 			{
 				"resources": [

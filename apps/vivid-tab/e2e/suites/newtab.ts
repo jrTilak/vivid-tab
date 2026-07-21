@@ -13,6 +13,10 @@ import {
 	writeLocalStorage,
 	writeSettings,
 } from "../support/extension";
+import {
+	dispatchSearchToggleToExtensionTab,
+	readConfiguredSearchCommand,
+} from "../support/search-command";
 
 type BrowserName = "chromium" | "firefox";
 
@@ -303,8 +307,15 @@ export const runNewtabSuite = (browserName: BrowserName) => {
 			});
 		}
 
-		it("opens search by pointer and hotkey, ignores blanks, and resets its draft", async () => {
+		it("opens search by pointer and browser command, ignores blanks, and resets its draft", async () => {
 			await openExtensionPage("newtab");
+			expect(await readConfiguredSearchCommand()).toEqual({
+				name: "toggle-vivid-search",
+				shortcut:
+					process.platform === "darwin"
+						? "Command+Shift+Space"
+						: "Ctrl+Shift+Space",
+			});
 
 			const searchTrigger = $("input[readonly][aria-haspopup='dialog']");
 			await expect(searchTrigger).toHaveAttribute("aria-label", "Open search");
@@ -329,10 +340,7 @@ export const runNewtabSuite = (browserName: BrowserName) => {
 			await browser.keys("Escape");
 			await expect(dialog).not.toBeDisplayed();
 
-			await browser.keys([
-				process.platform === "darwin" ? "Meta" : "Control",
-				",",
-			]);
+			await dispatchSearchToggleToExtensionTab();
 			dialog = $("[role='dialog']");
 			await expect(dialog).toBeDisplayed();
 			searchInput = dialog.$("input[placeholder='Search the web…']");

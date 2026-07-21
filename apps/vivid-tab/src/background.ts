@@ -1,4 +1,9 @@
-import { ALARMS, BACKGROUND_ACTIONS } from "@/constants/background-actions";
+import {
+	ALARMS,
+	BACKGROUND_ACTIONS,
+	EXTENSION_COMMANDS,
+	type ToggleVividSearchMessage,
+} from "@/constants/background-actions";
 import { LOCAL_STORAGE } from "@/constants/keys";
 import { resolveBookmarkRootFolder } from "@/lib/bookmarks";
 import { resolveSearchTarget } from "@/lib/search-query";
@@ -75,6 +80,39 @@ chrome.runtime.onMessage.addListener((message: unknown, _, sendResponse) => {
 
 		default:
 			return undefined;
+	}
+});
+
+const sendSearchToggleToTab = (tab: chrome.tabs.Tab | undefined) => {
+	const tabId = tab?.id;
+	if (typeof tabId !== "number") return;
+
+	const message: ToggleVividSearchMessage = {
+		action: BACKGROUND_ACTIONS.TOGGLE_VIVID_SEARCH,
+		targetTabId: tabId,
+	};
+
+	try {
+		void chrome.runtime.sendMessage(message).catch(() => undefined);
+	} catch {
+		/* Extension views may be navigating or already closed. */
+	}
+};
+
+chrome.commands.onCommand.addListener((command, tab) => {
+	if (command !== EXTENSION_COMMANDS.TOGGLE_VIVID_SEARCH) return;
+
+	if (typeof tab?.id === "number") {
+		sendSearchToggleToTab(tab);
+		return;
+	}
+
+	try {
+		chrome.tabs.query({ active: true, currentWindow: true }, ([activeTab]) => {
+			sendSearchToggleToTab(activeTab);
+		});
+	} catch {
+		/* Browser-owned pages may provide neither a tab nor query access. */
 	}
 });
 
