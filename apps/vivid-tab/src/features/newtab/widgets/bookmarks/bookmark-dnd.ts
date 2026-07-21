@@ -27,7 +27,14 @@ export const getBookmarkReorder = ({
 	) {
 		return undefined;
 	}
-	if (typeof fromIndex !== "number" || typeof toIndex !== "number") {
+	if (
+		typeof fromIndex !== "number" ||
+		typeof toIndex !== "number" ||
+		!Number.isInteger(fromIndex) ||
+		!Number.isInteger(toIndex) ||
+		fromIndex < 0 ||
+		toIndex < 0
+	) {
 		return undefined;
 	}
 

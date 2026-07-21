@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "@test/jest";
 import {
 	getNewtabLayoutType,
 	hasLeftLayoutColumn,
@@ -23,5 +23,7 @@ describe("new-tab layout", () => {
 
 		expect(hasLeftLayoutColumn(layout)).toBe(true);
 		expect(hasRightLayoutColumn(layout)).toBe(true);
+		expect(hasLeftLayoutColumn({ 1: "" })).toBe(false);
+		expect(hasRightLayoutColumn({ 4: "clock", 8: "todos" })).toBe(false);
 	});
 });

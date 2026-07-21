@@ -6,7 +6,7 @@ import {
 	mock,
 	spyOn,
 	test,
-} from "@test";
+} from "@test/jest";
 import { BACKGROUND_ACTIONS } from "@/constants/background-actions";
 import type { Bookmarks } from "@/types/bookmark";
 import {

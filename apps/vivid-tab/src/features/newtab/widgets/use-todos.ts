@@ -8,6 +8,7 @@ import {
 	useState,
 } from "react";
 import {
+	areTodosEqual,
 	createTodo,
 	deleteTodo,
 	getNearestExpirationDelay,
@@ -83,6 +84,7 @@ export const useTodos = ({
 	}, []);
 
 	useEffect(() => {
+		const storageChanges = chrome.storage.onChanged;
 		const handleStorageChange = (
 			changes: Record<string, chrome.storage.StorageChange>,
 			areaName: string,
@@ -91,20 +93,7 @@ export const useTodos = ({
 
 			const parsed = parseStoredTodos(changes[TODOS_STORAGE_KEY].newValue);
 			const currentTodos = todosRef.current;
-			const isUnchanged =
-				currentTodos.length === parsed.todos.length &&
-				currentTodos.every((todo, index) => {
-					const nextTodo = parsed.todos[index];
-
-					return (
-						nextTodo?.id === todo.id &&
-						nextTodo.text === todo.text &&
-						nextTodo.completed === todo.completed &&
-						nextTodo.completedAt === todo.completedAt
-					);
-				});
-
-			if (isUnchanged) return;
+			if (areTodosEqual(currentTodos, parsed.todos)) return;
 
 			localRevisionRef.current += 1;
 			todosRef.current = parsed.todos;
@@ -112,9 +101,9 @@ export const useTodos = ({
 			if (parsed.shouldPersist) persistTodos(parsed.todos);
 		};
 
-		chrome.storage.onChanged.addListener(handleStorageChange);
+		storageChanges.addListener(handleStorageChange);
 
-		return () => chrome.storage.onChanged.removeListener(handleStorageChange);
+		return () => storageChanges.removeListener(handleStorageChange);
 	}, []);
 
 	useEffect(() => {

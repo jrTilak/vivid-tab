@@ -5,6 +5,10 @@ export const TODOS_STORAGE_KEY = "todos";
 
 const StoredTodoSchema = z.object({
 	completed: z.boolean(),
+	/**
+	 * @deprecated Optional only for todos saved before v1.4.0; require this field
+	 * after removing the compatibility parser in v1.5.0.
+	 */
 	completedAt: z.optional(z.nullable(z.number())),
 	id: z.number(),
 	text: z.string(),
@@ -74,6 +78,10 @@ export const loadTodos = async (): Promise<ParsedStoredTodos> => {
 		return parseStoredTodos(localData[TODOS_STORAGE_KEY]);
 	}
 
+	/**
+	 * @deprecated Todos moved to local storage in v1.4.0. Remove this sync-storage
+	 * migration in v1.5.0.
+	 */
 	const syncData = await chrome.storage.sync.get(TODOS_STORAGE_KEY);
 	const legacyTodos = syncData[TODOS_STORAGE_KEY];
 	if (legacyTodos === undefined) return parseStoredTodos(undefined);

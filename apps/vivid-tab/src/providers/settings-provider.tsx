@@ -12,7 +12,7 @@ import {
 	LAST_ONLINE_IMAGES_FETCHED_AT,
 	LAST_WALLPAPER_CHANGED_AT,
 } from "@/constants/keys";
-import { ensureRootBookmarkFolder } from "@/lib/root-bookmark-folder";
+import { ensureRootBookmarkFolder } from "@/lib/bookmarks";
 import {
 	createDefaultSettings,
 	LEGACY_SETTINGS_STORAGE_KEY,
@@ -22,7 +22,7 @@ import {
 	SETTINGS_STORAGE_KEY,
 	serializeSettings,
 } from "@/lib/settings-storage";
-import { deleteWallpaperDatabase } from "@/lib/wallpaper-database";
+import { deleteWallpaperDatabase } from "@/lib/wallpapers/database";
 import type { Settings } from "@/zod/settings";
 
 const SYNC_DEBOUNCE_MS = 400;

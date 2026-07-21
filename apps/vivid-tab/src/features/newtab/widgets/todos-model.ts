@@ -102,3 +102,19 @@ export const sortTodos = (todos: readonly Todo[]): Todo[] =>
 
 		return second.id - first.id;
 	});
+
+export const areTodosEqual = (
+	currentTodos: readonly Todo[],
+	nextTodos: readonly Todo[],
+) =>
+	currentTodos.length === nextTodos.length &&
+	currentTodos.every((todo, index) => {
+		const nextTodo = nextTodos[index];
+
+		return (
+			nextTodo?.id === todo.id &&
+			nextTodo.text === todo.text &&
+			nextTodo.completed === todo.completed &&
+			nextTodo.completedAt === todo.completedAt
+		);
+	});

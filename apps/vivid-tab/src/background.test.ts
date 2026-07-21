@@ -6,7 +6,7 @@ import {
 	jest,
 	mock,
 	test,
-} from "@test";
+} from "@test/jest";
 import { ALARMS, BACKGROUND_ACTIONS } from "@/constants/background-actions";
 import { LOCAL_STORAGE } from "@/constants/keys";
 

@@ -3,7 +3,7 @@ import {
 	getBookmarkIconStorageKey,
 	notifyBookmarkIconChanged,
 	parseStoredBookmarkIcon,
-} from "@/lib/bookmark-icons";
+} from "@/lib/bookmarks";
 
 type StoredBookmarkIcon = {
 	icon: string;
@@ -110,11 +110,7 @@ export const persistBookmarkIcon = async (
 	notifyBookmarkIconChanged(bookmarkId);
 };
 
-export {
-	BOOKMARK_ICON_UPDATE_EVENT,
-	notifyBookmarkIconChanged,
-	parseStoredBookmarkIcon,
-};
+export { BOOKMARK_ICON_UPDATE_EVENT, parseStoredBookmarkIcon };
 
 /** Converts a selected local image into the data URL stored by the extension. */
 export const readIconFile = (file: File): Promise<string> => {

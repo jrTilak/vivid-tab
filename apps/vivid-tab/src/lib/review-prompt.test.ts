@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, mock, test } from "@test";
+import { afterEach, describe, expect, mock, test } from "@test/jest";
 import { LOCAL_STORAGE } from "@/constants/keys";
 import {
 	checkAndRecordReviewPrompt,

@@ -1,4 +1,4 @@
-import { openImageDB, type StoredImage } from "@/lib/wallpaper-database";
+import { openImageDB, type StoredImage } from "@/lib/wallpapers/database";
 
 const readImageAsDataUrl = (file: File): Promise<string> =>
 	new Promise((resolve, reject) => {

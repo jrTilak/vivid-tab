@@ -4,7 +4,7 @@ import {
 	getWallpaperRotationInterval,
 	isWallpaperRotationDue,
 	selectRandomWallpaperId,
-} from "@/lib/wallpaper-selection";
+} from "@/lib/wallpapers/selection";
 import { useSettings } from "@/providers/settings-provider";
 import { useImage } from "./use-image";
 

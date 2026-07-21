@@ -1,81 +1,14 @@
 import { useCallback, useEffect, useMemo, useReducer } from "react";
-import {
-	appendNote,
-	type Note,
-	parseStoredNotes,
-	removeNote,
-	sortNotesByNewest,
-} from "./notes-model";
+import { parseStoredNotes, sortNotesByNewest } from "./notes-model";
+import { INITIAL_NOTES_STATE, notesReducer } from "./notes-state";
 import {
 	NOTES_STORAGE_KEY,
 	readStoredNotes,
 	writeStoredNotes,
 } from "./notes-storage";
 
-type NotesState = {
-	draft: string;
-	notes: Note[];
-	revision: number;
-};
-
-type NotesAction =
-	| { type: "draft-changed"; draft: string }
-	| { type: "external-notes"; notes: Note[] }
-	| { type: "hydrated"; notes: Note[] }
-	| { type: "note-added"; createdAt: number }
-	| { type: "note-deleted"; id: number };
-
-const INITIAL_STATE: NotesState = {
-	draft: "",
-	notes: [],
-	revision: 0,
-};
-
-const notesReducer = (state: NotesState, action: NotesAction): NotesState => {
-	switch (action.type) {
-		case "draft-changed":
-			return { ...state, draft: action.draft };
-		case "hydrated":
-			// Keep local edits if storage resolves after the user creates a note.
-			return state.revision === 0 ? { ...state, notes: action.notes } : state;
-		case "external-notes": {
-			const isUnchanged =
-				state.notes.length === action.notes.length &&
-				state.notes.every((note, index) => {
-					const nextNote = action.notes[index];
-
-					return (
-						nextNote?.id === note.id &&
-						nextNote.text === note.text &&
-						nextNote.createdAt === note.createdAt
-					);
-				});
-
-			return isUnchanged
-				? state
-				: { ...state, notes: action.notes, revision: 0 };
-		}
-		case "note-added":
-			if (!state.draft.trim()) {
-				return state;
-			}
-
-			return {
-				draft: "",
-				notes: appendNote(state.notes, state.draft, action.createdAt),
-				revision: state.revision + 1,
-			};
-		case "note-deleted":
-			return {
-				...state,
-				notes: removeNote(state.notes, action.id),
-				revision: state.revision + 1,
-			};
-	}
-};
-
 export const useNotes = () => {
-	const [state, dispatch] = useReducer(notesReducer, INITIAL_STATE);
+	const [state, dispatch] = useReducer(notesReducer, INITIAL_NOTES_STATE);
 
 	useEffect(() => {
 		let isActive = true;
@@ -96,6 +29,7 @@ export const useNotes = () => {
 	}, []);
 
 	useEffect(() => {
+		const storageChanges = chrome.storage.onChanged;
 		const handleStorageChange = (
 			changes: Record<string, chrome.storage.StorageChange>,
 			areaName: string,
@@ -108,9 +42,9 @@ export const useNotes = () => {
 			});
 		};
 
-		chrome.storage.onChanged.addListener(handleStorageChange);
+		storageChanges.addListener(handleStorageChange);
 
-		return () => chrome.storage.onChanged.removeListener(handleStorageChange);
+		return () => storageChanges.removeListener(handleStorageChange);
 	}, []);
 
 	useEffect(() => {

@@ -1,4 +1,4 @@
-import { getBookmarkIconStorageKey } from "@/lib/bookmark-icons";
+import { getBookmarkIconStorageKey } from "@/lib/bookmarks";
 
 const getRuntimeError = () => {
 	const runtimeError = chrome.runtime.lastError;
@@ -40,9 +40,14 @@ const removeBookmarkStorage = (
 	url?: string,
 ): Promise<void> =>
 	new Promise((resolve, reject) => {
+		/**
+		 * @deprecated URL-keyed favicons predate bookmark-ID icon keys. Remove this
+		 * cleanup path in v1.5.0.
+		 */
+		const legacyIconKey = url ? `favicon-${url}` : undefined;
 		const keys = [
 			getBookmarkIconStorageKey(bookmarkId),
-			...(url ? [`favicon-${url}`] : []),
+			...(legacyIconKey ? [legacyIconKey] : []),
 		];
 
 		chrome.storage.local.remove(keys, () => {

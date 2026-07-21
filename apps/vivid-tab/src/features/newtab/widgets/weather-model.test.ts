@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "@test/jest";
 import {
 	createCachedWeather,
 	formatWeatherTemperature,
@@ -63,5 +63,7 @@ describe("weather model", () => {
 			"https://cdn.weatherapi.com/icon.png",
 		);
 		expect(getWeatherIconUrl("javascript:alert(1)")).toBeNull();
+		expect(getWeatherIconUrl("   ")).toBeNull();
+		expect(getWeatherIconUrl("http://[")).toBeNull();
 	});
 });

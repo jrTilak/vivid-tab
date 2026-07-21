@@ -2,7 +2,7 @@ import { useCallback, useSyncExternalStore } from "react";
 import {
 	getBookmarkIconSnapshot,
 	subscribeBookmarkIcon,
-} from "@/lib/bookmark-icon-store";
+} from "@/lib/bookmarks";
 
 type Props = {
 	id?: string;

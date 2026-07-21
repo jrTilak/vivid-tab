@@ -55,6 +55,10 @@ const parseCachedQuote = (value: unknown): CachedQuote | null => {
 			return { categoriesKey, fetchedAt, quote };
 		}
 
+		/**
+		 * @deprecated Bare quote-cache records are supported only through v1.4.0;
+		 * remove this fallback in v1.5.0.
+		 */
 		const legacyQuote = parseQuote(candidate);
 
 		return legacyQuote ? { quote: legacyQuote } : null;
@@ -73,9 +77,14 @@ const isCachedQuoteFresh = (
 	now - cachedQuote.fetchedAt < QUOTE_CACHE_DURATION_MS;
 
 const readCachedQuote = async (): Promise<CachedQuote | null> => {
-	const result = await chrome.storage.local.get(LOCAL_STORAGE.quote);
+	try {
+		const result = await chrome.storage.local.get(LOCAL_STORAGE.quote);
 
-	return parseCachedQuote(result[LOCAL_STORAGE.quote]);
+		return parseCachedQuote(result[LOCAL_STORAGE.quote]);
+	} catch (error) {
+		console.warn("Unable to read the cached quote:", error);
+		return null;
+	}
 };
 
 const saveCachedQuote = async (
@@ -112,13 +121,19 @@ const loadQuote = async (
 ): Promise<QuoteData> => {
 	const categoriesKey = [...categories].sort().join("|");
 	const cachedQuote = await readCachedQuote();
+	signal.throwIfAborted();
 	if (cachedQuote && isCachedQuoteFresh(cachedQuote, categoriesKey)) {
 		return cachedQuote.quote;
 	}
 
 	try {
 		const quote = await fetchQuote(categories, signal);
-		await saveCachedQuote(quote, categoriesKey);
+		try {
+			await saveCachedQuote(quote, categoriesKey);
+		} catch (error) {
+			// Cache availability must not hide a successfully fetched quote.
+			console.warn("Unable to cache the latest quote:", error);
+		}
 
 		return quote;
 	} catch (error) {

@@ -1,4 +1,4 @@
-import { describe, expect, test } from "@test";
+import { describe, expect, test } from "@test/jest";
 import { DEFAULT_SETTINGS, SETTINGS_VERSION } from "@/constants/settings";
 import {
 	createDefaultSettings,

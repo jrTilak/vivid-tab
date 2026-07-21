@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "@test/jest";
 import { runWelcomeCompletion } from "./complete-welcome";
 
 describe("runWelcomeCompletion", () => {
@@ -51,7 +51,7 @@ describe("runWelcomeCompletion", () => {
 				closeWelcomeTab: async () => undefined,
 			}),
 		).rejects.toThrow("was not saved");
-		expect(openedTab).toBeFalse();
+		expect(openedTab).toBe(false);
 	});
 
 	test("skips persistence when no folder is selected", async () => {
@@ -67,6 +67,97 @@ describe("runWelcomeCompletion", () => {
 			closeWelcomeTab: async () => undefined,
 		});
 
-		expect(persisted).toBeFalse();
+		expect(persisted).toBe(false);
+	});
+
+	test("does not close the welcome tab when the browser reuses it", async () => {
+		let closed = false;
+
+		await runWelcomeCompletion({
+			getWelcomeTab: async () => ({ id: 7 }),
+			persistRootFolder: async () => true,
+			openNewTab: async () => ({ id: 7 }),
+			closeWelcomeTab: async () => {
+				closed = true;
+			},
+		});
+
+		expect(closed).toBe(false);
+	});
+
+	test("does not close a welcome tab without an ID", async () => {
+		let closed = false;
+
+		await runWelcomeCompletion({
+			getWelcomeTab: async () => ({}),
+			persistRootFolder: async () => true,
+			openNewTab: async () => ({ id: 8 }),
+			closeWelcomeTab: async () => {
+				closed = true;
+			},
+		});
+
+		expect(closed).toBe(false);
+	});
+
+	test("stops before persistence when folder resolution fails", async () => {
+		const events: string[] = [];
+
+		await expect(
+			runWelcomeCompletion({
+				getWelcomeTab: async () => {
+					events.push("get-current");
+					return { id: 1 };
+				},
+				resolveRootFolder: async () => {
+					events.push("resolve-folder");
+					throw new Error("folder lookup failed");
+				},
+				persistRootFolder: async () => {
+					events.push("persist");
+					return true;
+				},
+				openNewTab: async () => {
+					events.push("open");
+					return { id: 2 };
+				},
+				closeWelcomeTab: async () => {
+					events.push("close");
+				},
+			}),
+		).rejects.toThrow("folder lookup failed");
+		expect(events).toEqual(["get-current", "resolve-folder"]);
+	});
+
+	test("does not close the welcome tab when opening its replacement fails", async () => {
+		let closed = false;
+
+		await expect(
+			runWelcomeCompletion({
+				getWelcomeTab: async () => ({ id: 1 }),
+				resolveRootFolder: () => "folder",
+				persistRootFolder: async () => true,
+				openNewTab: async () => {
+					throw new Error("tab creation failed");
+				},
+				closeWelcomeTab: async () => {
+					closed = true;
+				},
+			}),
+		).rejects.toThrow("tab creation failed");
+		expect(closed).toBe(false);
+	});
+
+	test("propagates failures when closing the old welcome tab", async () => {
+		await expect(
+			runWelcomeCompletion({
+				getWelcomeTab: async () => ({ id: 1 }),
+				persistRootFolder: async () => true,
+				openNewTab: async () => ({ id: 2 }),
+				closeWelcomeTab: async () => {
+					throw new Error("tab close failed");
+				},
+			}),
+		).rejects.toThrow("tab close failed");
 	});
 });

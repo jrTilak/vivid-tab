@@ -1,10 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "@test/jest";
 import type { Bookmarks } from "@/types/bookmark";
 import { getBookmarkReorder } from "./bookmark-dnd";
 import {
 	deriveBookmarkView,
 	getFolderCounts,
 	getValidMoveFolders,
+	isBookmarkFolder,
 	resolveActiveRootFolder,
 	sortBookmarksByIndex,
 } from "./bookmark-tree";
@@ -48,11 +49,49 @@ describe("bookmark tree", () => {
 		expect(stale.currentFolderChildren).toEqual([]);
 	});
 
+	test("derives home and virtual-root views without treating empty folders as URLs", () => {
+		const emptyFolder = {
+			children: [],
+			dateAdded: 1,
+			id: "empty",
+			index: 2,
+			parentId: "root",
+			title: "Empty",
+		};
+		const source = [...bookmarks, emptyFolder];
+		const home = deriveBookmarkView(source, "root", "home", []);
+
+		expect(home.currentFolderChildren.map(({ id }) => id)).toEqual([
+			"root-url",
+		]);
+		expect(home.currentParentId).toBe("root");
+		expect(home.rootFolders.map(({ id }) => id)).toEqual(["folder", "empty"]);
+		expect(isBookmarkFolder(emptyFolder)).toBe(true);
+
+		for (const virtualRoot of ["history", "top-sites"]) {
+			const view = deriveBookmarkView(source, "root", virtualRoot, []);
+			expect(view.currentFolderChildren).toEqual([]);
+			expect(view.currentParentId).toBeUndefined();
+		}
+	});
+
+	test("keeps the last valid folder when a deeper path segment is stale", () => {
+		const nested = deriveBookmarkView(bookmarks, "root", "home", [
+			"folder",
+			"missing",
+		]);
+
+		expect(nested.folderStack.map(({ id }) => id)).toEqual(["folder"]);
+		expect(nested.currentParentId).toBe("folder");
+		expect(nested.currentFolderChildren[0]?.id).toBe("nested-url");
+	});
+
 	test("sorts without mutating source data and counts both node types", () => {
 		const sorted = sortBookmarksByIndex(bookmarks);
 		expect(sorted.map(({ id }) => id)).toEqual(["root-url", "folder"]);
 		expect(bookmarks[0]?.id).toBe("folder");
 		expect(getFolderCounts(bookmarks)).toEqual({ bookmarks: 1, folders: 1 });
+		expect(getFolderCounts()).toEqual({ bookmarks: 0, folders: 0 });
 	});
 
 	test("validates persisted roots and excludes move descendants", () => {
@@ -76,6 +115,28 @@ describe("bookmark tree", () => {
 				"folder",
 			).map(({ id }) => id),
 		).toEqual(["sibling"]);
+
+		expect(
+			resolveActiveRootFolder({
+				candidate: "history",
+				hasHomeBookmarks: true,
+				rootFolderIds: ["folder"],
+				showHistory: true,
+				showTopSites: false,
+			}),
+		).toBe("history");
+		expect(
+			resolveActiveRootFolder({
+				candidate: "top-sites",
+				hasHomeBookmarks: true,
+				rootFolderIds: [],
+				showHistory: false,
+				showTopSites: false,
+			}),
+		).toBe("home");
+
+		const folders = [{ depth: 0, id: "other", title: "Other" }];
+		expect(getValidMoveFolders(folders, "missing")).toBe(folders);
 	});
 
 	test("ignores incomplete drops and calculates a safe reorder", () => {

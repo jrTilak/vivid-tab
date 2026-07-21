@@ -41,6 +41,10 @@ export const parseSettingsFile = (source: string): unknown => {
 		return (parsed as { settings: unknown }).settings;
 	}
 
+	/**
+	 * @deprecated Bare settings backups are accepted through v1.4.0 only; remove
+	 * this fallback in v1.5.0.
+	 */
 	return parsed;
 };
 
@@ -79,6 +83,10 @@ export const exportSettingsFile = (settings: Settings) => {
 
 	anchor.href = url;
 	anchor.download = `vivid-tab-settings-${new Date().toISOString().slice(0, 10)}.json`;
-	anchor.click();
-	URL.revokeObjectURL(url);
+
+	try {
+		anchor.click();
+	} finally {
+		URL.revokeObjectURL(url);
+	}
 };

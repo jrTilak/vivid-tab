@@ -6,7 +6,7 @@ import {
 	mock,
 	spyOn,
 	test,
-} from "@test";
+} from "@test/jest";
 import { LAST_ONLINE_IMAGES_FETCHED_AT } from "@/constants/keys";
 import {
 	createDefaultSettings,

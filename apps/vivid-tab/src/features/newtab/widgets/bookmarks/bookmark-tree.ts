@@ -1,4 +1,4 @@
-import type { FlattenedBookmarkFolder } from "@/lib/flatten-bookmark-folders";
+import type { FlattenedBookmarkFolder } from "@/lib/bookmarks";
 import type {
 	Bookmark,
 	BookmarkFolderNode,

@@ -1,7 +1,13 @@
 import * as React from "react";
+import {
+	getNextTheme,
+	isEditableThemeShortcutTarget,
+	isTheme,
+	resolveTheme,
+	type Theme,
+} from "@/lib/theme";
 
-export type Theme = "dark" | "light" | "system";
-type ResolvedTheme = "dark" | "light";
+export type { Theme } from "@/lib/theme";
 
 type ThemeProviderProps = {
 	children: React.ReactNode;
@@ -18,27 +24,10 @@ type ThemeProviderState = {
 };
 
 const COLOR_SCHEME_QUERY = "(prefers-color-scheme: dark)";
-const THEME_VALUES: Theme[] = ["dark", "light", "system"];
 
 const ThemeProviderContext = React.createContext<
 	ThemeProviderState | undefined
 >(undefined);
-
-function isTheme(value: string | null): value is Theme {
-	if (value === null) {
-		return false;
-	}
-
-	return THEME_VALUES.includes(value as Theme);
-}
-
-function getSystemTheme(): ResolvedTheme {
-	if (window.matchMedia(COLOR_SCHEME_QUERY).matches) {
-		return "dark";
-	}
-
-	return "light";
-}
 
 function disableTransitionsTemporarily() {
 	const style = document.createElement("style");
@@ -57,25 +46,6 @@ function disableTransitionsTemporarily() {
 			});
 		});
 	};
-}
-
-function isEditableTarget(target: EventTarget | null) {
-	if (!(target instanceof HTMLElement)) {
-		return false;
-	}
-
-	if (target.isContentEditable) {
-		return true;
-	}
-
-	const editableParent = target.closest(
-		"input, textarea, select, [contenteditable='true']",
-	);
-	if (editableParent) {
-		return true;
-	}
-
-	return false;
 }
 
 export function ThemeProvider({
@@ -109,8 +79,10 @@ export function ThemeProvider({
 	const applyTheme = React.useCallback(
 		(nextTheme: Theme, isSubsequentChange = true) => {
 			const root = document.documentElement;
-			const resolvedTheme =
-				nextTheme === "system" ? getSystemTheme() : nextTheme;
+			const resolvedTheme = resolveTheme(
+				nextTheme,
+				window.matchMedia(COLOR_SCHEME_QUERY).matches,
+			);
 			const restoreTransitions =
 				disableTransitionOnChange && isSubsequentChange
 					? disableTransitionsTemporarily()
@@ -160,7 +132,7 @@ export function ThemeProvider({
 				return;
 			}
 
-			if (isEditableTarget(event.target)) {
+			if (isEditableThemeShortcutTarget(event.target)) {
 				return;
 			}
 
@@ -169,14 +141,10 @@ export function ThemeProvider({
 			}
 
 			setThemeState((currentTheme) => {
-				const nextTheme =
-					currentTheme === "dark"
-						? "light"
-						: currentTheme === "light"
-							? "dark"
-							: getSystemTheme() === "dark"
-								? "light"
-								: "dark";
+				const nextTheme = getNextTheme(
+					currentTheme,
+					window.matchMedia(COLOR_SCHEME_QUERY).matches,
+				);
 
 				localStorage.setItem(storageKey, nextTheme);
 				return nextTheme;

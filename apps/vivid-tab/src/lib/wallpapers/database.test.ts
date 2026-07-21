@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test } from "@test";
+import { afterEach, beforeEach, describe, expect, test } from "@test/jest";
 import {
 	deleteWallpaperDatabase,
 	openImageDB,

@@ -1,7 +1,10 @@
 const SEARCH_SUGGESTIONS_ENDPOINT =
 	"https://suggestqueries.google.com/complete/search";
 
-/** Builds the provider URL without interpolating untrusted query text. */
+/**
+ * Builds the provider URL through URLSearchParams so arbitrary query text
+ * cannot alter fixed provider parameters.
+ */
 export const buildSearchSuggestionsUrl = (query: string) => {
 	const url = new URL(SEARCH_SUGGESTIONS_ENDPOINT);
 	url.searchParams.set("client", "firefox");
@@ -10,7 +13,10 @@ export const buildSearchSuggestionsUrl = (query: string) => {
 	return url.href;
 };
 
-/** Returns only valid string suggestions from the provider's tuple response. */
+/**
+ * Validates the provider's untrusted tuple response, removes blank and duplicate
+ * suggestions, and caps the list before it reaches render state.
+ */
 export const parseSearchSuggestions = (value: unknown): string[] => {
 	if (!Array.isArray(value) || !Array.isArray(value[1])) return [];
 

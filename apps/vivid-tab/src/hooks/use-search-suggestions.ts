@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import {
 	buildSearchSuggestionsUrl,
 	parseSearchSuggestions,
-} from "./search-suggestions";
+} from "@/lib/search-suggestions";
 
 type Props = {
 	query: string;

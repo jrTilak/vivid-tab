@@ -20,7 +20,7 @@ import {
 	mock,
 	spyOn,
 	test,
-} from "@test";
+} from "@test/jest";
 
 type MainDependencies = {
 	findFiles?: () => string[];

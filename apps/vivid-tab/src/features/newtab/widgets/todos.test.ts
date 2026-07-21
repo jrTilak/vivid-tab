@@ -1,6 +1,8 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "@test/jest";
 import {
+	areTodosEqual,
 	createTodo,
+	deleteTodo,
 	getNearestExpirationDelay,
 	removeExpiredTodos,
 	sortTodos,
@@ -44,6 +46,37 @@ describe("todo model", () => {
 
 		expect(sortTodos(todos).map(({ id }) => id)).toEqual([3, 2, 4]);
 		expect(todos).toEqual(originalOrder);
+	});
+
+	test("preserves array identity for missing update targets", () => {
+		const todos: Todo[] = [createTodo("Keep", 1)];
+
+		expect(deleteTodo(todos, 999)).toBe(todos);
+		expect(toggleTodo(todos, 999, 500)).toBe(todos);
+		expect(deleteTodo(todos, 1)).toEqual([]);
+	});
+
+	test("handles expiration boundaries and negative durations", () => {
+		const completed: Todo = {
+			completed: true,
+			completedAt: 1_000,
+			id: 1,
+			text: "Done",
+		};
+
+		expect(removeExpiredTodos([completed], 1, 60_999)).toHaveLength(1);
+		expect(removeExpiredTodos([completed], 1, 61_000)).toEqual([]);
+		expect(removeExpiredTodos([completed], -5, 1_000)).toEqual([]);
+		expect(getNearestExpirationDelay([], 1, 0)).toBeNull();
+		expect(getNearestExpirationDelay([completed], 0, 2_000)).toBe(0);
+	});
+
+	test("compares all fields used by external storage reconciliation", () => {
+		const todos: Todo[] = [createTodo("Same", 1)];
+
+		expect(areTodosEqual(todos, [{ ...todos[0] }])).toBe(true);
+		expect(areTodosEqual(todos, [])).toBe(false);
+		expect(areTodosEqual(todos, [createTodo("Changed", 1)])).toBe(false);
 	});
 });
 

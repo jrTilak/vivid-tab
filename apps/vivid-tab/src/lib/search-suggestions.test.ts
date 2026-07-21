@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "@test/jest";
 import {
 	buildSearchSuggestionsUrl,
 	parseSearchSuggestions,
@@ -19,5 +19,18 @@ describe("search suggestions", () => {
 		expect(parseSearchSuggestions({ suggestions: ["invalid shape"] })).toEqual(
 			[],
 		);
+	});
+
+	test("deduplicates and limits provider results to ten suggestions", () => {
+		const suggestions = Array.from(
+			{ length: 12 },
+			(_, index) => `item-${index}`,
+		);
+
+		expect(
+			parseSearchSuggestions(["query", [...suggestions, "item-0"]]),
+		).toEqual(suggestions.slice(0, 10));
+		expect(parseSearchSuggestions(null)).toEqual([]);
+		expect(parseSearchSuggestions(["query", null])).toEqual([]);
 	});
 });

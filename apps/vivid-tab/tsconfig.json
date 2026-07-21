@@ -6,7 +6,8 @@
 		"moduleResolution": "bundler",
 		"types": ["bun", "chrome", "node"],
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"@test/jest": ["./test/jest.ts"]
 		}
 	}
 }

@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { LAST_WALLPAPER_CHANGED_AT } from "@/constants/keys";
-import { selectRandomWallpaperId } from "@/lib/wallpaper-selection";
+import { selectRandomWallpaperId } from "@/lib/wallpapers/selection";
 import { useSettings } from "@/providers/settings-provider";
 
 export const useNextWallpaper = () => {

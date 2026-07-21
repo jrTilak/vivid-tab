@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { readBookmarks } from "@/lib/bookmark-reader";
+import { readBookmarks } from "@/lib/bookmarks";
 import type { Bookmarks } from "@/types/bookmark";
 
 const BOOKMARK_REFRESH_DELAY_MS = 25;

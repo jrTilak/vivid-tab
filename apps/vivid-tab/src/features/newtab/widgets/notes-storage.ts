@@ -8,7 +8,11 @@ export const readStoredNotes = async (): Promise<Note[]> => {
 		return parseStoredNotes(localResult[NOTES_STORAGE_KEY]);
 	}
 
-	/* Migrate legacy sync data; notes can exceed sync's small per-item quota. */
+	/**
+	 * Notes moved because they can exceed sync's small per-item quota.
+	 *
+	 * @deprecated Remove this sync-storage migration in v1.5.0.
+	 */
 	const syncResult = await chrome.storage.sync.get(NOTES_STORAGE_KEY);
 	const storedNotes = syncResult[NOTES_STORAGE_KEY];
 	if (storedNotes === undefined) return [];

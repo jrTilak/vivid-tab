@@ -4,10 +4,8 @@ export type NewtabLayoutType = "large" | "mid" | "small";
 const LEFT_COLUMN_SLOTS = ["1", "2", "3"] as const;
 const RIGHT_COLUMN_SLOTS = ["5", "6", "7"] as const;
 
-export const hasLayoutWidget = (
-	layout: NewtabLayout,
-	slots: readonly string[],
-) => slots.some((slot) => Boolean(layout[slot]));
+const hasLayoutWidget = (layout: NewtabLayout, slots: readonly string[]) =>
+	slots.some((slot) => Boolean(layout[slot]));
 
 /** Derives the bookmark column width without a render-delaying effect. */
 export const getNewtabLayoutType = (

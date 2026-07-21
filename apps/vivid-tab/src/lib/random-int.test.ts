@@ -1,4 +1,4 @@
-import { describe, expect, test } from "@test";
+import { describe, expect, test } from "@test/jest";
 import { randomInt } from "./random-int";
 
 describe("randomInt", () => {

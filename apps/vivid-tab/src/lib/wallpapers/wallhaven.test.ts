@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, mock, spyOn, test } from "@test";
+import { afterEach, describe, expect, mock, spyOn, test } from "@test/jest";
 import { DEFAULT_SEARCH_TERMS } from "@/constants/wallpapers";
 import { Wallhaven } from "./wallhaven";
 

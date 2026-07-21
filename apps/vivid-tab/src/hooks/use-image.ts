@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { openImageDB, type StoredImage } from "@/lib/wallpaper-database";
+import { openImageDB, type StoredImage } from "@/lib/wallpapers/database";
 
 /**
  * Retrieves an image from IndexedDB using its ID
