@@ -716,6 +716,7 @@ export const runSettingsSuite = (browserName: BrowserName) => {
 
 			await openSettingsTab("General");
 			await byAccessibleName("Reset").click();
+			await byAccessibleName("Reset settings").click();
 			const expected = createFactorySettings(rootFolderId);
 			const resetSettings = await waitForSettings(
 				(settings) => isDeepStrictEqual(settings, expected),
