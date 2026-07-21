@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
-import type { WeatherData } from "@/features/newtab/widgets/weather-model";
-import {
-	isWeatherAbortError,
-	loadWeather,
-} from "@/features/newtab/widgets/weather-service";
-import { useIsOnline } from "./use-is-online";
+import { useIsOnline } from "@/hooks/use-is-online";
+import type { WeatherData } from "./weather-model";
+import { isWeatherAbortError, loadWeather } from "./weather-service";
 
 const INITIAL_ERROR = { err: false, message: "" };
 

@@ -1,9 +1,9 @@
 import { IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import SearchDialog from "@/features/dialogs/search";
 import { cn } from "@/lib/cn";
 import { PopularApps } from "./popular-apps";
-import SearchDialog from "./search-dialog";
 
 const Searchbar = () => {
 	const [isOpen, setIsOpen] = useState(false);

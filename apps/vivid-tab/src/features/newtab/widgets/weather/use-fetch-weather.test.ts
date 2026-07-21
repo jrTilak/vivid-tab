@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, jest, mock, test } from "@test/jest";
 import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
 import { LOCAL_STORAGE } from "@/constants/keys";
-import { createCachedWeather } from "@/features/newtab/widgets/weather-model";
-import * as weatherService from "@/features/newtab/widgets/weather-service";
 import { useFetchWeather } from "./use-fetch-weather";
+import { createCachedWeather } from "./weather-model";
+import * as weatherService from "./weather-service";
 
 const originalChromeDescriptor = Object.getOwnPropertyDescriptor(
 	globalThis,

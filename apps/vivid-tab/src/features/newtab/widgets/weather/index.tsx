@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useFetchWeather } from "@/hooks/use-fetch-weather";
 import { useSettings } from "@/providers/settings-provider";
+import { useFetchWeather } from "./use-fetch-weather";
 import { formatWeatherTemperature, getWeatherIconUrl } from "./weather-model";
 
 const Weather = () => {
