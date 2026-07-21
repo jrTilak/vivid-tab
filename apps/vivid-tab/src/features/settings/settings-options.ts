@@ -4,7 +4,6 @@ import type { Settings } from "@/zod/settings";
 type General = Settings["general"];
 type Appearance = Settings["appearance"];
 type Background = Appearance["background"];
-type Searchbar = Settings["widgets"]["searchbar"];
 type Temperature = Settings["widgets"]["temperature"];
 type Timer = Settings["widgets"]["timer"];
 
@@ -55,17 +54,6 @@ export const RANDOMIZE_WALLPAPER_OPTIONS = [
 ] as const satisfies ReadonlyArray<{
 	label: string;
 	value: Background["randomizeWallpaper"];
-}>;
-
-export const SEARCH_ACTION_OPTIONS = [
-	{ label: "Default search engine", value: "default" },
-	{ label: "Ask ChatGPT", value: "ask-chatgpt" },
-	{ label: "Ask Claude", value: "ask-claude" },
-	{ label: "Search on YouTube", value: "search-on-youtube" },
-	{ label: "Search online", value: "search-online" },
-] as const satisfies ReadonlyArray<{
-	label: string;
-	value: Searchbar["submitDefaultAction"];
 }>;
 
 export const TIME_FORMAT_OPTIONS = [

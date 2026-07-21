@@ -98,7 +98,7 @@ const closeWindowAndReturn = async (
 };
 
 const submitSearchQuery = async (query: string) => {
-	await $("button[aria-haspopup='dialog']").click();
+	await $("input[readonly][aria-haspopup='dialog']").click();
 	const dialog = $("[role='dialog']");
 	await expect(dialog).toBeDisplayed();
 	await dialog.$("input[placeholder='Search the web…']").setValue(query);
@@ -306,7 +306,8 @@ export const runNewtabSuite = (browserName: BrowserName) => {
 		it("opens search by pointer and hotkey, ignores blanks, and resets its draft", async () => {
 			await openExtensionPage("newtab");
 
-			const searchTrigger = $("button[aria-haspopup='dialog']");
+			const searchTrigger = $("input[readonly][aria-haspopup='dialog']");
+			await expect(searchTrigger).toHaveAttribute("aria-label", "Open search");
 			await searchTrigger.click();
 
 			let dialog = $("[role='dialog']");
@@ -342,7 +343,7 @@ export const runNewtabSuite = (browserName: BrowserName) => {
 			await openExtensionPage("newtab");
 			const expectedUrl = "https://example.com/vivid-tab-e2e";
 
-			await $("button[aria-haspopup='dialog']").click();
+			await $("input[readonly][aria-haspopup='dialog']").click();
 			const dialog = $("[role='dialog']");
 			await dialog
 				.$("input[placeholder='Search the web…']")
@@ -396,6 +397,44 @@ export const runNewtabSuite = (browserName: BrowserName) => {
 			);
 			expect(unsafeSearch.url.startsWith("javascript:")).toBe(false);
 			await closeWindowAndReturn(unsafeSearch.handle, extensionHandle);
+		});
+
+		it("resolves a YouTube bang to its direct search URL", async () => {
+			const settings = await readSettings();
+			settings.general.openUrlIn = "new-tab";
+			await writeSettings(settings);
+			await openExtensionPage("newtab");
+
+			const extensionHandle = await browser.getWindowHandle();
+			const previousHandles = await browser.getWindowHandles();
+			const query = "vivid tab bang e2e";
+			await $("input[readonly][aria-haspopup='dialog']").click();
+			const dialog = $("[role='dialog']");
+			await dialog
+				.$("input[placeholder='Search the web…']")
+				.setValue(`!yt ${query}`);
+			await expect(dialog.$("img[src$='/assets/youtube.png']")).toBeDisplayed();
+			await dialog.$("button[aria-label='Search']").click();
+
+			const youtubeSearch = await waitForNewWindowUrl(
+				previousHandles,
+				(url) => {
+					try {
+						const target = new URL(url);
+
+						return (
+							target.hostname.endsWith("youtube.com") &&
+							target.pathname === "/results" &&
+							target.searchParams.get("search_query") === query
+						);
+					} catch {
+						return false;
+					}
+				},
+				"The !yt bang was not resolved to a YouTube search",
+			);
+			expect(youtubeSearch.url).not.toMatch(/^(?:chrome|moz)-extension:\/\//);
+			await closeWindowAndReturn(youtubeSearch.handle, extensionHandle);
 		});
 
 		it("opens a fully qualified URL in the current tab", async () => {

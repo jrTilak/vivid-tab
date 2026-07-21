@@ -70,17 +70,6 @@ export const SettingsSchema = z.object({
 		}),
 		layout: WidgetLayoutSchema,
 		searchbar: z.object({
-			dialogBackground: z.enum(["default", "transparent"]),
-			shortcuts: z.array(
-				z.enum(["chatgpt", "claude", "youtube", "search-online"]),
-			),
-			submitDefaultAction: z.enum([
-				"default",
-				"ask-chatgpt",
-				"ask-claude",
-				"search-on-youtube",
-				"search-online",
-			]),
 			searchSuggestions: z.boolean(),
 		}),
 	}),

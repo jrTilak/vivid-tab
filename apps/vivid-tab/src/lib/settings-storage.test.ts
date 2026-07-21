@@ -21,18 +21,23 @@ describe("settings normalization", () => {
 		);
 		expect(first).not.toBe(second);
 		expect(first.widgets).not.toBe(second.widgets);
-		expect(first.widgets.searchbar.shortcuts).not.toBe(
-			second.widgets.searchbar.shortcuts,
+		expect(first.widgets.quotes.categories).not.toBe(
+			second.widgets.quotes.categories,
 		);
 	});
 
-	test("deep-merges new fields into a partial current-version object", () => {
+	test("deep-merges new fields and strips retired search preferences", () => {
 		const result = normalizeSettings({
 			version: SETTINGS_VERSION,
 			general: { rootFolder: "custom-folder" },
 			widgets: {
 				timer: { timeFormat: "24h" },
-				searchbar: { shortcuts: [] },
+				searchbar: {
+					dialogBackground: "transparent",
+					searchSuggestions: true,
+					shortcuts: ["chatgpt"],
+					submitDefaultAction: "ask-chatgpt",
+				},
 			},
 		});
 
@@ -43,7 +48,9 @@ describe("settings normalization", () => {
 			timeFormat: "24h",
 			showSeconds: false,
 		});
-		expect(result.settings.widgets.searchbar.shortcuts).toEqual([]);
+		expect(result.settings.widgets.searchbar).toEqual({
+			searchSuggestions: true,
+		});
 		expect(result.settings.appearance.radius).toBe("rounded");
 		expect(result.settings.appearance.theme).toBe("dark");
 		expect(result.settings.appearance.visualEffect).toBe("translucent");

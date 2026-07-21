@@ -47,9 +47,6 @@ export const DEFAULT_SETTINGS = {
 			6: "notes",
 		},
 		searchbar: {
-			dialogBackground: "default",
-			shortcuts: ["chatgpt", "claude", "youtube", "search-online"],
-			submitDefaultAction: "default",
 			searchSuggestions: false,
 		},
 	},

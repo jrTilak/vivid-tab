@@ -344,7 +344,7 @@ export const runSettingsSuite = (browserName: BrowserName) => {
 				["Layout", "#searchbar"],
 				["Wallpaper", "#online-images-toggle"],
 				["Background", "#settings-background-blur"],
-				["Search bar", "#settings-search-action"],
+				["Search bar", "#settings-search-suggestions"],
 				["Timer", "#settings-time-format"],
 				["Weather", "#settings-temperature-unit"],
 				["Quotes", "#technology"],
@@ -484,10 +484,9 @@ export const runSettingsSuite = (browserName: BrowserName) => {
 			);
 		});
 
-		it("persists search, timer, and weather controls", async () => {
+		it("persists search suggestions, timer, and weather controls", async () => {
 			await openSettingsDialog();
 			await openSettingsTab("Search bar");
-			await chooseSelectOption("settings-search-action", "Search online");
 			await setSwitch("settings-search-suggestions", true);
 
 			await openSettingsTab("Timer");
@@ -500,16 +499,13 @@ export const runSettingsSuite = (browserName: BrowserName) => {
 
 			const settings = await waitForSettings(
 				(current) =>
-					current.widgets.searchbar.submitDefaultAction === "search-online" &&
 					current.widgets.searchbar.searchSuggestions &&
 					current.widgets.timer.timeFormat === "24h" &&
 					current.widgets.timer.showSeconds &&
 					current.widgets.temperature.unit === "fahrenheit",
 				"Widget settings were not persisted",
 			);
-			expect(settings.widgets.searchbar.submitDefaultAction).toBe(
-				"search-online",
-			);
+			expect(settings.widgets.searchbar.searchSuggestions).toBe(true);
 			expect(settings.widgets.timer).toEqual({
 				showSeconds: true,
 				timeFormat: "24h",
@@ -656,7 +652,6 @@ export const runSettingsSuite = (browserName: BrowserName) => {
 					settings.general.showTopSites = true;
 					settings.widgets.quotes.categories = ["technology"];
 					settings.widgets.searchbar.searchSuggestions = true;
-					settings.widgets.searchbar.submitDefaultAction = "search-online";
 					settings.widgets.temperature.unit = "fahrenheit";
 					settings.widgets.timer.showSeconds = true;
 					settings.widgets.timer.timeFormat = "24h";

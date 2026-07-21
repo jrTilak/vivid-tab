@@ -1,6 +1,6 @@
 import { IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/cn";
 import { PopularApps } from "./popular-apps";
 import SearchDialog from "./search-dialog";
@@ -17,20 +17,26 @@ const Searchbar = () => {
 					isOpen && "pointer-events-none -translate-y-96 opacity-0",
 				)}
 			>
-				<Button
-					aria-expanded={isOpen}
-					aria-haspopup="dialog"
-					className="h-10 grow justify-start px-3 text-muted-foreground shadow-lg"
-					onClick={() => setIsOpen(true)}
-					type="button"
-					variant="outline"
-				>
-					<span>Search the web…</span>
-					<span className="ml-auto hidden text-xs opacity-70 sm:inline">
+				<div className="relative grow">
+					<Input
+						aria-expanded={isOpen}
+						aria-haspopup="dialog"
+						aria-label="Open search"
+						className="cursor-pointer pr-10 text-muted-foreground shadow-lg sm:pr-24"
+						onClick={() => setIsOpen(true)}
+						onKeyDown={(event) => {
+							if (event.key !== "Enter" && event.key !== " ") return;
+							event.preventDefault();
+							setIsOpen(true);
+						}}
+						placeholder="Search the web…"
+						readOnly
+					/>
+					<span className="pointer-events-none absolute top-1/2 right-10 hidden -translate-y-1/2 text-xs opacity-70 sm:inline">
 						Ctrl/⌘ + ,
 					</span>
-					<IconSearch />
-				</Button>
+					<IconSearch className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" />
+				</div>
 				<PopularApps />
 			</div>
 		</>

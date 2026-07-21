@@ -25,4 +25,22 @@ describe("search service", () => {
 		expect(submitSearch(" \n\t ", "current-tab")).toBe(false);
 		expect(sendMessage).not.toHaveBeenCalled();
 	});
+
+	test("resolves a recognized bang to its direct provider URL", () => {
+		expect(submitSearch("!yt cats & dogs", "new-tab")).toBe(true);
+		expect(sendMessage).toHaveBeenCalledWith({
+			action: BACKGROUND_ACTIONS.SEARCH_QUERY,
+			openIn: "new-tab",
+			query: "https://www.youtube.com/results?search_query=cats+%26+dogs",
+		});
+	});
+
+	test("leaves an unknown bang for the browser search provider", () => {
+		expect(submitSearch("!unknown vivid tab", "current-tab")).toBe(true);
+		expect(sendMessage).toHaveBeenCalledWith({
+			action: BACKGROUND_ACTIONS.SEARCH_QUERY,
+			openIn: "current-tab",
+			query: "!unknown vivid tab",
+		});
+	});
 });

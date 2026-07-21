@@ -8,17 +8,17 @@ import {
 	DialogDescription,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupButton,
+	InputGroupInput,
+} from "@/components/ui/input-group";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useSearchSuggestions } from "@/hooks/use-search-suggestions";
+import { resolveBangSearch } from "@/lib/bang-search";
 import { useSettings } from "@/providers/settings-provider";
 import { submitSearch } from "./search-service";
-import {
-	buildShortcutQuery,
-	resolveDefaultSearchQuery,
-	SEARCH_SHORTCUTS,
-	type SearchShortcutId,
-} from "./search-shortcuts";
 
 type Props = {
 	onOpenChange: (open: boolean) => void;
@@ -34,11 +34,13 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
 			general,
 		},
 	} = useSettings();
+	const activeSearch = resolveBangSearch(searchQuery);
+	const debouncedSearch = resolveBangSearch(debouncedSearchQuery);
 	const searchSuggestions = useSearchSuggestions({
 		enabled: Boolean(
-			open && debouncedSearchQuery && searchbar.searchSuggestions,
+			open && debouncedSearch.query && searchbar.searchSuggestions,
 		),
-		query: debouncedSearchQuery,
+		query: debouncedSearch.query,
 	});
 
 	const handleOpenChange = useCallback(
@@ -56,13 +58,6 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
 		[general.openUrlIn, handleOpenChange],
 	);
 
-	const runShortcut = useCallback(
-		(shortcutId: SearchShortcutId) => {
-			runSearch(buildShortcutQuery(shortcutId, searchQuery));
-		},
-		[runSearch, searchQuery],
-	);
-
 	useHotkeys(
 		["ctrl+comma", "meta+comma"],
 		() => handleOpenChange(!open),
@@ -75,79 +70,54 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
 			<DialogContent className="w-[min(90vw,34rem)] max-w-[min(90vw,34rem)] pt-14">
 				<DialogTitle className="sr-only">Search the web</DialogTitle>
 				<DialogDescription className="sr-only">
-					Search directly or use one of your enabled shortcuts.
+					Search directly or use a bang shortcut such as !yt.
 				</DialogDescription>
 
 				<div className="flex flex-col items-center justify-center gap-4">
 					<form
-						className="mx-auto flex h-10 w-full max-w-[500px] motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-6 motion-safe:duration-200"
+						className="mx-auto w-full max-w-[500px] motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-6 motion-safe:duration-200"
 						onSubmit={(event) => {
 							event.preventDefault();
-							runSearch(
-								resolveDefaultSearchQuery(
-									searchbar.submitDefaultAction,
-									searchQuery,
-								),
-							);
+							runSearch(searchQuery);
 						}}
 					>
-						<Input
-							autoComplete="off"
-							autoFocus
-							className="h-10 rounded-r-none"
-							id="vivid-search-bar"
-							onChange={(event) => setSearchQuery(event.target.value)}
-							placeholder="Search the web…"
-							value={searchQuery}
-						/>
-						<Button
-							aria-label="Search"
-							className="h-10 rounded-l-none"
-							disabled={!searchQuery.trim()}
-							size="icon"
-							type="submit"
-							variant="secondary"
-						>
-							<IconSearch />
-						</Button>
+						<InputGroup>
+							{activeSearch.kind === "bang" && (
+								<InputGroupAddon
+									className="max-w-28"
+									title={`Search with ${activeSearch.bang.name}`}
+								>
+									{activeSearch.bang.icon ? (
+										<img
+											alt=""
+											aria-hidden="true"
+											draggable={false}
+											src={chrome.runtime.getURL(activeSearch.bang.icon)}
+										/>
+									) : (
+										<span className="truncate">{activeSearch.bang.name}</span>
+									)}
+								</InputGroupAddon>
+							)}
+							<InputGroupInput
+								autoComplete="off"
+								autoFocus
+								id="vivid-search-bar"
+								onChange={(event) => setSearchQuery(event.target.value)}
+								placeholder="Search the web…"
+								value={searchQuery}
+							/>
+							<InputGroupButton
+								aria-label="Search"
+								disabled={!searchQuery.trim()}
+								type="submit"
+							>
+								<IconSearch />
+							</InputGroupButton>
+						</InputGroup>
 					</form>
 
-					<div className="mx-auto grid w-full max-w-[500px] grid-cols-2 gap-2 sm:grid-cols-4">
-						{SEARCH_SHORTCUTS.filter((shortcut) =>
-							searchbar.shortcuts.includes(shortcut.id),
-						).map((shortcut, index) => (
-							<div
-								className="aspect-square w-full motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-6"
-								key={shortcut.id}
-								style={{
-									animationDelay: `${index * 100 + 100}ms`,
-									animationFillMode: "backwards",
-								}}
-							>
-								<Button
-									className="h-full w-full flex-col gap-1 border-border/30 py-5"
-									onClick={() => runShortcut(shortcut.id)}
-									type="button"
-									variant={
-										searchbar.dialogBackground === "transparent"
-											? "outline"
-											: "secondary"
-									}
-								>
-									<img
-										alt=""
-										className="size-8"
-										decoding="async"
-										draggable={false}
-										src={chrome.runtime.getURL(shortcut.icon)}
-									/>
-									<span className="text-sm">{shortcut.name}</span>
-								</Button>
-							</div>
-						))}
-					</div>
-
-					{searchQuery && searchbar.searchSuggestions && (
+					{debouncedSearch.query && searchbar.searchSuggestions && (
 						<section
 							aria-label="Search suggestions"
 							className="mx-auto flex w-full max-w-[500px] flex-wrap gap-2 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-6 motion-safe:duration-200"
@@ -156,7 +126,18 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
 								<Button
 									className="max-w-full truncate font-normal"
 									key={result}
-									onClick={() => runSearch(result)}
+									onClick={() => {
+										if (debouncedSearch.kind !== "bang") {
+											runSearch(result);
+											return;
+										}
+
+										runSearch(
+											debouncedSearch.position === "leading"
+												? `!${debouncedSearch.trigger} ${result}`
+												: `${result} !${debouncedSearch.trigger}`,
+										);
+									}}
 									size="xs"
 									type="button"
 									variant="secondary"

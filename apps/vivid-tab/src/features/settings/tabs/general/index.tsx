@@ -141,7 +141,7 @@ const GeneralSettings = () => {
 
 				<SettingsRow
 					controlId="settings-open-url"
-					description="Used by search shortcuts and quick actions."
+					description="Used by searches, bang shortcuts, bookmarks, and quick actions."
 					label="Open links in"
 				>
 					<Select
