@@ -91,6 +91,7 @@ export const SettingsSchema = z.object({
 		wallpapers: z.object({
 			selectedImageId: z.nullable(z.string()),
 			images: z.array(z.string()),
+			bookmarkedImageIds: z.array(z.string()),
 			onlineImages: z.object({
 				enabled: z.boolean(),
 				keywords: z.string(),

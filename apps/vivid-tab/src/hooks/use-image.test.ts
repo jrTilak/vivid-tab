@@ -22,6 +22,14 @@ const originalIndexedDbDescriptor = Object.getOwnPropertyDescriptor(
 	globalThis,
 	"indexedDB",
 );
+const originalCreateObjectUrlDescriptor = Object.getOwnPropertyDescriptor(
+	URL,
+	"createObjectURL",
+);
+const originalRevokeObjectUrlDescriptor = Object.getOwnPropertyDescriptor(
+	URL,
+	"revokeObjectURL",
+);
 
 const installIndexedDb = ({
 	automatic = true,
@@ -121,6 +129,24 @@ afterEach(() => {
 	} else {
 		Reflect.deleteProperty(globalThis, "indexedDB");
 	}
+	if (originalCreateObjectUrlDescriptor) {
+		Object.defineProperty(
+			URL,
+			"createObjectURL",
+			originalCreateObjectUrlDescriptor,
+		);
+	} else {
+		Reflect.deleteProperty(URL, "createObjectURL");
+	}
+	if (originalRevokeObjectUrlDescriptor) {
+		Object.defineProperty(
+			URL,
+			"revokeObjectURL",
+			originalRevokeObjectUrlDescriptor,
+		);
+	} else {
+		Reflect.deleteProperty(URL, "revokeObjectURL");
+	}
 });
 
 const image = (id: string): StoredImage => ({
@@ -151,6 +177,55 @@ describe("useImage", () => {
 		await waitFor(() => expect(result.current).toEqual(storedImage));
 		expect(databases).toHaveLength(1);
 		expect(databases[0]?.close).toHaveBeenCalledTimes(1);
+	});
+
+	test("uses and revokes an object URL for a cached full-resolution image", async () => {
+		const cachedSrc = new Blob(["cached image"], { type: "image/jpeg" });
+		const storedImage = { ...image("cached"), cachedSrc };
+		const createObjectURL = mock(() => "blob:vivid-tab-cached");
+		const revokeObjectURL = mock(() => undefined);
+		Object.defineProperty(URL, "createObjectURL", {
+			configurable: true,
+			value: createObjectURL,
+		});
+		Object.defineProperty(URL, "revokeObjectURL", {
+			configurable: true,
+			value: revokeObjectURL,
+		});
+		installIndexedDb({ images: { cached: storedImage } });
+
+		const { result, unmount } = renderHook(() => useImage("cached"));
+
+		await waitFor(() =>
+			expect(result.current?.src).toBe("blob:vivid-tab-cached"),
+		);
+		expect(result.current).toEqual({
+			...storedImage,
+			src: "blob:vivid-tab-cached",
+		});
+		expect(createObjectURL).toHaveBeenCalledWith(cachedSrc);
+		expect(revokeObjectURL).not.toHaveBeenCalled();
+
+		unmount();
+		expect(revokeObjectURL).toHaveBeenCalledWith("blob:vivid-tab-cached");
+	});
+
+	test("falls back to the remote source when object URL creation fails", async () => {
+		const storedImage = {
+			...image("fallback"),
+			cachedSrc: new Blob(["cached image"], { type: "image/jpeg" }),
+		};
+		Object.defineProperty(URL, "createObjectURL", {
+			configurable: true,
+			value: mock(() => {
+				throw new Error("Object URLs unavailable");
+			}),
+		});
+		installIndexedDb({ images: { fallback: storedImage } });
+
+		const { result } = renderHook(() => useImage("fallback"));
+
+		await waitFor(() => expect(result.current).toEqual(storedImage));
 	});
 
 	test("returns null for missing records, read errors, and open errors", async () => {

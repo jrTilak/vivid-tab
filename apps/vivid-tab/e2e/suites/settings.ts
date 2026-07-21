@@ -707,10 +707,24 @@ export const runSettingsSuite = (browserName: BrowserName) => {
 			if (!uploadedWallpaperId) throw new Error("Uploaded wallpaper has no ID");
 			expect(await readWallpaperDatabaseIds()).toContain(uploadedWallpaperId);
 			await byAccessibleName("Use this wallpaper").click();
+			const wallpaperConfirmation = $('[role="alertdialog"]');
+			await expect(wallpaperConfirmation).toBeDisplayed();
+			await wallpaperConfirmation.$("button=Cancel").click();
+			await wallpaperConfirmation.waitForExist({ reverse: true });
+			expect(
+				(await readSettings()).appearance.wallpapers.selectedImageId,
+			).toBeNull();
+			expect(
+				(await readSettings()).appearance.background.randomizeWallpaper,
+			).toBe("daily");
+
+			await byAccessibleName("Use this wallpaper").click();
+			await $('[role="alertdialog"]').$("button=Set wallpaper").click();
 			await waitForSettings(
 				(settings) =>
 					settings.appearance.wallpapers.selectedImageId ===
-					uploadedWallpaperId,
+						uploadedWallpaperId &&
+					settings.appearance.background.randomizeWallpaper === "off",
 				"Uploaded wallpaper was not selected before reset",
 			);
 

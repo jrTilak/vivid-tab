@@ -10,6 +10,8 @@ export interface StoredImage {
 	src: string;
 	source: string;
 	fetchedAt: number;
+	/** Full-resolution remote image cached for instant, offline display. */
+	cachedSrc?: Blob;
 	/** Used by the gallery so it does not download every full-resolution image. */
 	thumbnailSrc?: string;
 }

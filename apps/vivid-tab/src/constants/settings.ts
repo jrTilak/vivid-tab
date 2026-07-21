@@ -60,6 +60,7 @@ export const DEFAULT_SETTINGS = {
 		wallpapers: {
 			selectedImageId: null,
 			images: [] as string[],
+			bookmarkedImageIds: [] as string[],
 			onlineImages: {
 				enabled: false,
 				keywords: DEFAULT_SEARCH_TERMS.join(", "),

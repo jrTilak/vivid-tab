@@ -33,8 +33,12 @@ type WallpaperInternals = {
 			count?: number,
 		) => Promise<WallhavenImage[]>;
 	};
-	_replaceOnlineImages: (
+	_downloadOnlineImages: (
 		images: readonly WallhavenImage[],
+	) => Promise<Array<WallhavenImage & { cachedSrc: Blob }>>;
+	_replaceOnlineImages: (
+		images: ReadonlyArray<WallhavenImage & { cachedSrc: Blob }>,
+		bookmarkedImageIds: readonly string[],
 	) => Promise<ReplaceResult>;
 };
 
@@ -50,10 +54,23 @@ const service = wallpaper as unknown as WallpaperInternals;
 const originalChrome = globalThis.chrome;
 const originalDateNow = Date.now;
 const originalIndexedDB = globalThis.indexedDB;
+const originalFetch = globalThis.fetch;
 const originalFetchImages = service._provider.fetchImages;
+const originalDownloadOnlineImages = service._downloadOnlineImages;
 const originalReplaceOnlineImages = service._replaceOnlineImages;
 
-const makeSettings = () => createDefaultSettings();
+const makeSettings = () => {
+	const settings = createDefaultSettings();
+	settings.appearance.wallpapers.onlineImages.enabled = true;
+	settings.appearance.background.randomizeWallpaper = "daily";
+
+	return settings;
+};
+const asDownloaded = (images: readonly WallhavenImage[]) =>
+	images.map((image) => ({
+		...image,
+		cachedSrc: new Blob([image.src], { type: "image/jpeg" }),
+	}));
 
 const installFailingIndexedDB = (
 	outcome: "abort" | "error",
@@ -167,6 +184,7 @@ const installChromeMock = ({
 
 beforeEach(() => {
 	service._provider.fetchImages = mock(async () => []);
+	service._downloadOnlineImages = mock(async (images) => asDownloaded(images));
 	service._replaceOnlineImages = mock(async () => ({
 		ids: [] as string[],
 		removedIds: new Set<string>(),
@@ -177,11 +195,69 @@ afterEach(() => {
 	globalThis.chrome = originalChrome;
 	Date.now = originalDateNow;
 	globalThis.indexedDB = originalIndexedDB;
+	globalThis.fetch = originalFetch;
 	service._provider.fetchImages = originalFetchImages;
+	service._downloadOnlineImages = originalDownloadOnlineImages;
 	service._replaceOnlineImages = originalReplaceOnlineImages;
 });
 
 describe("online wallpaper refresh", () => {
+	test("downloads unique valid images and skips transport, status, MIME, and empty failures", async () => {
+		service._downloadOnlineImages = originalDownloadOnlineImages;
+		globalThis.fetch = mock(async (input) => {
+			const url = String(input);
+			if (url.endsWith("network.jpg")) throw new Error("offline");
+			if (url.endsWith("status.jpg")) {
+				return { ok: false, blob: mock() } as unknown as Response;
+			}
+
+			const blob = url.endsWith("text.jpg")
+				? new Blob(["not an image"], { type: "text/plain" })
+				: url.endsWith("empty.jpg")
+					? new Blob([], { type: "image/jpeg" })
+					: new Blob(["image"], { type: "image/jpeg" });
+
+			return {
+				blob: async () => blob,
+				ok: true,
+			} as Response;
+		}) as unknown as typeof fetch;
+		const good = {
+			src: "https://wallhaven.cc/good.jpg",
+			thumbnailSrc: "https://wallhaven.cc/good-thumb.jpg",
+		};
+
+		const result = await service._downloadOnlineImages([
+			good,
+			good,
+			{
+				src: "https://wallhaven.cc/network.jpg",
+				thumbnailSrc: "network-thumb",
+			},
+			{
+				src: "https://wallhaven.cc/status.jpg",
+				thumbnailSrc: "status-thumb",
+			},
+			{
+				src: "https://wallhaven.cc/text.jpg",
+				thumbnailSrc: "text-thumb",
+			},
+			{
+				src: "https://wallhaven.cc/empty.jpg",
+				thumbnailSrc: "empty-thumb",
+			},
+		]);
+
+		expect(globalThis.fetch).toHaveBeenCalledTimes(5);
+		expect(result).toHaveLength(1);
+		expect(result[0]).toEqual(
+			expect.objectContaining({
+				...good,
+				cachedSrc: expect.any(Blob),
+			}),
+		);
+	});
+
 	test("does no work when online images are disabled", async () => {
 		const settings = makeSettings();
 		settings.appearance.wallpapers.onlineImages.enabled = false;
@@ -285,7 +361,7 @@ describe("online wallpaper refresh", () => {
 
 		expect(storage.syncSet).toHaveBeenCalledTimes(1);
 		const write = storage.syncSet.mock.calls[0]?.[0] as { settings: string };
-		expect(JSON.parse(write.settings)).toEqual(makeSettings());
+		expect(JSON.parse(write.settings)).toEqual(createDefaultSettings());
 	});
 
 	test("preserves legacy settings before replacing them with defaults", async () => {
@@ -297,7 +373,7 @@ describe("online wallpaper refresh", () => {
 
 		expect(storage.syncSet).toHaveBeenCalledWith({
 			[LEGACY_SETTINGS_STORAGE_KEY]: legacySettings,
-			settings: serializeSettings(makeSettings()),
+			settings: serializeSettings(createDefaultSettings()),
 		});
 	});
 
@@ -327,7 +403,10 @@ describe("online wallpaper refresh", () => {
 			[" Space", "City "],
 			20,
 		);
-		expect(service._replaceOnlineImages).toHaveBeenCalledWith(images);
+		expect(service._replaceOnlineImages).toHaveBeenCalledWith(
+			asDownloaded(images),
+			[],
+		);
 		expect(storage.syncSet).toHaveBeenCalledTimes(1);
 		const writtenValue = storage.syncSet.mock.calls[0]?.[0] as {
 			settings: string;
@@ -340,14 +419,14 @@ describe("online wallpaper refresh", () => {
 			"new-online",
 		]);
 		expect(writtenSettings.appearance.wallpapers.selectedImageId).toBe(
-			"new-online",
+			"uploaded",
 		);
 		expect(storage.localSet).toHaveBeenCalledWith({
 			[LAST_ONLINE_IMAGES_FETCHED_AT]: String(now),
 		});
 	});
 
-	test("does not persist a refresh when replacement produces no IDs", async () => {
+	test("records a successful refresh when every downloaded URL is already saved", async () => {
 		const storage = installChromeMock();
 		service._provider.fetchImages = mock(async () => [
 			{
@@ -360,8 +439,55 @@ describe("online wallpaper refresh", () => {
 
 		expect(service._replaceOnlineImages).toHaveBeenCalledTimes(1);
 		expect(storage.syncGet).toHaveBeenCalledTimes(2);
+		expect(storage.syncSet).toHaveBeenCalledTimes(1);
+		expect(storage.localSet).toHaveBeenCalledTimes(1);
+	});
+
+	test("preserves existing cache and settings when every download fails", async () => {
+		const settings = makeSettings();
+		settings.appearance.wallpapers.images = ["existing-online"];
+		settings.appearance.wallpapers.selectedImageId = "existing-online";
+		const storage = installChromeMock({ settings });
+		service._provider.fetchImages = mock(async () => [
+			{
+				src: "https://wallhaven.cc/unavailable.jpg",
+				thumbnailSrc: "https://wallhaven.cc/unavailable-thumb.jpg",
+			},
+		]);
+		service._downloadOnlineImages = mock(async () => []);
+
+		await wallpaper.fetchOnlineImages(true);
+
+		expect(service._replaceOnlineImages).not.toHaveBeenCalled();
+		expect(storage.syncGet).toHaveBeenCalledTimes(1);
 		expect(storage.syncSet).not.toHaveBeenCalled();
 		expect(storage.localSet).not.toHaveBeenCalled();
+	});
+
+	test("publishes only full images that downloaded successfully", async () => {
+		const storage = installChromeMock();
+		const images = [
+			{
+				src: "https://wallhaven.cc/good.jpg",
+				thumbnailSrc: "https://wallhaven.cc/good-thumb.jpg",
+			},
+			{
+				src: "https://wallhaven.cc/bad.jpg",
+				thumbnailSrc: "https://wallhaven.cc/bad-thumb.jpg",
+			},
+		];
+		const successful = asDownloaded(images.slice(0, 1));
+		service._provider.fetchImages = mock(async () => images);
+		service._downloadOnlineImages = mock(async () => successful);
+		service._replaceOnlineImages = mock(async () => ({
+			ids: ["good"],
+			removedIds: new Set<string>(),
+		}));
+
+		await wallpaper.fetchOnlineImages(true);
+
+		expect(service._replaceOnlineImages).toHaveBeenCalledWith(successful, []);
+		expect(storage.syncSet).toHaveBeenCalledTimes(1);
 	});
 
 	test("atomically replaces only Wallhaven records in IndexedDB", async () => {
@@ -432,6 +558,91 @@ describe("online wallpaper refresh", () => {
 		}
 	});
 
+	test("keeps bookmarked provider records and skips new records with the same URL", async () => {
+		await deleteWallpaperDatabase();
+		const settings = makeSettings();
+		settings.appearance.wallpapers.images = [
+			"local_manual",
+			"bookmarked-online",
+			"old-online",
+		];
+		settings.appearance.wallpapers.selectedImageId = "old-online";
+		settings.appearance.wallpapers.bookmarkedImageIds = ["bookmarked-online"];
+		const storage = installChromeMock({ settings });
+		const bookmarkedBlob = new Blob(["saved"], { type: "image/jpeg" });
+		await writeStoredImages([
+			{
+				fetchedAt: 1,
+				id: "local_manual",
+				source: "local",
+				src: "data:image/jpeg;base64,bG9jYWw=",
+			},
+			{
+				cachedSrc: bookmarkedBlob,
+				fetchedAt: 1,
+				id: "bookmarked-online",
+				source: "wallhaven",
+				src: "https://wallhaven.cc/saved.jpg",
+			},
+			{
+				cachedSrc: new Blob(["old"], { type: "image/jpeg" }),
+				fetchedAt: 1,
+				id: "old-online",
+				source: "wallhaven",
+				src: "https://wallhaven.cc/old.jpg",
+			},
+		]);
+		const images = [
+			{
+				src: "https://wallhaven.cc/saved.jpg",
+				thumbnailSrc: "https://wallhaven.cc/saved-thumb.jpg",
+			},
+			{
+				src: "https://wallhaven.cc/new.jpg",
+				thumbnailSrc: "https://wallhaven.cc/new-thumb.jpg",
+			},
+		];
+		service._provider.fetchImages = mock(async () => images);
+		service._replaceOnlineImages = originalReplaceOnlineImages;
+
+		try {
+			await wallpaper.fetchOnlineImages(true);
+
+			const records = await readStoredImages();
+			expect(records).toHaveLength(3);
+			expect(records.map(({ id }) => id)).toContain("local_manual");
+			expect(records.map(({ id }) => id)).toContain("bookmarked-online");
+			expect(records.map(({ id }) => id)).not.toContain("old-online");
+			expect(
+				records.filter(({ src }) => src === "https://wallhaven.cc/saved.jpg"),
+			).toHaveLength(1);
+			const newRecord = records.find(
+				({ src }) => src === "https://wallhaven.cc/new.jpg",
+			);
+			expect(newRecord).toHaveProperty("cachedSrc");
+
+			const write = storage.syncSet.mock.calls[0]?.[0] as {
+				settings: string;
+			};
+			const writtenSettings = JSON.parse(write.settings) as ReturnType<
+				typeof makeSettings
+			>;
+			expect(writtenSettings.appearance.wallpapers.images).toEqual([
+				"local_manual",
+				"bookmarked-online",
+				newRecord?.id,
+			]);
+			expect(writtenSettings.appearance.wallpapers.bookmarkedImageIds).toEqual([
+				"bookmarked-online",
+			]);
+			expect(writtenSettings.appearance.wallpapers.selectedImageId).toBe(
+				"local_manual",
+			);
+		} finally {
+			await deleteWallpaperDatabase();
+		}
+	});
+
 	test.each([
 		["error", new DOMException("quota exceeded"), "quota exceeded"],
 		["error", null, "Failed to replace wallpapers"],
@@ -441,12 +652,16 @@ describe("online wallpaper refresh", () => {
 		service._replaceOnlineImages = originalReplaceOnlineImages;
 
 		await expect(
-			service._replaceOnlineImages([
-				{
-					src: "https://wallhaven.cc/new.jpg",
-					thumbnailSrc: "https://wallhaven.cc/new-thumb.jpg",
-				},
-			]),
+			service._replaceOnlineImages(
+				[
+					{
+						src: "https://wallhaven.cc/new.jpg",
+						thumbnailSrc: "https://wallhaven.cc/new-thumb.jpg",
+						cachedSrc: new Blob(["image"], { type: "image/jpeg" }),
+					},
+				],
+				[],
+			),
 		).rejects.toThrow(message);
 		expect(close).toHaveBeenCalledTimes(1);
 	});

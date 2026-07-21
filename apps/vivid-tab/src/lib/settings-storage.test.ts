@@ -47,6 +47,9 @@ describe("settings normalization", () => {
 		expect(result.settings.appearance.radius).toBe("rounded");
 		expect(result.settings.appearance.theme).toBe("dark");
 		expect(result.settings.appearance.visualEffect).toBe("translucent");
+		expect(result.settings.appearance.wallpapers.bookmarkedImageIds).toEqual(
+			[],
+		);
 		expect(result.settings.appearance).toEqual(
 			createDefaultSettings().appearance,
 		);

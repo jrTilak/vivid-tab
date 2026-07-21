@@ -5,11 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { DEFAULT_SEARCH_TERMS } from "@/constants/wallpapers";
 import { cn } from "@/lib/cn";
+import { orderWallpaperIds } from "@/lib/wallpapers/order";
 import { wallpaper } from "@/lib/wallpapers/service";
 import { useSettings } from "@/providers/settings-provider";
 import { SettingsPage, SettingsRow, SettingsSection } from "../../settings-ui";
 import ImageCard from "./components/image-card";
 import UploadButton from "./components/upload-button";
+import WallpaperSelectionDialog from "./components/wallpaper-selection-dialog";
 import {
 	deleteStoredWallpaper,
 	storeLocalWallpaper,
@@ -19,19 +21,33 @@ export default function WallpaperSettings() {
 	const {
 		settings: {
 			appearance: {
-				wallpapers: { selectedImageId, images, onlineImages },
+				background: { randomizeWallpaper },
+				wallpapers: {
+					bookmarkedImageIds,
+					selectedImageId,
+					images,
+					onlineImages,
+				},
 			},
 		},
 		setSettings,
 	} = useSettings();
 	const [isRefreshing, setIsRefreshing] = useState(false);
+	const [pendingSelection, setPendingSelection] = useState<{
+		imageId: string | null;
+	} | null>(null);
+	const orderedImageIds = orderWallpaperIds(images, bookmarkedImageIds);
 
-	const handleImageSelect = useCallback(
+	const commitImageSelection = useCallback(
 		(id: string | null) => {
 			setSettings((prev) => ({
 				...prev,
 				appearance: {
 					...prev.appearance,
+					background: {
+						...prev.appearance.background,
+						randomizeWallpaper: "off",
+					},
 					wallpapers: {
 						...prev.appearance.wallpapers,
 						selectedImageId: id,
@@ -41,6 +57,25 @@ export default function WallpaperSettings() {
 		},
 		[setSettings],
 	);
+
+	const handleImageSelect = useCallback(
+		(imageId: string | null) => {
+			if (randomizeWallpaper === "off") {
+				commitImageSelection(imageId);
+				return;
+			}
+
+			setPendingSelection({ imageId });
+		},
+		[commitImageSelection, randomizeWallpaper],
+	);
+
+	const handlePendingSelectionConfirm = useCallback(() => {
+		if (!pendingSelection) return;
+
+		commitImageSelection(pendingSelection.imageId);
+		setPendingSelection(null);
+	}, [commitImageSelection, pendingSelection]);
 
 	const handleImageUpload = useCallback(
 		async (file: File) => {
@@ -52,7 +87,12 @@ export default function WallpaperSettings() {
 						...prev.appearance,
 						wallpapers: {
 							...prev.appearance.wallpapers,
-							images: [...prev.appearance.wallpapers.images, imageId],
+							images: [
+								imageId,
+								...prev.appearance.wallpapers.images.filter(
+									(id) => id !== imageId,
+								),
+							],
 						},
 					},
 				}));
@@ -73,6 +113,10 @@ export default function WallpaperSettings() {
 						...prev.appearance,
 						wallpapers: {
 							...prev.appearance.wallpapers,
+							bookmarkedImageIds:
+								prev.appearance.wallpapers.bookmarkedImageIds.filter(
+									(id) => id !== imageId,
+								),
 							images: prev.appearance.wallpapers.images.filter(
 								(id) => id !== imageId,
 							),
@@ -86,6 +130,29 @@ export default function WallpaperSettings() {
 			} catch (error) {
 				console.error("Failed to delete the wallpaper:", error);
 			}
+		},
+		[setSettings],
+	);
+
+	const handleBookmarkChange = useCallback(
+		(imageId: string) => {
+			setSettings((prev) => {
+				const bookmarks = prev.appearance.wallpapers.bookmarkedImageIds;
+				const isBookmarked = bookmarks.includes(imageId);
+
+				return {
+					...prev,
+					appearance: {
+						...prev.appearance,
+						wallpapers: {
+							...prev.appearance.wallpapers,
+							bookmarkedImageIds: isBookmarked
+								? bookmarks.filter((id) => id !== imageId)
+								: [...bookmarks, imageId],
+						},
+					},
+				};
+			});
 		},
 		[setSettings],
 	);
@@ -127,6 +194,13 @@ export default function WallpaperSettings() {
 
 	return (
 		<SettingsPage>
+			<WallpaperSelectionDialog
+				onConfirm={handlePendingSelectionConfirm}
+				onOpenChange={(open) => {
+					if (!open) setPendingSelection(null);
+				}}
+				open={pendingSelection !== null}
+			/>
 			<SettingsSection
 				description="Fetch fresh, safe-only wallpaper choices from Wallhaven."
 				title="Online wallpapers"
@@ -184,15 +258,21 @@ export default function WallpaperSettings() {
 					<div className="grid grid-cols-2 gap-4">
 						<UploadButton onUpload={(file) => void handleImageUpload(file)} />
 
-						{[null, ...images].map((image) => (
+						{[null, ...orderedImageIds].map((image) => (
 							<ImageCard
 								imageId={image}
+								isBookmarked={
+									image !== null && bookmarkedImageIds.includes(image)
+								}
 								isSelected={image === selectedImageId}
 								key={image ?? "default-wallpaper"}
 								onDelete={
 									image === null
 										? undefined
 										: () => void handleImageDelete(image)
+								}
+								onBookmarkChange={
+									image === null ? undefined : () => handleBookmarkChange(image)
 								}
 								onSelect={() => handleImageSelect(image)}
 							/>

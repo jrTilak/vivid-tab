@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { openImageDB, type StoredImage } from "@/lib/wallpapers/database";
 
 /**
- * Retrieves an image from IndexedDB using its ID
- * Params: imageId (string | null) - ID of the image to retrieve
- * Returns: object with image data including source metadata
+ * Retrieves a wallpaper and exposes its cached Blob through a temporary object
+ * URL. Local and legacy records without a Blob continue to use their stored
+ * source directly. Object URLs are revoked when the record changes or unmounts.
  */
 const useImage = (imageId: string | null) => {
 	const [imageData, setImageData] = useState<StoredImage | null>(null);
@@ -19,6 +19,7 @@ const useImage = (imageId: string | null) => {
 		setImageData(null);
 		let cancelled = false;
 		let db: IDBDatabase | null = null;
+		let objectUrl: string | null = null;
 
 		openImageDB()
 			.then((database) => {
@@ -30,7 +31,24 @@ const useImage = (imageId: string | null) => {
 				getRequest.onsuccess = () => {
 					if (cancelled) return;
 
-					setImageData((getRequest.result as StoredImage | undefined) ?? null);
+					const storedImage = getRequest.result as StoredImage | undefined;
+					if (!storedImage) {
+						setImageData(null);
+
+						return;
+					}
+
+					if (storedImage.cachedSrc) {
+						try {
+							objectUrl = URL.createObjectURL(storedImage.cachedSrc);
+						} catch {
+							objectUrl = null;
+						}
+					}
+
+					setImageData(
+						objectUrl ? { ...storedImage, src: objectUrl } : storedImage,
+					);
 				};
 
 				getRequest.onerror = () => {
@@ -48,6 +66,7 @@ const useImage = (imageId: string | null) => {
 
 		return () => {
 			cancelled = true;
+			if (objectUrl) URL.revokeObjectURL(objectUrl);
 		};
 	}, [imageId]);
 

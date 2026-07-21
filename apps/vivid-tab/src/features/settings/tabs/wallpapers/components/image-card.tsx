@@ -1,20 +1,26 @@
-import { IconTrash } from "@tabler/icons-react";
+import { IconBookmark, IconTrash } from "@tabler/icons-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useImage } from "@/hooks/use-image";
+import { cn } from "@/lib/cn";
 
 const ImageCard = ({
 	imageId,
+	isBookmarked,
 	isSelected,
+	onBookmarkChange,
 	onDelete,
 	onSelect,
 }: {
 	imageId: string | null;
+	isBookmarked: boolean;
 	isSelected: boolean;
+	onBookmarkChange?: () => void;
 	onDelete?: () => void;
 	onSelect: () => void;
 }) => {
 	const imageData = useImage(imageId);
+	const isOnlineWallpaper = imageData?.source === "wallhaven";
 
 	return (
 		<div className="group relative h-48 overflow-hidden rounded-lg bg-muted">
@@ -49,6 +55,20 @@ const ImageCard = ({
 					</Badge>
 				)}
 			</button>
+			{isOnlineWallpaper && onBookmarkChange && (
+				<Button
+					aria-label={
+						isBookmarked ? "Remove wallpaper bookmark" : "Bookmark wallpaper"
+					}
+					className="absolute top-2 left-2 z-10 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
+					onClick={onBookmarkChange}
+					size="icon"
+					type="button"
+					variant="secondary"
+				>
+					<IconBookmark className={cn(isBookmarked && "fill-current")} />
+				</Button>
+			)}
 			{onDelete && (
 				<Button
 					aria-label="Delete wallpaper"

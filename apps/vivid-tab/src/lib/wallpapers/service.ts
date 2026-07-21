@@ -9,6 +9,11 @@ import { openImageDB, type StoredImage } from "./database";
 import { Wallhaven, type WallhavenImage } from "./wallhaven";
 
 const ONLINE_IMAGE_REFRESH_INTERVAL_MS = 60 * 60 * 1000;
+const ONLINE_IMAGE_DOWNLOAD_CONCURRENCY = 4;
+
+type DownloadedWallhavenImage = WallhavenImage & {
+	cachedSrc: Blob;
+};
 
 type ReplaceOnlineImagesResult = {
 	ids: string[];
@@ -22,22 +27,77 @@ class Wallpaper {
 	private _forcedRefreshQueued = false;
 
 	/**
-	 * Replaces one provider's records atomically in a single IndexedDB
-	 * transaction while leaving uploaded and unknown-provider images intact.
+	 * Downloads full-resolution images before any cached records are replaced.
+	 * Invalid or failed responses are omitted so a partially available provider
+	 * can still refresh the usable portion of the gallery.
+	 */
+	private async _downloadOnlineImages(
+		images: readonly WallhavenImage[],
+	): Promise<DownloadedWallhavenImage[]> {
+		const uniqueImages = [
+			...new Map(images.map((image) => [image.src, image])).values(),
+		];
+		const downloaded = new Array<DownloadedWallhavenImage | undefined>(
+			uniqueImages.length,
+		);
+		let nextIndex = 0;
+
+		const worker = async () => {
+			while (nextIndex < uniqueImages.length) {
+				const index = nextIndex;
+				nextIndex += 1;
+				const image = uniqueImages[index];
+				if (!image) continue;
+
+				try {
+					const response = await fetch(image.src);
+					if (!response.ok) continue;
+
+					const cachedSrc = await response.blob();
+					if (
+						cachedSrc.size === 0 ||
+						!cachedSrc.type.toLowerCase().startsWith("image/")
+					) {
+						continue;
+					}
+
+					downloaded[index] = { ...image, cachedSrc };
+				} catch {
+					/* A failed image is skipped while other provider results continue. */
+				}
+			}
+		};
+
+		await Promise.all(
+			Array.from(
+				{
+					length: Math.min(
+						ONLINE_IMAGE_DOWNLOAD_CONCURRENCY,
+						uniqueImages.length,
+					),
+				},
+				worker,
+			),
+		);
+
+		return downloaded.filter(
+			(image): image is DownloadedWallhavenImage => image !== undefined,
+		);
+	}
+
+	/**
+	 * Replaces one provider's unbookmarked records atomically while leaving
+	 * uploaded, bookmarked, and unknown-provider images intact. New results whose
+	 * URL is already bookmarked are skipped to prevent duplicate gallery entries.
 	 */
 	private async _replaceOnlineImages(
-		images: readonly WallhavenImage[],
+		images: readonly DownloadedWallhavenImage[],
+		bookmarkedImageIds: readonly string[],
 	): Promise<ReplaceOnlineImagesResult> {
 		const db = await openImageDB();
 		const source = this._provider.sourceName;
 		const now = Date.now();
-		const storedImages = images.map<StoredImage>(({ src, thumbnailSrc }) => ({
-			fetchedAt: now,
-			id: `${source}_${now}_${crypto.randomUUID()}`,
-			source,
-			src,
-			thumbnailSrc,
-		}));
+		const bookmarkedIds = new Set(bookmarkedImageIds);
 
 		try {
 			return await new Promise<ReplaceOnlineImagesResult>((resolve, reject) => {
@@ -45,21 +105,47 @@ class Wallpaper {
 				const store = transaction.objectStore("images");
 				const getAllRequest = store.getAll();
 				const removedIds = new Set<string>();
+				const insertedIds: string[] = [];
 
 				getAllRequest.onsuccess = () => {
-					for (const image of getAllRequest.result as StoredImage[]) {
+					const storedRecords = getAllRequest.result as StoredImage[];
+					const preservedUrls = new Set(
+						storedRecords
+							.filter(
+								(image) =>
+									image.source === source && bookmarkedIds.has(image.id),
+							)
+							.map(({ src }) => src),
+					);
+
+					for (const image of storedRecords) {
 						if (image.source !== source) continue;
+						if (bookmarkedIds.has(image.id)) continue;
 
 						removedIds.add(image.id);
 						store.delete(image.id);
 					}
 
-					for (const image of storedImages) store.put(image);
+					for (const image of images) {
+						if (preservedUrls.has(image.src)) continue;
+
+						preservedUrls.add(image.src);
+						const storedImage: StoredImage = {
+							cachedSrc: image.cachedSrc,
+							fetchedAt: now,
+							id: `${source}_${now}_${crypto.randomUUID()}`,
+							source,
+							src: image.src,
+							thumbnailSrc: image.thumbnailSrc,
+						};
+						insertedIds.push(storedImage.id);
+						store.put(storedImage);
+					}
 				};
 
 				transaction.oncomplete = () =>
 					resolve({
-						ids: storedImages.map(({ id }) => id),
+						ids: insertedIds,
 						removedIds,
 					});
 				transaction.onerror = () =>
@@ -169,6 +255,8 @@ class Wallpaper {
 			);
 
 			if (images.length === 0) return;
+			const downloadedImages = await this._downloadOnlineImages(images);
+			if (downloadedImages.length === 0) return;
 
 			/*
 			 * Fetching can take seconds. Re-read before touching IndexedDB so disabling
@@ -181,9 +269,10 @@ class Wallpaper {
 			const currentWallpapers = latest.appearance.wallpapers;
 			if (!currentWallpapers.onlineImages.enabled) return;
 
-			const { ids, removedIds } = await this._replaceOnlineImages(images);
-			const firstNewImageId = ids[0];
-			if (!firstNewImageId) return;
+			const { ids, removedIds } = await this._replaceOnlineImages(
+				downloadedImages,
+				currentWallpapers.bookmarkedImageIds,
+			);
 
 			/**
 			 * @deprecated Preserve unknown provider IDs through v1.4.0, then remove
@@ -192,7 +281,7 @@ class Wallpaper {
 			const preservedIds = currentWallpapers.images.filter(
 				(id) => !removedIds.has(id),
 			);
-			const nextImageIds = [...preservedIds, ...ids];
+			const nextImageIds = [...new Set([...preservedIds, ...ids])];
 			const selectedImageId = currentWallpapers.selectedImageId;
 
 			await chrome.storage.sync.set({
@@ -205,7 +294,7 @@ class Wallpaper {
 							images: nextImageIds,
 							selectedImageId:
 								selectedImageId && !nextImageIds.includes(selectedImageId)
-									? firstNewImageId
+									? (nextImageIds[0] ?? null)
 									: selectedImageId,
 						},
 					},
