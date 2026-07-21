@@ -11,7 +11,11 @@ const config = {
 		"src/tabs/*.tsx",
 		"src/styles/index.css",
 	],
-	ignoreDependencies: ["@types/chrome", "data-base64"],
+	/* CSS `npm:` font URLs are resolved by Plasmo but are invisible to Knip. */
+	ignoreDependencies: [
+		"@fontsource-variable/bricolage-grotesque",
+		"@fontsource-variable/spline-sans",
+	],
 	ignoreIssues: {
 		"src/components/ui/**": ["exports"],
 	},

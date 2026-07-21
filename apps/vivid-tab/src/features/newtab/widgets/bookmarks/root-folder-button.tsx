@@ -66,7 +66,7 @@ const RootFolderButton = ({
 						className={cn(
 							"text-xs px-2.5 py-1 h-fit rounded-sm",
 							activeRootFolder !== id &&
-								"dark:bg-muted/20 hover:bg-muted/30 text-white",
+								"bg-muted/40 text-foreground hover:bg-muted/70 in-data-[visual-effect=opaque]:bg-muted in-data-[visual-effect=translucent]:bg-muted/40",
 							isOver && "bg-destructive",
 							isDragging && "scale-110",
 						)}

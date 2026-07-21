@@ -4,7 +4,7 @@ import { RootProvider } from "@/providers/root-provider";
 
 const WelcomeTab = () => {
 	return (
-		<RootProvider theme="dark">
+		<RootProvider>
 			<WelcomeContextProvider>
 				<Welcome />
 			</WelcomeContextProvider>

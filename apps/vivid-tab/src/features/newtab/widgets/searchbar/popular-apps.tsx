@@ -16,7 +16,7 @@ export function PopularApps() {
 			<PopoverTrigger asChild>
 				<Button
 					aria-label="Open popular apps"
-					className="text-background transition-transform hover:scale-105 dark:text-foreground"
+					className="text-foreground transition-transform hover:scale-105"
 					size="icon"
 					type="button"
 					variant="ghost"
@@ -42,32 +42,13 @@ export function PopularApps() {
 										: "_blank"
 								}
 							>
-								{typeof app.icon === "string" ? (
-									<img
-										alt=""
-										className="size-12 rounded-lg"
-										decoding="async"
-										draggable={false}
-										src={chrome.runtime.getURL(app.icon)}
-									/>
-								) : (
-									<>
-										<img
-											alt=""
-											className="size-12 rounded-lg dark:hidden"
-											decoding="async"
-											draggable={false}
-											src={chrome.runtime.getURL(app.icon.light)}
-										/>
-										<img
-											alt=""
-											className="hidden size-12 rounded-lg dark:block"
-											decoding="async"
-											draggable={false}
-											src={chrome.runtime.getURL(app.icon.dark)}
-										/>
-									</>
-								)}
+								<img
+									alt=""
+									className="size-12 rounded-lg"
+									decoding="async"
+									draggable={false}
+									src={chrome.runtime.getURL(app.icon)}
+								/>
 								<span className="text-xs text-foreground">{app.title}</span>
 							</a>
 						</Button>

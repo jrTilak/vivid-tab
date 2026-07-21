@@ -1,10 +1,5 @@
-type ThemedAppIcon = {
-	dark: string;
-	light: string;
-};
-
 type PopularApp = {
-	icon: string | ThemedAppIcon;
+	icon: string;
 	title: string;
 	url: string;
 };
@@ -18,18 +13,12 @@ export const POPULAR_APPS = [
 	{
 		title: "Notion",
 		url: "https://www.notion.so/",
-		icon: {
-			dark: "assets/notion-light.png",
-			light: "assets/notion.png",
-		},
+		icon: "assets/notion-light.png",
 	},
 	{
 		title: "X (Twitter)",
 		url: "https://x.com/",
-		icon: {
-			dark: "assets/x-twitter-light.png",
-			light: "assets/x.png",
-		},
+		icon: "assets/x-twitter-light.png",
 	},
 	{
 		title: "WhatsApp",

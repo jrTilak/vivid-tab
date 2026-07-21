@@ -45,6 +45,7 @@ describe("settings normalization", () => {
 		});
 		expect(result.settings.widgets.searchbar.shortcuts).toEqual([]);
 		expect(result.settings.appearance.radius).toBe("rounded");
+		expect(result.settings.appearance.theme).toBe("dark");
 		expect(result.settings.appearance.visualEffect).toBe("translucent");
 		expect(result.settings.appearance).toEqual(
 			createDefaultSettings().appearance,
@@ -60,9 +61,14 @@ describe("settings normalization", () => {
 			version: SETTINGS_VERSION,
 			appearance: { visualEffect: "blurred" },
 		});
+		const legacyLightTheme = normalizeSettings({
+			version: SETTINGS_VERSION,
+			appearance: { theme: "light" },
+		});
 
 		expect(radius.wasReset).toBe(true);
 		expect(visualEffect.wasReset).toBe(true);
+		expect(legacyLightTheme.wasReset).toBe(true);
 	});
 
 	test("keeps widget layout atomic so hidden widgets stay hidden", () => {

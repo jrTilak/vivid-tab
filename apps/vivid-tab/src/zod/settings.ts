@@ -1,5 +1,6 @@
 import * as z from "zod/mini";
 import { SETTINGS_VERSION } from "@/constants/settings";
+import { THEMES } from "@/lib/theme";
 
 const LayoutSlotSchema = z.enum(["0", "1", "2", "3", "4", "5", "6", "7", "8"]);
 const WidgetIdSchema = z.enum([
@@ -80,6 +81,7 @@ export const SettingsSchema = z.object({
 	}),
 	appearance: z.object({
 		radius: z.enum(["rounded", "none", "sm"]),
+		theme: z.enum(THEMES),
 		visualEffect: z.enum(["opaque", "translucent"]),
 		wallpapers: z.object({
 			selectedImageId: z.nullable(z.string()),

@@ -52,6 +52,7 @@ export const DEFAULT_SETTINGS = {
 	},
 	appearance: {
 		radius: "rounded",
+		theme: "dark",
 		visualEffect: "translucent",
 		wallpapers: {
 			selectedImageId: null,

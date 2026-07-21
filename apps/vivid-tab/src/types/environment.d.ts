@@ -9,6 +9,9 @@ declare namespace NodeJS {
 		readonly PLASMO_PUBLIC_FIREFOX_ADDON_URL?: string;
 		readonly PLASMO_PUBLIC_DEV_RADIUS?: "rounded" | "none" | "sm";
 		readonly PLASMO_PUBLIC_DEV_VISUAL_EFFECT?: "opaque" | "translucent";
-		readonly PLASMO_PUBLIC_DEV_THEME?: "dark" | "light" | "system";
+		readonly PLASMO_PUBLIC_DEV_THEME?:
+			| "dark"
+			| "catppuccin-mocha"
+			| "tokyo-night";
 	}
 }

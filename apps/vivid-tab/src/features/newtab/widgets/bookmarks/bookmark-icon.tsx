@@ -17,7 +17,7 @@ const BookmarkIcon = ({ className, src, title }: BookmarkIconProps) => {
 		<div
 			aria-hidden="true"
 			className={cn(
-				"relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted/80 text-sm font-medium text-muted-foreground in-data-[visual-effect=translucent]:bg-muted/60",
+				"relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted text-sm font-medium text-muted-foreground in-data-[visual-effect=opaque]:bg-muted in-data-[visual-effect=translucent]:bg-muted/60",
 				className,
 			)}
 		>

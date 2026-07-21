@@ -18,7 +18,7 @@ const Settings = ({ onOpenReviewDialog }: SettingsProps) => {
 			<DialogTrigger asChild>
 				<Button
 					aria-label="Open settings"
-					className="text-background dark:text-foreground"
+					className="text-foreground"
 					onFocus={() => void import("./settings-dialog")}
 					onPointerEnter={() => void import("./settings-dialog")}
 					size="icon"

@@ -55,7 +55,7 @@ const BookmarkFolder = (props: Props) => {
 						style={style}
 						onClick={() => props.onOpenFolder(props.id)}
 						className={cn(
-							"flex flex-col space-y-1 p-2 rounded-lg hover:scale-105 w-24 disabled:opacity-50 cursor-pointer disabled:cursor-default transition-transform",
+							"flex w-24 cursor-pointer flex-col space-y-1 rounded-lg p-2 transition-transform hover:scale-105 hover:bg-accent/70 disabled:cursor-default disabled:opacity-50 in-data-[visual-effect=opaque]:hover:bg-accent in-data-[visual-effect=translucent]:hover:bg-accent/60",
 							isOver && "bg-accent/10",
 							isDragging && "bg-destructive/20",
 							isDragging && "relative z-50",
@@ -105,7 +105,7 @@ const BookmarkFolder = (props: Props) => {
 						style={style}
 						ref={setNodeRef}
 						className={cn(
-							"flex gap-2 p-2 items-center rounded-lg transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-default transition-transform",
+							"flex cursor-pointer items-center gap-2 rounded-lg p-2 transition-all hover:bg-accent/70 disabled:cursor-default disabled:opacity-50 in-data-[visual-effect=opaque]:hover:bg-accent in-data-[visual-effect=translucent]:hover:bg-accent/60",
 							isOver && "bg-accent/10",
 							isDragging && "scale-110 bg-destructive/20",
 							isDragging && "relative z-50",

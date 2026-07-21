@@ -8,12 +8,12 @@ describe("resolveDevOverrides", () => {
 				NODE_ENV: "development",
 				PLASMO_PUBLIC_DEV_RADIUS: "none",
 				PLASMO_PUBLIC_DEV_VISUAL_EFFECT: "opaque",
-				PLASMO_PUBLIC_DEV_THEME: "light",
+				PLASMO_PUBLIC_DEV_THEME: "catppuccin-mocha",
 			}),
 		).toEqual({
 			radius: "none",
 			visualEffect: "opaque",
-			theme: "light",
+			theme: "catppuccin-mocha",
 		});
 	});
 
@@ -23,7 +23,7 @@ describe("resolveDevOverrides", () => {
 				NODE_ENV: "production",
 				PLASMO_PUBLIC_DEV_RADIUS: "none",
 				PLASMO_PUBLIC_DEV_VISUAL_EFFECT: "opaque",
-				PLASMO_PUBLIC_DEV_THEME: "light",
+				PLASMO_PUBLIC_DEV_THEME: "tokyo-night",
 			}),
 		).toEqual({});
 	});
@@ -48,12 +48,12 @@ describe("resolveDevOverrides", () => {
 			resolveDevOverrides({
 				NODE_ENV: "development",
 				PLASMO_PUBLIC_DEV_RADIUS: "sm",
-				PLASMO_PUBLIC_DEV_THEME: "system",
+				PLASMO_PUBLIC_DEV_THEME: "tokyo-night",
 			}),
 		).toEqual({
 			radius: "sm",
 			visualEffect: undefined,
-			theme: "system",
+			theme: "tokyo-night",
 		});
 	});
 });

@@ -10,8 +10,8 @@ import {
 	ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { useIcon } from "@/hooks/use-icon";
+import { getFileIcon } from "@/lib/bookmarks";
 import { cn } from "@/lib/cn";
-import { getFileIcon } from "@/lib/get-file-icon";
 import type { BookmarkUrlNode } from "@/types/bookmark";
 import type { RequestBookmarkAction } from "../bookmark-actions";
 import { BookmarkContextActions } from "../bookmark-context-actions";
@@ -93,7 +93,7 @@ const BookmarkUrl = ({
 								}
 							}}
 							className={cn(
-								"flex items-center cursor-pointer disabled:cursor-default flex-col space-y-1 p-2 rounded-lg hover:scale-105 text-center text-xs w-24 transition-transform",
+								"flex w-24 cursor-pointer flex-col items-center space-y-1 rounded-lg p-2 text-center text-xs transition-transform hover:scale-105 hover:bg-accent/70 disabled:cursor-default in-data-[visual-effect=opaque]:hover:bg-accent in-data-[visual-effect=translucent]:hover:bg-accent/60",
 								isOver && "bg-accent/10",
 								isDragging && "bg-destructive/20",
 								isDragging && "relative z-50",
@@ -124,7 +124,7 @@ const BookmarkUrl = ({
 							}
 						}}
 						className={cn(
-							"flex items-center gap-2 p-2 rounded-lg hover:bg-accent/10 overflow-hidden w-full cursor-pointer disabled:cursor-default transition-all",
+							"flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg p-2 transition-all hover:bg-accent/70 disabled:cursor-default in-data-[visual-effect=opaque]:hover:bg-accent in-data-[visual-effect=translucent]:hover:bg-accent/60",
 							isOver && "bg-accent/10",
 							isDragging && "bg-destructive/20",
 							isDragging && "relative z-50",

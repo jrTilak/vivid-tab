@@ -3,11 +3,11 @@
 @import "shadcn/tailwind.css";
 
 @font-face {
-	font-family: "Inter";
+	font-family: "Spline Sans";
 	font-style: normal;
 	font-display: swap;
 	font-weight: 100 900;
-	src: url("npm:@fontsource-variable/inter/files/inter-latin-wght-normal.woff2")
+	src: url("npm:@fontsource-variable/spline-sans/files/spline-sans-latin-wght-normal.woff2")
 		format("woff2-variations");
 }
 
@@ -23,7 +23,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-	--font-body: "Inter", sans-serif;
+	--font-body: "Spline Sans", sans-serif;
 	--font-heading: "Bricolage Grotesque", sans-serif;
 	--color-sidebar-ring: var(--sidebar-ring);
 	--color-sidebar-border: var(--sidebar-border);
@@ -33,11 +33,6 @@
 	--color-sidebar-primary: var(--sidebar-primary);
 	--color-sidebar-foreground: var(--sidebar-foreground);
 	--color-sidebar: var(--sidebar);
-	--color-chart-5: var(--chart-5);
-	--color-chart-4: var(--chart-4);
-	--color-chart-3: var(--chart-3);
-	--color-chart-2: var(--chart-2);
-	--color-chart-1: var(--chart-1);
 	--color-ring: var(--ring);
 	--color-input: var(--input);
 	--color-border: var(--border);
@@ -66,40 +61,7 @@
 }
 
 :root {
-	--background: oklch(1 0 0);
-	--foreground: oklch(0.145 0 0);
-	--card: oklch(1 0 0);
-	--card-foreground: oklch(0.145 0 0);
-	--popover: oklch(1 0 0);
-	--popover-foreground: oklch(0.145 0 0);
-	--primary: oklch(0.205 0 0);
-	--primary-foreground: oklch(0.985 0 0);
-	--secondary: oklch(0.97 0 0);
-	--secondary-foreground: oklch(0.205 0 0);
-	--muted: oklch(0.97 0 0);
-	--muted-foreground: oklch(0.556 0 0);
-	--accent: oklch(0.97 0 0);
-	--accent-foreground: oklch(0.205 0 0);
-	--destructive: oklch(0.577 0.245 27.325);
-	--border: oklch(0.922 0 0);
-	--input: oklch(0.922 0 0);
-	--ring: oklch(0.708 0 0);
-	--chart-1: oklch(0.87 0 0);
-	--chart-2: oklch(0.556 0 0);
-	--chart-3: oklch(0.439 0 0);
-	--chart-4: oklch(0.371 0 0);
-	--chart-5: oklch(0.269 0 0);
-	--sidebar: oklch(0.985 0 0);
-	--sidebar-foreground: oklch(0.145 0 0);
-	--sidebar-primary: oklch(0.205 0 0);
-	--sidebar-primary-foreground: oklch(0.985 0 0);
-	--sidebar-accent: oklch(0.97 0 0);
-	--sidebar-accent-foreground: oklch(0.205 0 0);
-	--sidebar-border: oklch(0.922 0 0);
-	--sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
+	color-scheme: dark;
 	--background: oklch(0.145 0 0);
 	--foreground: oklch(0.985 0 0);
 	--card: oklch(0.205 0 0);
@@ -118,11 +80,6 @@
 	--border: oklch(1 0 0 / 10%);
 	--input: oklch(1 0 0 / 15%);
 	--ring: oklch(0.556 0 0);
-	--chart-1: oklch(0.87 0 0);
-	--chart-2: oklch(0.556 0 0);
-	--chart-3: oklch(0.439 0 0);
-	--chart-4: oklch(0.371 0 0);
-	--chart-5: oklch(0.269 0 0);
 	--sidebar: oklch(0.205 0 0);
 	--sidebar-foreground: oklch(0.985 0 0);
 	--sidebar-primary: oklch(0.488 0.243 264.376);
@@ -131,6 +88,64 @@
 	--sidebar-accent-foreground: oklch(0.985 0 0);
 	--sidebar-border: oklch(1 0 0 / 10%);
 	--sidebar-ring: oklch(0.556 0 0);
+}
+
+:root[data-theme="catppuccin-mocha"] {
+	--background: #1e1e2e;
+	--foreground: #cdd6f4;
+	--card: #313244;
+	--card-foreground: #cdd6f4;
+	--popover: #313244;
+	--popover-foreground: #cdd6f4;
+	--primary: #cba6f7;
+	--primary-foreground: #1e1e2e;
+	--secondary: #45475a;
+	--secondary-foreground: #cdd6f4;
+	--muted: #313244;
+	--muted-foreground: #a6adc8;
+	--accent: #45475a;
+	--accent-foreground: #cdd6f4;
+	--destructive: #f38ba8;
+	--border: #585b70;
+	--input: #45475a;
+	--ring: #cba6f7;
+	--sidebar: #181825;
+	--sidebar-foreground: #cdd6f4;
+	--sidebar-primary: #cba6f7;
+	--sidebar-primary-foreground: #1e1e2e;
+	--sidebar-accent: #45475a;
+	--sidebar-accent-foreground: #cdd6f4;
+	--sidebar-border: #585b70;
+	--sidebar-ring: #cba6f7;
+}
+
+:root[data-theme="tokyo-night"] {
+	--background: #1a1b26;
+	--foreground: #c0caf5;
+	--card: #24283b;
+	--card-foreground: #c0caf5;
+	--popover: #24283b;
+	--popover-foreground: #c0caf5;
+	--primary: #7aa2f7;
+	--primary-foreground: #1a1b26;
+	--secondary: #292e42;
+	--secondary-foreground: #c0caf5;
+	--muted: #292e42;
+	--muted-foreground: #a9b1d6;
+	--accent: #3b4261;
+	--accent-foreground: #c0caf5;
+	--destructive: #f7768e;
+	--border: #3b4261;
+	--input: #3b4261;
+	--ring: #7aa2f7;
+	--sidebar: #16161e;
+	--sidebar-foreground: #c0caf5;
+	--sidebar-primary: #7aa2f7;
+	--sidebar-primary-foreground: #1a1b26;
+	--sidebar-accent: #292e42;
+	--sidebar-accent-foreground: #c0caf5;
+	--sidebar-border: #3b4261;
+	--sidebar-ring: #7aa2f7;
 }
 
 @layer base {

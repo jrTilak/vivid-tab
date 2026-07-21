@@ -7,7 +7,6 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { useSettings } from "@/providers/settings-provider";
-import { type Theme, useTheme } from "@/providers/theme-provider";
 import type { Settings } from "@/zod/settings";
 import {
 	RADIUS_OPTIONS,
@@ -23,7 +22,6 @@ const AppearanceSettings = () => {
 		settings: { appearance },
 		setSettings,
 	} = useSettings();
-	const { setTheme, theme } = useTheme();
 
 	const updateAppearance = useCallback(
 		<Key extends keyof Appearance>(key: Key, value: Appearance[Key]) => {
@@ -46,8 +44,10 @@ const AppearanceSettings = () => {
 			>
 				<SettingsRow controlId="settings-theme" label="Theme">
 					<Select
-						value={theme}
-						onValueChange={(value) => setTheme(value as Theme)}
+						value={appearance.theme}
+						onValueChange={(value) =>
+							updateAppearance("theme", value as Appearance["theme"])
+						}
 					>
 						<SelectTrigger className="w-48" id="settings-theme">
 							<SelectValue />

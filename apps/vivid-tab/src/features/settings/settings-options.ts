@@ -1,4 +1,4 @@
-import type { Theme } from "@/providers/theme-provider";
+import type { Theme } from "@/lib/theme";
 import type { Settings } from "@/zod/settings";
 
 type General = Settings["general"];
@@ -9,9 +9,9 @@ type Temperature = Settings["widgets"]["temperature"];
 type Timer = Settings["widgets"]["timer"];
 
 export const THEME_OPTIONS = [
-	{ label: "System", value: "system" },
-	{ label: "Light", value: "light" },
 	{ label: "Dark", value: "dark" },
+	{ label: "Catppuccin Mocha", value: "catppuccin-mocha" },
+	{ label: "Tokyo Night", value: "tokyo-night" },
 ] as const satisfies ReadonlyArray<{ label: string; value: Theme }>;
 
 export const RADIUS_OPTIONS = [

@@ -1,6 +1,7 @@
+import { THEMES, type Theme } from "./theme";
+
 const RADII = ["rounded", "none", "sm"] as const;
 const VISUAL_EFFECTS = ["opaque", "translucent"] as const;
-const THEMES = ["dark", "light", "system"] as const;
 
 /**
  * Radius values accepted by the development appearance override.
@@ -15,7 +16,7 @@ export type DevVisualEffect = (typeof VISUAL_EFFECTS)[number];
 /**
  * Themes accepted by the development appearance override.
  */
-export type DevTheme = (typeof THEMES)[number];
+export type DevTheme = Theme;
 
 type DevEnvironment = {
 	NODE_ENV?: string;
