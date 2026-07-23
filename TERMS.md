@@ -8,7 +8,7 @@ By installing or using Vivid Tab, you agree to these terms. If you do not agree,
 
 ## 2. License
 
-Vivid Tab is open-source software. Your rights to use, copy, modify, distribute, sublicense, or sell the software are governed by the repository's [Modified MIT License](./LICENSE), including its attribution requirement.
+Vivid Tab is open-source software. Your rights to use, copy, modify, distribute, sublicense, or sell the software are governed by the repository's [MIT License](https://github.com/jrtilak/vivid-tab/blob/master/LICENSE).
 
 ## 3. Browser permissions and third-party services
 
@@ -18,7 +18,7 @@ Third-party services are governed by their own terms and policies. Their availab
 
 ## 4. Privacy
 
-How Vivid Tab stores data and communicates with third parties is described in the [Privacy Policy](./PRIVACY.md).
+How Vivid Tab stores data and communicates with third parties is described in the [Privacy Policy](https://vividtab.jrtilak.dev/privacy).
 
 ## 5. Responsible use
 
@@ -26,7 +26,7 @@ You agree to use Vivid Tab lawfully and not to misuse the extension or third-par
 
 ## 6. Disclaimer and limitation of liability
 
-Vivid Tab is provided "as is," without warranties of any kind. To the fullest extent permitted by applicable law, the authors and copyright holders are not liable for claims, damages, data loss, service interruptions, or other liability arising from the software or its use. The repository [license](./LICENSE) contains the controlling warranty and liability terms for the software.
+Vivid Tab is provided "as is," without warranties of any kind. To the fullest extent permitted by applicable law, the authors and copyright holders are not liable for claims, damages, data loss, service interruptions, or other liability arising from the software or its use. The repository [license](https://github.com/jrtilak/vivid-tab/blob/master/LICENSE) contains the controlling warranty and liability terms for the software.
 
 ## 7. Changes
 

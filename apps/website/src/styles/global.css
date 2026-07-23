@@ -1,0 +1,280 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap");
+@import "tailwindcss";
+
+@theme {
+	--color-background: hsl(var(--background));
+	--color-foreground: hsl(var(--foreground));
+	--color-card: hsl(var(--card));
+	--color-card-foreground: hsl(var(--card-foreground));
+	--color-primary: hsl(var(--primary));
+	--color-primary-foreground: hsl(var(--primary-foreground));
+	--color-secondary: hsl(var(--secondary));
+	--color-secondary-foreground: hsl(var(--secondary-foreground));
+	--color-muted: hsl(var(--muted));
+	--color-muted-foreground: hsl(var(--muted-foreground));
+	--color-accent: hsl(var(--accent));
+	--color-accent-foreground: hsl(var(--accent-foreground));
+	--color-destructive: hsl(var(--destructive));
+	--color-destructive-foreground: hsl(var(--destructive-foreground));
+	--color-border: hsl(var(--border));
+	--color-input: hsl(var(--input));
+	--color-ring: hsl(var(--ring));
+	--font-sans: "Bricolage Grotesque", sans-serif;
+	--font-heading: "Bricolage Grotesque", sans-serif;
+	--radius-lg: var(--radius);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-sm: calc(var(--radius) - 4px);
+}
+
+:root {
+	--background: 0 0% 100%;
+	--foreground: 240 10% 3.9%;
+	--card: 0 0% 100%;
+	--card-foreground: 240 10% 3.9%;
+	--primary: 240 5.9% 10%;
+	--primary-foreground: 0 0% 98%;
+	--secondary: 240 4.8% 95.9%;
+	--secondary-foreground: 240 5.9% 10%;
+	--muted: 240 4.8% 95.9%;
+	--muted-foreground: 240 3.8% 46.1%;
+	--accent: 240 4.8% 95.9%;
+	--accent-foreground: 240 5.9% 10%;
+	--destructive: 0 84.2% 60.2%;
+	--destructive-foreground: 0 0% 98%;
+	--border: 240 5.9% 90%;
+	--input: 240 5.9% 90%;
+	--ring: 240 5.9% 10%;
+	--radius: 0.3rem;
+}
+
+@property --angle {
+	syntax: "<angle>";
+	initial-value: 0deg;
+	inherits: false;
+}
+
+@keyframes trail {
+	to {
+		--angle: 360deg;
+	}
+}
+
+@keyframes sheet-in {
+	from {
+		transform: translateX(100%);
+	}
+	to {
+		transform: translateX(0);
+	}
+}
+
+@layer base {
+	* {
+		box-sizing: border-box;
+		border-color: hsl(var(--border));
+	}
+
+	html {
+		scroll-behavior: smooth;
+	}
+
+	body {
+		min-width: 320px;
+		min-height: 100vh;
+		margin: 0;
+		background: hsl(var(--background));
+		color: hsl(var(--foreground));
+		font-family: "Bricolage Grotesque", sans-serif;
+	}
+
+	button,
+	a,
+	summary {
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	:focus-visible {
+		outline: 2px solid hsl(var(--ring));
+		outline-offset: 2px;
+	}
+}
+
+@layer components {
+	.site-container {
+		width: 100%;
+		margin-inline: auto;
+		padding-inline: 2rem;
+	}
+
+	.button {
+		display: inline-flex;
+		height: 2.5rem;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		white-space: nowrap;
+		border-radius: var(--radius);
+		padding: 0.5rem 1rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+		line-height: 1.25rem;
+		transition:
+			color 150ms,
+			background-color 150ms,
+			border-color 150ms;
+	}
+
+	.button-primary {
+		background: hsl(var(--primary));
+		color: hsl(var(--primary-foreground));
+	}
+
+	.button-primary:hover {
+		background: hsl(var(--primary) / 90%);
+	}
+
+	.button-secondary {
+		background: hsl(var(--secondary));
+		color: hsl(var(--secondary-foreground));
+	}
+
+	.button-secondary:hover {
+		background: hsl(var(--secondary) / 80%);
+	}
+
+	.button-outline {
+		border: 1px solid hsl(var(--input));
+		background: hsl(var(--background));
+		color: hsl(var(--foreground));
+	}
+
+	.button-outline:hover,
+	.button-ghost:hover {
+		background: hsl(var(--accent));
+		color: hsl(var(--accent-foreground));
+	}
+
+	.button-ghost {
+		background: transparent;
+	}
+
+	.button-lg {
+		height: 2.75rem;
+		padding-inline: 2rem;
+	}
+
+	.button-icon {
+		width: 2.5rem;
+		padding: 0;
+	}
+
+	.animated-border-trail {
+		position: relative;
+		height: fit-content;
+		width: fit-content;
+		overflow: hidden;
+		border-radius: 1rem;
+		background: rgb(229 231 235);
+		padding: 1px;
+	}
+
+	.animated-border-trail::before {
+		position: absolute;
+		inset: 0;
+		content: "";
+		animation: trail 10s linear infinite;
+		background: conic-gradient(
+			from var(--angle) at 50% 50%,
+			transparent 90%,
+			purple
+		);
+	}
+
+	.animated-border-content {
+		position: relative;
+		height: 100%;
+		width: 100%;
+		overflow: hidden;
+		border-radius: 15px;
+		background: white;
+	}
+
+	.document {
+		width: 100%;
+		max-width: 48rem;
+		margin-inline: auto;
+		padding: 3rem 1rem;
+		line-height: 1.65;
+	}
+
+	.document h1 {
+		margin-bottom: 2rem;
+		font-size: 1.875rem;
+		font-weight: 700;
+		line-height: 2.25rem;
+		text-decoration: underline;
+	}
+
+	.document h2 {
+		margin-block: 2rem 1rem;
+		font-size: 1.25rem;
+		font-weight: 600;
+		line-height: 1.75rem;
+	}
+
+	.document h3 {
+		margin-block: 1.5rem 0.75rem;
+		font-size: 1.05rem;
+		font-weight: 600;
+	}
+
+	.document p,
+	.document ul,
+	.document ol {
+		margin-bottom: 1rem;
+	}
+
+	.document ul {
+		list-style: disc;
+		padding-left: 1.5rem;
+	}
+
+	.document ol {
+		list-style: decimal;
+		padding-left: 1.5rem;
+	}
+
+	.document a:not(.button) {
+		color: hsl(var(--destructive));
+		text-decoration: underline;
+	}
+
+	.mobile-sheet {
+		inset: 0 0 0 auto;
+		width: 75%;
+		max-width: 24rem;
+		height: 100dvh;
+		max-height: none;
+		margin: 0 0 0 auto;
+		border: 0;
+		border-left: 1px solid hsl(var(--border));
+		background: hsl(var(--background));
+		color: hsl(var(--foreground));
+		padding: 1.5rem;
+		box-shadow: 0 20px 25px -5px rgb(0 0 0 / 10%);
+	}
+
+	.mobile-sheet[open] {
+		animation: sheet-in 300ms ease-out;
+	}
+
+	.mobile-sheet::backdrop {
+		background: rgb(0 0 0 / 80%);
+	}
+}
+
+@media (min-width: 1400px) {
+	.site-container {
+		max-width: 1400px;
+	}
+}

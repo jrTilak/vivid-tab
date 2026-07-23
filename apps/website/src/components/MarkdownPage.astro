@@ -1,0 +1,18 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+interface Props {
+	description: string;
+	title: string;
+}
+
+const { description, title } = Astro.props;
+---
+
+<BaseLayout description={description} title={title}>
+	<main class="min-h-screen">
+		<article class="document">
+			<slot />
+		</article>
+	</main>
+</BaseLayout>

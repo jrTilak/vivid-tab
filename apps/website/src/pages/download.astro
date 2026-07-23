@@ -1,0 +1,46 @@
+---
+import { Icon } from "astro-icon/components";
+import { SITE } from "../data/site";
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout description="Install Vivid Tab for Chrome or Firefox, or build it from source." title="Download Vivid Tab">
+	<main class="flex min-h-[60vh] flex-col items-center justify-center p-4 text-center">
+		<div class="max-w-3xl space-y-8">
+			<div class="space-y-4">
+				<h1 class="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl">Get Vivid Tab</h1>
+				<p class="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+					Transform your new tab experience. Available for Chrome and Firefox based browsers.
+				</p>
+			</div>
+
+			<div class="flex flex-col items-center gap-4" data-browser-only="chrome">
+				<a class="button button-outline button-lg px-8 text-lg" href={SITE.chromeStoreUrl} rel="noreferrer" target="_blank">
+					<img alt="" class="size-5" src="/chrome.svg" /> Download for Chrome
+				</a>
+				<div class="grid gap-4 sm:grid-cols-2">
+					<a class="button button-outline" href={SITE.firefoxStoreUrl} rel="noreferrer" target="_blank">
+						<img alt="" class="size-5" src="/firefox.svg" /> Download for Firefox
+					</a>
+					<a class="button button-outline" href={SITE.githubUrl} rel="noreferrer" target="_blank">
+						<Icon class="size-4" name="tabler:brand-github" /> Build from Source
+					</a>
+				</div>
+			</div>
+
+			<div class="flex flex-col items-center gap-4" data-browser-only="firefox" hidden>
+				<a class="button button-primary button-lg px-8 text-lg" href={SITE.firefoxStoreUrl} rel="noreferrer" target="_blank">
+					<img alt="" class="size-5" src="/firefox.svg" /> Download for Firefox
+				</a>
+				<div class="grid gap-4 sm:grid-cols-2">
+					<a class="button button-outline" href={SITE.chromeStoreUrl} rel="noreferrer" target="_blank">
+						<img alt="" class="size-5" src="/chrome.svg" /> Download for Chrome
+					</a>
+					<a class="button button-outline" href={SITE.githubUrl} rel="noreferrer" target="_blank">
+						<Icon class="size-4" name="tabler:brand-github" /> Build from Source
+					</a>
+				</div>
+			</div>
+		</div>
+	</main>
+</BaseLayout>

@@ -1,0 +1,142 @@
+---
+import { Icon } from "astro-icon/components";
+import { HIGHLIGHTS } from "../../data/site";
+
+const icons = ["tabler:bookmarks", "tabler:bolt", "tabler:layers-subtract"];
+---
+
+<section class="site-container flex flex-col gap-16 px-8">
+	<div class="flex flex-col items-center justify-center" id="highlights">
+		<h2 class="w-full max-w-md text-center text-3xl font-bold text-foreground md:text-4xl lg:text-5xl">
+			Highlights
+		</h2>
+		<p class="mt-4 max-w-xl text-center text-muted-foreground">
+			Vivid Tab offers bang search, unlimited bookmarks, and complete customization, helping
+			you personalize your new tab without adding clutter.
+		</p>
+	</div>
+
+	<div
+		class="mx-auto grid w-full max-w-7xl grid-cols-1 overflow-hidden rounded-lg border border-border bg-background shadow-sm md:grid-cols-2"
+		data-highlights
+	>
+		<div class="relative min-h-72 overflow-hidden bg-muted md:min-h-[31rem]">
+			<div class="absolute inset-0 transition-opacity duration-200" data-highlight-visual="0">
+				<img
+					alt={HIGHLIGHTS[0].imageAlt}
+					class="size-full object-cover object-center"
+					decoding="sync"
+					height="800"
+					src="/preview.png"
+					width="1280"
+				/>
+			</div>
+
+			<div
+				aria-hidden="true"
+				class="absolute inset-0 hidden place-items-center bg-background p-8"
+				data-highlight-visual="1"
+			>
+				<div class="w-full max-w-md space-y-3">
+					<div class="rounded-lg border border-border bg-card p-4 shadow-sm">
+						<div class="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
+							<Icon class="size-4" name="tabler:brand-youtube" />
+							Search YouTube
+						</div>
+						<p class="font-mono text-sm"><strong class="text-primary">!yt</strong> ambient music</p>
+					</div>
+					<div class="rounded-lg border border-border bg-card p-4 shadow-sm">
+						<div class="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
+							<Icon class="size-4" name="tabler:brand-github" />
+							Search GitHub
+						</div>
+						<p class="font-mono text-sm"><strong class="text-primary">!gh</strong> astro releases</p>
+					</div>
+					<div class="rounded-lg border border-border bg-card p-4 shadow-sm">
+						<div class="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
+							<Icon class="size-4" name="tabler:brand-google" />
+							Search Google
+						</div>
+						<p class="font-mono text-sm"><strong class="text-primary">!g</strong> weekend weather</p>
+					</div>
+				</div>
+			</div>
+
+			<div
+				aria-hidden="true"
+				class="absolute inset-0 hidden"
+				data-highlight-visual="2"
+			>
+				<img
+					alt={HIGHLIGHTS[2].imageAlt}
+					class="size-full object-cover object-center"
+					decoding="async"
+					height="800"
+					loading="lazy"
+					src={HIGHLIGHTS[2].image}
+					width="1280"
+				/>
+			</div>
+		</div>
+
+		<div class="flex items-center bg-muted p-6">
+			<div class="w-full space-y-4">
+				{
+					HIGHLIGHTS.map((feature, index) => (
+						<button
+							aria-pressed={index === 0 ? "true" : "false"}
+							class:list={[
+								"flex w-full cursor-pointer items-start gap-4 rounded-lg p-4 text-left transition-colors",
+								index === 0
+									? "border border-border bg-background shadow-sm"
+									: "hover:bg-background/50",
+							]}
+							data-highlight-trigger={index}
+							type="button"
+						>
+							<span class="shrink-0 rounded-lg bg-primary/10 p-2 text-primary">
+								<Icon class="size-4" name={icons[index]} />
+							</span>
+							<span class="space-y-1">
+								<strong class="block font-medium text-foreground">{feature.title}</strong>
+								<span class="block text-sm text-muted-foreground">{feature.description}</span>
+							</span>
+						</button>
+					))
+				}
+			</div>
+		</div>
+	</div>
+</section>
+
+<script>
+	const roots = document.querySelectorAll<HTMLElement>("[data-highlights]");
+
+	for (const root of roots) {
+		const triggers = Array.from(
+			root.querySelectorAll<HTMLButtonElement>("[data-highlight-trigger]"),
+		);
+		const visuals = Array.from(root.querySelectorAll<HTMLElement>("[data-highlight-visual]"));
+
+		for (const trigger of triggers) {
+			trigger.addEventListener("click", () => {
+				const activeIndex = trigger.dataset.highlightTrigger;
+
+				for (const item of triggers) {
+					const isActive = item.dataset.highlightTrigger === activeIndex;
+					item.setAttribute("aria-pressed", String(isActive));
+					item.classList.toggle("border", isActive);
+					item.classList.toggle("border-border", isActive);
+					item.classList.toggle("bg-background", isActive);
+					item.classList.toggle("shadow-sm", isActive);
+					item.classList.toggle("hover:bg-background/50", !isActive);
+				}
+
+				for (const visual of visuals) {
+					visual.classList.toggle("hidden", visual.dataset.highlightVisual !== activeIndex);
+					visual.classList.toggle("grid", visual.dataset.highlightVisual === activeIndex);
+				}
+			});
+		}
+	}
+</script>

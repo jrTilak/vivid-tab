@@ -22,13 +22,13 @@ Vivid Tab is an open-source Chrome and Firefox extension that transforms your ne
 
 ## 📌 Preview
 
-![Screenshot 1](https://github.com/jrTilak/vivid-tab-website/raw/master/public/preview.png)
+![Vivid Tab preview](https://vividtab.jrtilak.dev/preview.png)
 
 ---
 
 ## 🛠 Built With
 
-Vivid Tab is developed using **Plasmo**, a framework for building browser extensions.
+The extension is built with **Plasmo**, and the product website is built with **Astro**.
 
 🔗 [Plasmo Documentation](https://docs.plasmo.com/)
 
@@ -97,10 +97,7 @@ Vivid Tab is built with the help of these amazing resources:
 
 ## 📜 License
 
-This project is open-source and available under a Modified MIT License (see LICENSE for details).
-
-> **Attribution Requirement:**
-> Any copies, distributions, or substantial portions of this software or derivative works must include clear and explicit credit to the original author: **jrTilak** (e.g., "Original author: jrTilak" in documentation, about sections, or credits).
+This project is open source and available under the [MIT License](./LICENSE).
 
 ---
 
