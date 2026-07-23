@@ -4,14 +4,33 @@ import { getBookmarkInitials } from "./bookmark-display";
 
 interface BookmarkIconProps {
 	className?: string;
-	src?: string | null;
+	sources?: readonly (string | null | undefined)[];
 	title: string;
 }
 
-/** Uses native lazy loading so large bookmark collections do not preload every favicon. */
-const BookmarkIcon = ({ className, src, title }: BookmarkIconProps) => {
-	const [failedSource, setFailedSource] = useState<string>();
-	const showImage = Boolean(src && src !== failedSource);
+/**
+ * Lazily loads the first working source and falls through failed candidates.
+ * This lets Firefox try a high-resolution touch icon before the conventional
+ * favicon while still ending with a readable initials fallback.
+ */
+const BookmarkIcon = ({
+	className,
+	sources = [],
+	title,
+}: BookmarkIconProps) => {
+	const uniqueSources = [...new Set(sources.filter(Boolean) as string[])];
+	const sourceKey = uniqueSources.join("\u0000");
+	const [failureState, setFailureState] = useState<{
+		failedSources: ReadonlySet<string>;
+		sourceKey: string;
+	}>(() => ({ failedSources: new Set(), sourceKey }));
+	const failedSources =
+		failureState.sourceKey === sourceKey
+			? failureState.failedSources
+			: new Set<string>();
+	const source = uniqueSources.find(
+		(candidate) => !failedSources.has(candidate),
+	);
 
 	return (
 		<div
@@ -21,15 +40,26 @@ const BookmarkIcon = ({ className, src, title }: BookmarkIconProps) => {
 				className,
 			)}
 		>
-			{showImage ? (
+			{source ? (
 				<img
 					alt=""
 					className="size-full object-contain object-center"
 					decoding="async"
 					fetchPriority="low"
 					loading="lazy"
-					onError={() => setFailedSource(src ?? undefined)}
-					src={src ?? undefined}
+					onError={() => {
+						setFailureState((current) => {
+							const next = new Set(
+								current.sourceKey === sourceKey
+									? current.failedSources
+									: undefined,
+							);
+							next.add(source);
+
+							return { failedSources: next, sourceKey };
+						});
+					}}
+					src={source}
 				/>
 			) : (
 				<span className="flex size-full items-center justify-center bg-muted text-sm font-medium text-muted-foreground in-data-[visual-effect=opaque]:bg-muted in-data-[visual-effect=translucent]:bg-muted/60">

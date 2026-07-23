@@ -14,6 +14,7 @@ import {
 	InputGroupInput,
 } from "@/components/ui/input-group";
 import { Link } from "@/components/ui/link";
+import { getBundledAssetUrl } from "@/constants/assets";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useSearchSuggestions } from "@/hooks/use-search-suggestions";
 import { resolveBangSearch } from "@/lib/bang-search";
@@ -35,6 +36,10 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
 		},
 	} = useSettings();
 	const activeSearch = resolveBangSearch(searchQuery);
+	const activeBangIcon =
+		activeSearch.kind === "bang"
+			? getBundledAssetUrl(activeSearch.bang.icon)
+			: undefined;
 	const debouncedSearch = resolveBangSearch(debouncedSearchQuery);
 	const searchSuggestions = useSearchSuggestions({
 		enabled: Boolean(
@@ -79,12 +84,12 @@ const SearchDialog = ({ open, onOpenChange }: Props) => {
 									className="max-w-28"
 									title={`Search with ${activeSearch.bang.name}`}
 								>
-									{activeSearch.bang.icon ? (
+									{activeBangIcon ? (
 										<img
 											alt=""
 											aria-hidden="true"
 											draggable={false}
-											src={chrome.runtime.getURL(activeSearch.bang.icon)}
+											src={activeBangIcon}
 										/>
 									) : (
 										<span className="truncate">{activeSearch.bang.name}</span>

@@ -56,6 +56,17 @@ export const EXPECTED_API_PERMISSIONS = [
 	"topSites",
 	"geolocation",
 	"alarms",
+	"favicon",
+] as const;
+
+export const EXPECTED_FIREFOX_API_PERMISSIONS = [
+	"bookmarks",
+	"storage",
+	"unlimitedStorage",
+	"search",
+	"topSites",
+	"geolocation",
+	"alarms",
 ] as const;
 
 export const EXPECTED_FIREFOX_DATA_PERMISSIONS = [
@@ -67,6 +78,34 @@ export const EXPECTED_OPTIONAL_PERMISSIONS = ["history"] as const;
 
 const MINIMUM_ARCHIVE_BYTES = 1_024;
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
+
+export const REQUIRED_RELEASE_ASSETS = [
+	["audio-file", "svg"],
+	["claude", "png"],
+	["doc-document-docx", "svg"],
+	["drive", "png"],
+	["file", "svg"],
+	["folder-svgrepo-com", "png"],
+	["gmail", "png"],
+	["happy", "png"],
+	["icon", "png"],
+	["image", "svg"],
+	["linkedin", "png"],
+	["local-directory", "svg"],
+	["notion-light", "png"],
+	["openai", "png"],
+	["pdf-file", "svg"],
+	["ppt", "svg"],
+	["sad", "png"],
+	["scene", "jpg"],
+	["svg", "svg"],
+	["video-file", "svg"],
+	["whatsapp", "png"],
+	["x", "png"],
+	["x-twitter-light", "png"],
+	["xls", "svg"],
+	["youtube", "png"],
+] as const;
 
 const isJsonObject = (value: unknown): value is JsonObject =>
 	typeof value === "object" && value !== null && !Array.isArray(value);
@@ -98,6 +137,26 @@ const sameMembers = (actual: readonly string[], expected: readonly string[]) =>
 		.sort()
 		.every((value, index) => value === [...expected].sort()[index]);
 
+/**
+ * Finds source assets that Plasmo failed to emit into a release archive.
+ * Raw imports use a content hash between the source stem and extension.
+ */
+export const findMissingReleaseAssets = (
+	entries: readonly string[],
+): string[] => {
+	const filenames = entries.map((entry) => entry.split("/").at(-1) ?? "");
+
+	return REQUIRED_RELEASE_ASSETS.filter(
+		([stem, extension]) =>
+			!filenames.some((filename) =>
+				new RegExp(
+					`^${stem.replaceAll("-", "\\-")}\\.[a-f0-9]{8,}\\.${extension}$`,
+					"i",
+				).test(filename),
+			),
+	).map(([stem, extension]) => `${stem}.${extension}`);
+};
+
 const getFirefoxDataPermissions = (manifest: JsonObject): string[] | null => {
 	const browserSettings = manifest.browser_specific_settings;
 	if (!isJsonObject(browserSettings)) return null;
@@ -127,12 +186,13 @@ const getFirefoxId = (manifest: JsonObject): unknown => {
 	return isJsonObject(gecko) ? gecko.id : undefined;
 };
 
-const getFirefoxHostOverride = (manifest: JsonObject): string[] | null => {
+const getFirefoxOverride = (manifest: JsonObject): JsonObject | null => {
 	const overrides = manifest.overrides;
 	if (!isJsonObject(overrides)) return null;
 
 	const firefox = overrides.firefox;
-	return isJsonObject(firefox) ? toStringArray(firefox.host_permissions) : null;
+
+	return isJsonObject(firefox) ? firefox : null;
 };
 
 /**
@@ -210,13 +270,28 @@ export const validateReleaseSource = ({
 		errors.push("manifest host permissions must match the approved providers");
 	}
 
-	const firefoxHostPermissions = getFirefoxHostOverride(manifest);
+	const firefoxOverride = getFirefoxOverride(manifest);
+	const firefoxHostPermissions = firefoxOverride
+		? toStringArray(firefoxOverride.host_permissions)
+		: null;
 	if (
 		!firefoxHostPermissions ||
 		!sameMembers(firefoxHostPermissions, EXPECTED_FIREFOX_HOST_PERMISSIONS)
 	) {
 		errors.push(
 			"Firefox host permissions must omit the remote suggestion provider",
+		);
+	}
+
+	const firefoxApiPermissions = firefoxOverride
+		? toStringArray(firefoxOverride.permissions)
+		: null;
+	if (
+		!firefoxApiPermissions ||
+		!sameMembers(firefoxApiPermissions, EXPECTED_FIREFOX_API_PERMISSIONS)
+	) {
+		errors.push(
+			"Firefox API permissions must omit Chromium's favicon permission",
 		);
 	}
 
@@ -303,10 +378,11 @@ export const validateGeneratedManifest = ({
 	}
 
 	const apiPermissions = toStringArray(manifest.permissions);
-	if (
-		!apiPermissions ||
-		!sameMembers(apiPermissions, EXPECTED_API_PERMISSIONS)
-	) {
+	const expectedApiPermissions =
+		target === "firefox"
+			? EXPECTED_FIREFOX_API_PERMISSIONS
+			: EXPECTED_API_PERMISSIONS;
+	if (!apiPermissions || !sameMembers(apiPermissions, expectedApiPermissions)) {
 		errors.push(`${target} manifest contains unexpected API permissions`);
 	}
 
@@ -405,6 +481,13 @@ export const inspectReleaseArchive = async ({
 	if (!entries.includes("manifest.json")) {
 		throw new Error(
 			`${archivePath} does not contain a top-level manifest.json`,
+		);
+	}
+
+	const missingAssets = findMissingReleaseAssets(entries);
+	if (missingAssets.length > 0) {
+		throw new Error(
+			`${archivePath} is missing packaged assets: ${missingAssets.join(", ")}`,
 		);
 	}
 

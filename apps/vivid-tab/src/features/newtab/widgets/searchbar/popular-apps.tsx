@@ -47,7 +47,7 @@ export function PopularApps() {
 									className="size-12 rounded-lg"
 									decoding="async"
 									draggable={false}
-									src={chrome.runtime.getURL(app.icon)}
+									src={app.icon}
 								/>
 								<span className="text-xs text-foreground">{app.title}</span>
 							</a>

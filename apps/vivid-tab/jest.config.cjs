@@ -23,6 +23,7 @@ module.exports = {
 	moduleNameMapper: {
 		"^@/(.*)$": "<rootDir>/src/$1",
 		"^@test/jest$": "<rootDir>/test/jest.ts",
+		"^raw:/assets/(.*)$": "<rootDir>/assets/$1",
 	},
 	rootDir: __dirname,
 	roots: ["<rootDir>/src", "<rootDir>/scripts"],
@@ -34,6 +35,7 @@ module.exports = {
 	},
 	testMatch: ["**/*.test.ts", "**/*.test.tsx"],
 	transform: {
+		"^.+\\.(?:jpe?g|png|svg)$": "<rootDir>/test/asset-transformer.cjs",
 		"^.+\\.tsx?$": [
 			"babel-jest",
 			{

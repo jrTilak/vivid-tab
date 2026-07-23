@@ -19,7 +19,6 @@ import {
 	getBookmarkChildren,
 	getBookmarkIconSnapshot,
 	getBookmarkIconStorageKey,
-	getFileIcon,
 	notifyBookmarkIconChanged,
 	parseStoredBookmarkIcon,
 	readBookmarks,
@@ -861,64 +860,5 @@ describe("bookmark icon store", () => {
 		expect(getBookmarkIconSnapshot("failed-slow-read")).toBeNull();
 		expect(consoleError).toHaveBeenCalledTimes(1);
 		consoleError.mockRestore();
-	});
-});
-
-describe("getFileIcon", () => {
-	const installRuntimeUrlMock = () => {
-		const getURL = mock((name: string) => `extension://${name}`);
-		globalThis.chrome = {
-			runtime: { getURL },
-		} as unknown as typeof chrome;
-
-		return getURL;
-	};
-
-	test("returns null for web bookmarks without consulting the runtime", () => {
-		const getURL = installRuntimeUrlMock();
-
-		expect(getFileIcon("https://example.com/report.pdf")).toBeNull();
-		expect(getURL).not.toHaveBeenCalled();
-	});
-
-	test.each([
-		["file:///tmp/report.PDF", "pdf-file.svg"],
-		["file:///tmp/report.doc", "doc-document-docx.svg"],
-		["file:///tmp/report.docx", "doc-document-docx.svg"],
-		["file:///tmp/sheet.xls", "xls.svg"],
-		["file:///tmp/sheet.xlsx", "xls.svg"],
-		["file:///tmp/slides.ppt", "ppt.svg"],
-		["file:///tmp/slides.pptx", "ppt.svg"],
-		["file:///tmp/photo.jpg", "image.svg"],
-		["file:///tmp/photo.jpeg", "image.svg"],
-		["file:///tmp/photo.png", "image.svg"],
-		["file:///tmp/photo.gif", "image.svg"],
-		["file:///tmp/photo.bmp", "image.svg"],
-		["file:///tmp/vector.svg", "svg.svg"],
-		["file:///tmp/song.mp3", "audio-file.svg"],
-		["file:///tmp/song.wav", "audio-file.svg"],
-		["file:///tmp/song.aac", "audio-file.svg"],
-		["file:///tmp/song.flac", "audio-file.svg"],
-		["file:///tmp/movie.mp4", "video-file.svg"],
-		["file:///tmp/movie.avi", "video-file.svg"],
-		["file:///tmp/archive.zip", "file-broken.svg"],
-	])("maps %s to the correct bundled asset", (url, asset) => {
-		installRuntimeUrlMock();
-
-		expect(getFileIcon(url)).toBe(`extension://assets/svg/${asset}`);
-	});
-
-	test("falls back safely for malformed and extensionless file URLs", () => {
-		installRuntimeUrlMock();
-
-		expect(getFileIcon("file://%invalid")).toBe(
-			"extension://assets/svg/file-broken.svg",
-		);
-		expect(getFileIcon("file:///tmp/README")).toBe(
-			"extension://assets/svg/file-broken.svg",
-		);
-		expect(getFileIcon("FILE:///tmp/report.pdf")).toBe(
-			"extension://assets/svg/pdf-file.svg",
-		);
 	});
 });

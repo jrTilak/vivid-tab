@@ -18,6 +18,8 @@ const config = {
 	ignoreDependencies: [
 		"@fontsource-variable/bricolage-grotesque",
 		"@fontsource-variable/outfit",
+		/* Plasmo's `raw:` asset scheme is an import prefix, not a package. */
+		"raw",
 		/* Retained intentionally for feature-level animation work. */
 		"motion",
 		/* WebdriverIO resolves these names from runner configuration at runtime. */

@@ -1,3 +1,4 @@
+import defaultWallpaperUrl from "raw:/assets/scene.jpg";
 import { useEffect, useState } from "react";
 import { useWallpaper } from "@/hooks/use-wallpaper";
 import { cn } from "@/lib/cn";
@@ -75,7 +76,7 @@ const WallpaperBackground = ({
 				src={
 					displayImage?.id === activeImageId
 						? displayImage.src
-						: chrome.runtime.getURL("assets/scene.jpg")
+						: defaultWallpaperUrl
 				}
 			/>
 			<div

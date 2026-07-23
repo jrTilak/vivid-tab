@@ -1,3 +1,4 @@
+import defaultWallpaperUrl from "raw:/assets/scene.jpg";
 import { IconBookmark, IconTrash } from "@tabler/icons-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -41,7 +42,7 @@ const ImageCard = ({
 					loading="lazy"
 					src={
 						imageId === null
-							? chrome.runtime.getURL("assets/scene.jpg")
+							? defaultWallpaperUrl
 							: (imageData?.thumbnailSrc ?? imageData?.src)
 					}
 					width={200}

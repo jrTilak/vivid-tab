@@ -10,12 +10,12 @@ import {
 	ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { useIcon } from "@/hooks/use-icon";
-import { getFileIcon } from "@/lib/bookmarks";
 import { cn } from "@/lib/cn";
 import type { BookmarkUrlNode } from "@/types/bookmark";
 import type { RequestBookmarkAction } from "../bookmark-actions";
 import { BookmarkContextActions } from "../bookmark-context-actions";
-import { getBookmarkFaviconUrl } from "../bookmark-display";
+import { getBookmarkFaviconSources } from "../bookmark-display";
+import { getFileIcon } from "../bookmark-file-icon";
 import { BookmarkIcon } from "../bookmark-icon";
 import { openBookmarkUrl } from "../open-bookmark-url";
 
@@ -32,11 +32,12 @@ const BookmarkUrl = ({
 	onAction,
 	...props
 }: Props) => {
-	const { icon } = useIcon({
-		id: props.id,
-		defaultIcon: getFileIcon(props.url),
-	});
-	const faviconUrl = getBookmarkFaviconUrl(props.url);
+	const { icon } = useIcon({ id: props.id });
+	const iconSources = [
+		icon,
+		getFileIcon(props.url),
+		...getBookmarkFaviconSources(props.url),
+	];
 
 	const { isOver, setNodeRef } = useDroppable({
 		id: props.id,
@@ -104,7 +105,7 @@ const BookmarkUrl = ({
 						>
 							<BookmarkIcon
 								className="mx-auto transition-transform group-hover/bookmark:scale-[1.02]"
-								src={icon ?? faviconUrl}
+								sources={iconSources}
 								title={props.title}
 							/>
 							<p className="text-center line-clamp-2 text-xs break-all">
@@ -140,7 +141,7 @@ const BookmarkUrl = ({
 								"mx-auto transition-transform group-hover/bookmark:scale-[1.02]",
 								isDragging && "scale-105",
 							)}
-							src={icon ?? faviconUrl}
+							sources={iconSources}
 							title={props.title}
 						/>
 						<p className="text-xs w-full text-left line-clamp-2">

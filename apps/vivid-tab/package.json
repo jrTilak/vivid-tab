@@ -104,6 +104,15 @@
 					"https://wallhaven.cc/*",
 					"https://w.wallhaven.cc/*",
 					"https://th.wallhaven.cc/*"
+				],
+				"permissions": [
+					"bookmarks",
+					"storage",
+					"unlimitedStorage",
+					"search",
+					"topSites",
+					"geolocation",
+					"alarms"
 				]
 			}
 		},
@@ -114,7 +123,8 @@
 			"search",
 			"topSites",
 			"geolocation",
-			"alarms"
+			"alarms",
+			"favicon"
 		],
 		"optional_permissions": [
 			"history"

@@ -1,3 +1,4 @@
+import extensionIconUrl from "raw:/assets/icon.png";
 import { IconArrowRight } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -15,7 +16,7 @@ const WelcomeTab = () => {
 					className="mx-auto size-20"
 					decoding="async"
 					draggable={false}
-					src={chrome.runtime.getURL("assets/icon.png")}
+					src={extensionIconUrl}
 				/>
 				<div className="space-y-2">
 					<h1 className="text-2xl font-semibold">Hi, I&apos;m Vivid!</h1>

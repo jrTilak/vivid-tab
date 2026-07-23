@@ -1,3 +1,4 @@
+import bookmarkFolderIconUrl from "raw:/assets/folder-svgrepo-com.png";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { memo } from "react";
 import {
@@ -71,10 +72,7 @@ const BookmarkFolder = (props: Props) => {
 									isDragging && "scale-105",
 								)}
 							>
-								<img
-									src={chrome.runtime.getURL("assets/folder-svgrepo-com.png")}
-									alt="Folder"
-								/>
+								<img src={bookmarkFolderIconUrl} alt="Folder" />
 								<img
 									src={icon}
 									alt=""
@@ -86,7 +84,7 @@ const BookmarkFolder = (props: Props) => {
 								ref={draggableRef}
 								{...attributes}
 								{...listeners}
-								src={chrome.runtime.getURL("assets/folder-svgrepo-com.png")}
+								src={bookmarkFolderIconUrl}
 								alt=""
 								className={cn(
 									"size-12 mx-auto rounded-md object-contain object-center transition-transform group-hover/bookmark:scale-[1.02]",
@@ -122,7 +120,7 @@ const BookmarkFolder = (props: Props) => {
 								)}
 							>
 								<img
-									src={chrome.runtime.getURL("assets/folder-svgrepo-com.png")}
+									src={bookmarkFolderIconUrl}
 									className="size-12 min-w-12"
 									alt="Folder"
 								/>
@@ -137,7 +135,7 @@ const BookmarkFolder = (props: Props) => {
 								ref={draggableRef}
 								{...attributes}
 								{...listeners}
-								src={chrome.runtime.getURL("assets/folder-svgrepo-com.png")}
+								src={bookmarkFolderIconUrl}
 								alt=""
 								className={cn(
 									"size-12 mx-auto rounded-md object-contain object-center transition-transform group-hover/bookmark:scale-[1.02]",

@@ -3,11 +3,14 @@ import { resolve } from "node:path";
 import { describe, expect, mock, test } from "@test/jest";
 import {
 	EXPECTED_API_PERMISSIONS,
+	EXPECTED_FIREFOX_API_PERMISSIONS,
 	EXPECTED_FIREFOX_DATA_PERMISSIONS,
 	EXPECTED_FIREFOX_HOST_PERMISSIONS,
 	EXPECTED_HOST_PERMISSIONS,
 	EXPECTED_OPTIONAL_PERMISSIONS,
+	findMissingReleaseAssets,
 	inspectReleaseArchive,
+	REQUIRED_RELEASE_ASSETS,
 	validateGeneratedManifest,
 	validateReleaseSource,
 } from "./validate-release";
@@ -26,7 +29,7 @@ type TestManifest = {
 	};
 	host_permissions: string[];
 	overrides?: {
-		firefox: { host_permissions: string[] };
+		firefox: { host_permissions: string[]; permissions: string[] };
 	};
 	optional_permissions: string[];
 	permissions: string[];
@@ -36,10 +39,20 @@ type TestManifest = {
 	}>;
 };
 
-const makeManifest = (): TestManifest => ({
-	host_permissions: [...EXPECTED_HOST_PERMISSIONS] as string[],
+const makeManifest = (
+	target: "chrome" | "firefox" = "chrome",
+): TestManifest => ({
+	host_permissions: [
+		...(target === "firefox"
+			? EXPECTED_FIREFOX_HOST_PERMISSIONS
+			: EXPECTED_HOST_PERMISSIONS),
+	] as string[],
 	optional_permissions: [...EXPECTED_OPTIONAL_PERMISSIONS] as string[],
-	permissions: [...EXPECTED_API_PERMISSIONS] as string[],
+	permissions: [
+		...(target === "firefox"
+			? EXPECTED_FIREFOX_API_PERMISSIONS
+			: EXPECTED_API_PERMISSIONS),
+	] as string[],
 	browser_specific_settings: {
 		gecko: {
 			id: "vividtab@jrtilak.dev",
@@ -56,6 +69,7 @@ const makeSourceManifest = (): TestManifest => ({
 	overrides: {
 		firefox: {
 			host_permissions: [...EXPECTED_FIREFOX_HOST_PERMISSIONS] as string[],
+			permissions: [...EXPECTED_FIREFOX_API_PERMISSIONS] as string[],
 		},
 	},
 });
@@ -75,12 +89,7 @@ const makePackage = () => ({
 });
 
 const makeGeneratedManifest = (target: "chrome" | "firefox" = "chrome") => ({
-	...makeManifest(),
-	host_permissions: [
-		...(target === "firefox"
-			? EXPECTED_FIREFOX_HOST_PERMISSIONS
-			: EXPECTED_HOST_PERMISSIONS),
-	] as string[],
+	...makeManifest(target),
 	description: DESCRIPTION,
 	manifest_version: 3,
 	name: DISPLAY_NAME,
@@ -183,6 +192,26 @@ describe("release source validation", () => {
 			]),
 		);
 	});
+
+	test("requires Firefox to override Chromium's favicon permission", () => {
+		const packageData = makePackage();
+		packageData.manifest.overrides = {
+			firefox: {
+				host_permissions: [...EXPECTED_FIREFOX_HOST_PERMISSIONS],
+				permissions: [...EXPECTED_API_PERMISSIONS],
+			},
+		};
+
+		expect(
+			validateReleaseSource({
+				changelog: `## [${VERSION}]`,
+				packageJson: JSON.stringify(packageData),
+				whatsNew: `What's New in Vivid Tab ${VERSION}`,
+			}),
+		).toContain(
+			"Firefox API permissions must omit Chromium's favicon permission",
+		);
+	});
 });
 
 describe("generated manifest validation", () => {
@@ -260,16 +289,48 @@ describe("generated manifest validation", () => {
 			"firefox manifest must require Firefox 140 or newer",
 		]);
 	});
+
+	test("rejects browser-specific favicon permission drift", () => {
+		const chromeManifest = makeGeneratedManifest("chrome");
+		chromeManifest.permissions = [...EXPECTED_FIREFOX_API_PERMISSIONS];
+		const firefoxManifest = makeGeneratedManifest("firefox");
+		firefoxManifest.permissions = [...EXPECTED_API_PERMISSIONS];
+
+		expect(
+			validateGeneratedManifest({
+				description: DESCRIPTION,
+				displayName: DISPLAY_NAME,
+				manifest: chromeManifest,
+				target: "chrome",
+				version: VERSION,
+			}),
+		).toContain("chrome manifest contains unexpected API permissions");
+		expect(
+			validateGeneratedManifest({
+				description: DESCRIPTION,
+				displayName: DISPLAY_NAME,
+				manifest: firefoxManifest,
+				target: "firefox",
+				version: VERSION,
+			}),
+		).toContain("firefox manifest contains unexpected API permissions");
+	});
 });
 
 describe("release archive inspection", () => {
+	const packagedAssets = REQUIRED_RELEASE_ASSETS.map(
+		([stem, extension]) => `${stem}.12345678.${extension}`,
+	).join("\n");
+
 	test("checks ZIP integrity and reads the top-level manifest", async () => {
 		const manifest = makeGeneratedManifest();
 		const runCommand = mock(
 			async (_command: string, arguments_: readonly string[]) => {
 				switch (arguments_[0]) {
 					case "-Z1":
-						return { stdout: "manifest.json\nnewtab.html\n" };
+						return {
+							stdout: `manifest.json\nnewtab.html\n${packagedAssets}\n`,
+						};
 					case "-p":
 						return { stdout: JSON.stringify(manifest) };
 					default:
@@ -317,7 +378,9 @@ describe("release archive inspection", () => {
 		const runCommand = mock(
 			async (_command: string, arguments_: readonly string[]) => ({
 				stdout:
-					arguments_[0] === "-Z1" ? "nested/manifest.json\nnewtab.html\n" : "",
+					arguments_[0] === "-Z1"
+						? `nested/manifest.json\nnewtab.html\n${packagedAssets}\n`
+						: "",
 			}),
 		);
 
@@ -333,7 +396,10 @@ describe("release archive inspection", () => {
 	test("rejects an invalid manifest inside an otherwise valid ZIP", async () => {
 		const runCommand = mock(
 			async (_command: string, arguments_: readonly string[]) => ({
-				stdout: arguments_[0] === "-Z1" ? "manifest.json\n" : "not json",
+				stdout:
+					arguments_[0] === "-Z1"
+						? `manifest.json\n${packagedAssets}\n`
+						: "not json",
 			}),
 		);
 
@@ -344,5 +410,40 @@ describe("release archive inspection", () => {
 				runCommand,
 			}),
 		).rejects.toThrow("manifest.json is not valid JSON");
+	});
+
+	test("reports every missing production asset", () => {
+		expect(
+			findMissingReleaseAssets([
+				"manifest.json",
+				"nested/scene.12345678.jpg",
+				"youtube.abcdef12.png",
+			]),
+		).toEqual(
+			REQUIRED_RELEASE_ASSETS.map(
+				([stem, extension]) => `${stem}.${extension}`,
+			).filter(
+				(filename) => filename !== "scene.jpg" && filename !== "youtube.png",
+			),
+		);
+	});
+
+	test("rejects an archive whose production assets were not emitted", async () => {
+		const runCommand = mock(
+			async (_command: string, arguments_: readonly string[]) => ({
+				stdout:
+					arguments_[0] === "-Z1"
+						? "manifest.json\nnewtab.html\nscene.12345678.jpg\n"
+						: JSON.stringify(makeGeneratedManifest()),
+			}),
+		);
+
+		await expect(
+			inspectReleaseArchive({
+				archivePath: "/tmp/missing-assets.zip",
+				getFileSize: async () => 10_000,
+				runCommand,
+			}),
+		).rejects.toThrow("is missing packaged assets");
 	});
 });

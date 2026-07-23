@@ -1,3 +1,5 @@
+import happyImageUrl from "raw:/assets/happy.png";
+import sadImageUrl from "raw:/assets/sad.png";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import { checkAndRecordReviewPrompt } from "@/lib/review-prompt";
@@ -110,7 +112,7 @@ const AskForReview = ({ open, onOpenChange }: AskForReviewProps) => {
 								onClick={handleNotReally}
 							>
 								<img
-									src={chrome.runtime.getURL("assets/sad.png")}
+									src={sadImageUrl}
 									className="h-[100px] w-[100px]"
 									alt="Sad emoji"
 								/>
@@ -125,7 +127,7 @@ const AskForReview = ({ open, onOpenChange }: AskForReviewProps) => {
 								onClick={handleLikeIt}
 							>
 								<img
-									src={chrome.runtime.getURL("assets/happy.png")}
+									src={happyImageUrl}
 									className="h-[100px] w-[100px]"
 									alt="Happy emoji"
 								/>

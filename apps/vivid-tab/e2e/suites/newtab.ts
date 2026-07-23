@@ -425,7 +425,15 @@ export const runNewtabSuite = (browserName: BrowserName) => {
 			await dialog
 				.$("input[placeholder='Search the web…']")
 				.setValue(`!yt ${query}`);
-			await expect(dialog.$("img[src$='/assets/youtube.png']")).toBeDisplayed();
+			const bangIcon = dialog.$("[title='Search with YouTube'] img");
+			await expect(bangIcon).toBeDisplayed();
+			await browser.waitUntil(
+				async () => Number(await bangIcon.getProperty("naturalWidth")) > 0,
+				{
+					timeout: 5_000,
+					timeoutMsg: "The packaged YouTube bang icon did not load",
+				},
+			);
 			await dialog.$("button[aria-label='Search']").click();
 
 			const youtubeSearch = await waitForNewWindowUrl(
