@@ -4,7 +4,7 @@
  * Source: Kagi Bangs (MIT, Copyright (c) 2024 Kagi Search)
  * Repository: https://github.com/kagisearch/bangs
  * Data: https://raw.githubusercontent.com/kagisearch/bangs/main/data/bangs.json
- * Source SHA-256: 9831c39b724021875192137674b2d95d0c392eb29204d0f982f67a0559647e82
+ * Source SHA-256: daf74e2efa05d4556a3245999e5c67fe24c4c9607de18883a31f13463361631a
  */
 // biome-ignore format: Keep generated source deterministic.
 export const BANGS = [
