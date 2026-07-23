@@ -1,0 +1,13 @@
+{
+	"extends": "plasmo/templates/tsconfig.base",
+	"exclude": ["e2e", "node_modules"],
+	"include": [".plasmo/index.d.ts", "./**/*.ts", "./**/*.tsx", "knip.js"],
+	"compilerOptions": {
+		"moduleResolution": "bundler",
+		"types": ["bun", "chrome", "node"],
+		"paths": {
+			"@/*": ["./src/*"],
+			"@test/jest": ["./test/jest.ts"]
+		}
+	}
+}

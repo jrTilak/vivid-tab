@@ -1,0 +1,13 @@
+{
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"incremental": false,
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"noEmit": true,
+		"target": "ES2022",
+		"types": ["bun", "node", "chrome", "mocha", "@wdio/globals/types"]
+	},
+	"exclude": ["../node_modules"],
+	"include": ["./**/*.ts"]
+}

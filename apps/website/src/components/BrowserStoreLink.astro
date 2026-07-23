@@ -1,0 +1,47 @@
+---
+import { SITE } from "../data/site";
+
+interface Props {
+	class?: string;
+	label?: string;
+	mode?: "download" | "rate";
+	showIcon?: boolean;
+}
+
+const {
+	class: className = "button button-secondary",
+	label,
+	mode = "download",
+	showIcon = true,
+} = Astro.props;
+const isRating = mode === "rate";
+const chromeLabel = label ?? (isRating ? "Rate Vivid Tab" : "Download for Chrome");
+const firefoxLabel = label ?? (isRating ? "Rate Vivid Tab" : "Download for Firefox");
+---
+
+<a
+	class={className}
+	data-browser-link
+	data-chrome-label={chromeLabel}
+	data-chrome-url={isRating ? SITE.chromeReviewUrl : SITE.chromeStoreUrl}
+	data-firefox-label={firefoxLabel}
+	data-firefox-url={isRating ? SITE.firefoxReviewUrl : SITE.firefoxStoreUrl}
+	href={isRating ? SITE.chromeReviewUrl : SITE.chromeStoreUrl}
+	rel="noreferrer"
+	target="_blank"
+>
+	{showIcon && (
+		<img
+			alt=""
+			aria-hidden="true"
+			class="size-6"
+			data-browser-icon
+			data-chrome-icon="/chrome.svg"
+			data-firefox-icon="/firefox.svg"
+			height="22"
+			src="/chrome.svg"
+			width="22"
+		/>
+	)}
+	<span data-browser-label>{chromeLabel}</span>
+</a>

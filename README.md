@@ -1,32 +1,34 @@
 # Vivid Tab - A New Tab, A New Vibe
 
-Vivid Tab is an open-source Chrome extension that transforms your new tab into a fully customizable, productivity-enhancing dashboard. Whether you need quick access to bookmarks, smart search, or real-time weather updates, Vivid Tab ensures a vibrant and seamless browsing experience.
+Vivid Tab is an open-source Chrome and Firefox extension that transforms your new tab into a customizable productivity dashboard. It keeps bookmarks, bang search, notes, to-dos, weather, quotes, and wallpapers close at hand.
 
-🔗 [Get it on Chrome Web Store](https://chrome.google.com/webstore/detail/vivid-tab/hchlkclbagoklpnijoadpghhcjpeoeim)
+🔗 [Get it on Chrome Web Store](https://chromewebstore.google.com/detail/vivid-tab/hchlkclbagoklpnijoadpghhcjpeoeim)
+
+🔗 [Get it for Firefox](https://addons.mozilla.org/en-US/firefox/addon/vivid-tab/)
 
 ---
 
 ## 🚀 Highlights
 
 - 🔖 **Unlimited Bookmarks** - Display unlimited bookmarks as shortcuts for quick access to your favorite sites.
-- 🔎 **Smart Search** - Instantly search with AI, search engines, or YouTube directly from your new tab.
+- 🔎 **Bang Search** - Use shortcuts such as `!yt`, `!g`, or `!gh` to search supported services directly.
 - 🎨 **Fully Customizable** - Drag and drop components, change backgrounds, and personalize your layout.
 - ✅ **To-Dos & Notes** - Stay organized with built-in task lists and quick notes.
 - ☁️ **Weather & Location-based Insights** - Get real-time weather updates and relevant local information.
 - 🌍 **Forever Free & Open Source** - Vivid Tab is completely free and welcomes community contributions.
-- ☁️ Random Wallpaper Support using wallhaven API
+- ☁️ Random wallpaper support using the Wallhaven API
 
 ---
 
 ## 📌 Preview
 
-![Screenshot 1](https://github.com/jrTilak/vivid-tab-website/raw/master/public/preview.png)
+![Vivid Tab preview](https://vividtab.jrtilak.dev/preview.png)
 
 ---
 
 ## 🛠 Built With
 
-Vivid Tab is developed using **Plasmo**, a powerful framework for building Chrome extensions effortlessly.
+The extension is built with **Plasmo**, and the product website is built with **Astro**.
 
 🔗 [Plasmo Documentation](https://docs.plasmo.com/)
 
@@ -36,7 +38,7 @@ Vivid Tab is developed using **Plasmo**, a powerful framework for building Chrom
 
 ### Install from Chrome Web Store
 
-🔗 [Vivid Tab on Chrome Web Store](https://chrome.google.com/webstore/detail/vivid-tab/hchlkclbagoklpnijoadpghhcjpeoeim)
+🔗 [Vivid Tab on Chrome Web Store](https://chromewebstore.google.com/detail/vivid-tab/hchlkclbagoklpnijoadpghhcjpeoeim)
 
 ### Manual Installation
 
@@ -46,19 +48,23 @@ Vivid Tab is developed using **Plasmo**, a powerful framework for building Chrom
    ```
 2. Install dependencies:
    ```sh
-   pnpm install
+   bun install
    ```
 3. Start development mode:
    ```sh
-   pnpm dev
+   bun run --cwd apps/vivid-tab dev
    ```
    or build the project:
    ```sh
-   pnpm build
+   bun run --cwd apps/vivid-tab build
    ```
 4. Navigate to `chrome://extensions/` in your browser.
 5. Enable **Developer Mode** (toggle in the top right corner).
-6. Click **Load Unpacked** and select the `build` folder.
+6. Click **Load Unpacked** and select `apps/vivid-tab/build/chrome-mv3-prod`.
+
+## 🔒 Privacy and Terms
+
+Vivid Tab does not run analytics, profile users, sell personal data, or retain data on a Vivid Tab server. Features such as weather, online wallpapers, searches, and optional Chromium suggestions contact their respective providers only when needed. Read the [Privacy Policy](./PRIVACY.md) and [Terms of Service](./TERMS.md) for details.
 
 ---
 
@@ -84,17 +90,14 @@ Vivid Tab is built with the help of these amazing resources:
 
 - 🎨 **[SVG Repo](https://www.svgrepo.com/)** - For the beautiful SVG icons used throughout the extension.
 - 😊 **[Brixmoji](https://brixmoji.com/)** - For the awesome emojis that bring personality to the interface.
-- 🖼️ **[Pixabay](https://pixabay.com/)** & **[Wallhaven](https://wallhaven.cc/)** - For providing wallpaper APIs that enhance the visual experience.
+- 🖼️ **[Wallhaven](https://wallhaven.cc/)** - For providing the wallpaper API that enhances the visual experience.
 - 🚀 **[Plasmo](https://www.plasmo.com/)** - For the awesome framework that makes building Chrome extensions a breeze.
 
 ---
 
 ## 📜 License
 
-This project is open-source and available under a Modified MIT License (see LICENSE for details).
-
-> **Attribution Requirement:**  
-> Any copies, distributions, or substantial portions of this software or derivative works must include clear and explicit credit to the original author: **jrTilak** (e.g., "Original author: jrTilak" in documentation, about sections, or credits).
+This project is open source and available under the [MIT License](./LICENSE).
 
 ---
 

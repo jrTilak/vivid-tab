@@ -1,0 +1,36 @@
+---
+import { SITE } from "../data/site";
+
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-20 border-t border-border bg-background sm:mt-24">
+	<div class="site-container flex flex-col items-center justify-center gap-2 px-6 py-6 lg:px-8">
+		<nav aria-label="Legal" class="text-center">
+			<a
+				class="mx-2 text-sm leading-6 text-muted-foreground transition-colors hover:text-foreground"
+				href="/privacy"
+			>
+				Privacy Policy
+			</a>
+			<a
+				class="mx-2 text-sm leading-6 text-muted-foreground transition-colors hover:text-foreground"
+				href="/terms"
+			>
+				Terms of Service
+			</a>
+		</nav>
+
+		<p class="text-center text-xs leading-5 text-muted-foreground">
+			&copy; {year}
+			<a
+				class="text-destructive underline"
+				href={SITE.portfolioUrl}
+				rel="noreferrer"
+				target="_blank"
+			>
+				@jrTilak
+			</a>
+		</p>
+	</div>
+</footer>

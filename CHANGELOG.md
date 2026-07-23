@@ -1,12 +1,37 @@
 # Changelog
 
+## [1.4.0] - 2026-07-21
+
+### Added
+
+- Added bang shortcuts such as `!yt`, `!g`, and `!gh` to search directly on supported services.
+- Added bundled quotes with selectable categories, so the quote widget no longer depends on a live quote API.
+- Added Catppuccin Mocha and Tokyo Night themes, configurable corner radius, and opaque or translucent surfaces.
+- Added uploaded, bookmarked, cached, and preloaded wallpaper management.
+- Added automatic migration for unversioned 1.3 settings during the 1.4 update.
+- Added extensive unit and Chromium/Firefox end-to-end coverage.
+
+### Changed
+
+- Reorganized the extension into focused Welcome, New Tab, and Settings features.
+- Updated settings, widgets, dialogs, bookmarks, wallpaper controls, fonts, and icons for a more consistent interface.
+- Refined wallpaper ordering and refresh behavior while preserving uploaded and bookmarked images.
+- Narrowed remote access to the search-suggestion, weather, and wallpaper providers used by the extension.
+- Disabled remote search suggestions in Firefox to comply with Mozilla's search-transmission policy.
+
+### Fixed
+
+- Fixed inconsistent translucent and radius styling across controls and dialogs.
+- Fixed bookmark navigation, editing, fallback icons, and empty-root-folder behavior.
+- Fixed several wallpaper loading, caching, selection, and refresh edge cases.
+- Fixed development setup and cross-browser extension packaging issues.
 
 ## [1.3.0] - 2026-05-26
 
 - Wallpaper switching improvements.
 - Minor bug fixes, performance improvements, refactor.
 
-## [1.2.0] - ........
+## [1.2.0]
 
 - Added **Firefox support** with major cross-browser fixes
 - Support automatic wallpaper from wallhaven.

@@ -1,0 +1,16 @@
+---
+interface Props {
+	formId: string;
+}
+
+const { formId } = Astro.props;
+---
+
+<div
+	data-fillout-dynamic-resize
+	data-fillout-embed-type="standard"
+	data-fillout-id={formId}
+	data-fillout-inherit-parameters
+	style="height: 500px; width: 100%;"
+></div>
+<script is:inline src="https://server.fillout.com/embed/v1/"></script>

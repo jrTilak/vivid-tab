@@ -1,0 +1,14 @@
+---
+import { Content as WhatsNewContent } from "../../../../WHATS_NEW.md";
+import BrowserStoreLink from "./BrowserStoreLink.astro";
+---
+
+<article class="document">
+	<WhatsNewContent />
+	<div class="mt-10 flex flex-wrap gap-3" aria-label="Release actions">
+		<a class="button button-outline" href="/feedback">Give feedback</a>
+		<BrowserStoreLink class="button button-primary" mode="rate" showIcon={false} />
+		<a class="button button-outline" href="/changelog">See all changelogs</a>
+	</div>
+	<div class="mt-12 border-t border-gray-700"></div>
+</article>

@@ -1,0 +1,70 @@
+---
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import { SITE } from "../data/site";
+import "../styles/global.css";
+
+interface Props {
+	description?: string;
+	title?: string;
+}
+
+const {
+	description = "Customize your new tab with bookmarks, weather, to-dos, and more for a vibrant, productive browsing experience.",
+	title = "Vivid Tab: A new tab, a new vibe.",
+} = Astro.props;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? SITE.url);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta content="width=device-width, initial-scale=1" name="viewport" />
+		<meta content={description} name="description" />
+		<meta content="jrTilak" name="author" />
+		<meta content="new tab, productivity, bookmarks, weather, to-dos, chrome extension, vivid tab, jrtilak" name="keywords" />
+		<meta content={description} property="og:description" />
+		<meta content={`${SITE.url}/preview.png`} property="og:image" />
+		<meta content="Vivid Tab Preview" property="og:image:alt" />
+		<meta content="1200" property="og:image:width" />
+		<meta content="630" property="og:image:height" />
+		<meta content="en_US" property="og:locale" />
+		<meta content="Vivid Tab" property="og:site_name" />
+		<meta content={title} property="og:title" />
+		<meta content="website" property="og:type" />
+		<meta content={canonicalUrl} property="og:url" />
+		<meta content="summary_large_image" name="twitter:card" />
+		<link href={canonicalUrl} rel="canonical" />
+		<link href={SITE.portfolioUrl} rel="author" />
+		<link href="/icon.png" rel="icon" type="image/png" />
+		<title>{title}</title>
+	</head>
+	<body>
+		<Header currentPath={Astro.url.pathname} />
+		<slot />
+		<Footer />
+
+		<script>
+			const isFirefox = navigator.userAgent.toLowerCase().includes("firefox");
+
+			for (const link of document.querySelectorAll("[data-browser-link]")) {
+				if (!(link instanceof HTMLAnchorElement)) continue;
+				const url = isFirefox ? link.dataset.firefoxUrl : link.dataset.chromeUrl;
+				const label = isFirefox ? link.dataset.firefoxLabel : link.dataset.chromeLabel;
+				if (url) link.href = url;
+				const labelElement = link.querySelector("[data-browser-label]");
+				if (label && labelElement) labelElement.textContent = label;
+				const icon = link.querySelector("[data-browser-icon]");
+				if (icon instanceof HTMLImageElement) {
+					icon.src = isFirefox ? "/firefox.svg" : "/chrome.svg";
+				}
+			}
+
+			for (const element of document.querySelectorAll("[data-browser-only]")) {
+				if (!(element instanceof HTMLElement)) continue;
+				element.hidden = element.dataset.browserOnly !== (isFirefox ? "firefox" : "chrome");
+			}
+		</script>
+	</body>
+</html>

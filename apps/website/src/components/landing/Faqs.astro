@@ -1,0 +1,30 @@
+---
+import { Icon } from "astro-icon/components";
+import { FAQS } from "../../data/site";
+---
+
+<section class="site-container flex flex-col gap-16 px-8" id="faqs">
+	<div class="flex flex-col items-center justify-center">
+		<h2 class="w-full max-w-md text-center text-3xl font-bold text-foreground md:text-4xl lg:text-5xl">
+			FAQs
+		</h2>
+	</div>
+
+	<div class="mx-auto w-full max-w-4xl divide-y divide-border border-y border-border">
+		{
+			FAQS.map((faq) => (
+				<details class="group" name="vivid-tab-faq">
+					<summary class="flex cursor-pointer list-none items-center justify-between gap-6 py-5 font-medium text-foreground marker:content-none">
+						<span>{faq.question}</span>
+						<Icon
+							aria-hidden="true"
+							class="size-5 shrink-0 transition-transform group-open:rotate-180"
+							name="tabler:chevron-down"
+						/>
+					</summary>
+					<p class="max-w-3xl pb-5 text-sm leading-7 text-muted-foreground">{faq.answer}</p>
+				</details>
+			))
+		}
+	</div>
+</section>

@@ -1,0 +1,102 @@
+---
+import { Icon } from "astro-icon/components";
+import { SITE } from "../../data/site";
+---
+
+<section class="relative isolate overflow-hidden bg-background">
+	<svg
+		aria-hidden="true"
+		class="pointer-events-none absolute inset-0 -z-10 size-full stroke-border [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]"
+	>
+		<defs>
+			<pattern
+				height="200"
+				id="hero-grid"
+				patternUnits="userSpaceOnUse"
+				width="200"
+				x="50%"
+				y="-1"
+			>
+				<path d="M.5 200V.5H200" fill="none"></path>
+			</pattern>
+		</defs>
+		<rect fill="url(#hero-grid)" height="100%" stroke-width="0" width="100%"></rect>
+	</svg>
+
+	<div class="site-container px-6 pt-10 lg:flex lg:px-8 lg:pt-40">
+		<div class="max-w-2xl lg:mx-0 lg:max-w-xl lg:shrink-0 lg:pt-8">
+			<a
+				class="mt-12 inline-flex rounded-md border border-border bg-background px-3 py-1 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted sm:mt-24 lg:mt-16"
+				href="/whats-new"
+			>
+				🚀 New Release v1.4.0
+			</a>
+
+			<h1 class="mt-10 text-4xl font-bold tracking-tight text-foreground sm:text-6xl">
+				Vivid Tab: A new tab,<br />a <span class="text-destructive">new</span> vibe.
+			</h1>
+			<p class="mt-6 text-lg leading-8 text-muted-foreground">
+				Customize your new tab with bookmarks, bang search, weather, to-dos, notes, and
+				more for a vibrant, productive browsing experience.
+			</p>
+			<div class="mt-10 flex flex-wrap items-center gap-4 sm:gap-6">
+				<a class="button button-primary button-lg" href="/download">
+					Get it now!
+					<Icon class="size-5" name="tabler:arrow-right" />
+				</a>
+				<a
+					class="button button-outline button-lg"
+					href={SITE.githubUrl}
+					rel="noreferrer"
+					target="_blank"
+				>
+					GitHub
+					<Icon class="size-5" name="tabler:brand-github" />
+				</a>
+			</div>
+		</div>
+
+		<div
+			class="mt-16 flex sm:mt-24 lg:ml-10 lg:mr-0 lg:mt-0 lg:max-w-none lg:flex-none xl:ml-32"
+		>
+			<div class="animated-border-trail hero-preview h-full">
+			<a aria-label="Watch the Vivid Tab demo on YouTube" class="animated-border-content group block cursor-pointer" href={SITE.demoUrl} rel="noreferrer" target="_blank">
+				<img
+					alt="Vivid Tab dashboard"
+					class="h-full w-full max-w-full rounded-md object-cover object-center transition duration-200 ease-out group-hover:brightness-[0.8]"
+					decoding="sync"
+					fetchpriority="high"
+					height="1080"
+					src="/preview.png"
+					width="1920"
+				/>
+				<span
+					class="absolute inset-0 flex scale-[0.9] items-center justify-center rounded-2xl transition-transform duration-200 ease-out group-hover:scale-100"
+				>
+					<span
+						class="flex size-28 items-center justify-center rounded-full bg-primary/10 backdrop-blur-md"
+					>
+						<span
+							class="flex size-20 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md transition-transform duration-200 ease-out group-hover:scale-110"
+						>
+							<Icon class="ml-1 size-8 fill-current" name="tabler:player-play-filled" />
+						</span>
+					</span>
+				</span>
+			</a>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.hero-preview {
+		width: min(56rem, 100%);
+	}
+
+	@media (min-width: 1024px) {
+		.hero-preview {
+			width: 64rem;
+		}
+	}
+</style>

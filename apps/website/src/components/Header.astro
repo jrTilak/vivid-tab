@@ -1,0 +1,153 @@
+---
+import { Icon } from "astro-icon/components";
+import { SITE } from "../data/site";
+import BrowserStoreLink from "./BrowserStoreLink.astro";
+
+interface Props {
+	currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+const navigation = [
+	{ external: false, href: "/", label: "Home" },
+	{ external: false, href: "/privacy", label: "Privacy Policy" },
+	{ external: false, href: "/terms", label: "Terms of Service" },
+	{ external: true, href: SITE.contactUrl, label: "Contact Us" },
+] as const;
+
+const isActive = (href: string) =>
+	href === "/" ? currentPath === href : currentPath.startsWith(href);
+---
+
+<header class="sticky top-0 z-50 w-full border-b border-slate-200 bg-white" id="header">
+	<div class="site-container flex h-14 items-center">
+		<a class="mr-8 flex shrink-0 items-center gap-2" href="/">
+			<img alt="Vivid Tab" class="size-[30px]" height="30" src="/icon.png" width="30" />
+			<span class="text-xl font-bold text-slate-950">Vivid Tab</span>
+		</a>
+
+		<nav aria-label="Primary navigation" class="hidden flex-1 md:block">
+			<ul class="flex items-center justify-center gap-8">
+				{
+					navigation.map((item) => (
+						<li>
+							<a
+								aria-current={!item.external && isActive(item.href) ? "page" : undefined}
+								class:list={[
+									"text-sm font-medium transition-colors hover:text-primary",
+									!item.external && isActive(item.href)
+										? "text-primary"
+										: "text-muted-foreground",
+								]}
+								href={item.href}
+								rel={item.external ? "noreferrer" : undefined}
+								target={item.external ? "_blank" : undefined}
+							>
+								{item.label}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</nav>
+
+		<div class="ml-auto hidden md:flex">
+			<BrowserStoreLink
+				class="button button-secondary"
+				label="Download Now"
+			/>
+		</div>
+
+		<button
+			aria-controls="mobile-navigation"
+			aria-expanded="false"
+			aria-label="Open navigation menu"
+			class="button button-ghost button-icon ml-auto md:hidden"
+			data-toggle-menu
+			type="button"
+		>
+			<Icon aria-hidden="true" class="size-7" name="tabler:menu-2" />
+		</button>
+		<button aria-label="Close navigation menu" class="fixed inset-0 z-40 hidden bg-black/80 md:hidden" data-menu-overlay type="button"></button>
+
+		<nav
+			aria-label="Mobile navigation"
+			class="fixed inset-y-0 right-0 z-50 hidden h-dvh w-3/4 max-w-sm flex-col border-l border-border bg-background p-6 shadow-lg md:hidden"
+			id="mobile-navigation"
+		>
+			<h2 class="text-lg font-semibold">Vivid Tab</h2>
+			<button aria-label="Close navigation menu" class="button button-ghost button-icon absolute top-4 right-4" data-menu-close type="button">
+				<Icon aria-hidden="true" class="size-4" name="tabler:x" />
+			</button>
+			<ul class="flex flex-col py-6">
+				{
+					navigation.map((item) => (
+						<li>
+							<a
+								aria-current={!item.external && isActive(item.href) ? "page" : undefined}
+								class:list={[
+									"flex w-full items-center py-2 text-lg font-medium transition-colors hover:text-primary",
+									!item.external && isActive(item.href)
+										? "text-primary"
+										: "text-muted-foreground",
+								]}
+								href={item.href}
+								rel={item.external ? "noreferrer" : undefined}
+								target={item.external ? "_blank" : undefined}
+							>
+								{item.label}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+
+			<div class="mt-auto">
+				<BrowserStoreLink
+					class="button button-secondary w-full"
+					label="Download Now"
+				/>
+			</div>
+		</nav>
+	</div>
+</header>
+
+<style is:global>
+	@media (max-width: 767px) {
+		#header.expanded #mobile-navigation {
+			position: fixed;
+			inset: 0 0 0 auto;
+			z-index: 50;
+			display: flex;
+			width: 75%;
+			max-width: 24rem;
+			padding: 1.5rem;
+			box-shadow: -1rem 0 3rem rgb(15 23 42 / 15%);
+		}
+
+		#header.expanded [data-menu-overlay] {
+			display: block;
+		}
+	}
+</style>
+
+<script>
+	const header = document.querySelector("#header");
+	const trigger = header?.querySelector<HTMLElement>("[data-toggle-menu]");
+	const closeButton = header?.querySelector<HTMLElement>("[data-menu-close]");
+	const overlay = header?.querySelector<HTMLElement>("[data-menu-overlay]");
+	const mobileNavigation = header?.querySelector("#mobile-navigation");
+
+	const setOpen = (open: boolean) => {
+		header?.classList.toggle("expanded", open);
+		trigger?.setAttribute("aria-expanded", String(open));
+		document.body.classList.toggle("overflow-hidden", open);
+	};
+
+	trigger?.addEventListener("click", () => setOpen(trigger.getAttribute("aria-expanded") !== "true"));
+	closeButton?.addEventListener("click", () => setOpen(false));
+	overlay?.addEventListener("click", () => setOpen(false));
+	mobileNavigation?.addEventListener("click", (event) => {
+		if ((event.target as Element).closest("a")) setOpen(false);
+	});
+</script>
